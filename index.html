@@ -1,0 +1,1142 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arnos</title>
+  <style>
+    /* CLASSIC CLEAN GOOGLE-LIKE / CLASSIC HTML STYLING */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #ffffff;
+      color: #222222;
+      line-height: 1.5;
+    }
+
+    /* Classic Google Style Button */
+    button, input[type="submit"] {
+      background-color: #f8f9fa;
+      border: 1px solid #f8f9fa;
+      border-radius: 4px;
+      color: #3c4043;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      padding: 8px 16px;
+      cursor: pointer;
+      display: inline-block;
+      text-align: center;
+    }
+    button:hover, input[type="submit"]:hover {
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+      background-color: #f1f3f4;
+      border-color: #dadce0;
+      color: #202124;
+    }
+    button:active {
+      background-color: #e8eaed;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Primary Accent Button Style */
+    button.btn-primary {
+      background-color: #1a73e8;
+      border: 1px solid #1a73e8;
+      color: #ffffff;
+      font-weight: bold;
+    }
+    button.btn-primary:hover {
+      background-color: #1557b0;
+      border-color: #1557b0;
+      color: #ffffff;
+    }
+
+    /* Form Inputs - Strict Standard Text Direction */
+    input[type="text"], input[type="password"], input[type="date"], textarea {
+      width: 100%;
+      padding: 8px 12px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      background-color: #ffffff;
+      color: #222222;
+      direction: ltr !important;
+      text-align: left !important;
+      unicode-bidi: embed !important;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus, input[type="password"]:focus, input[type="date"]:focus, textarea:focus {
+      outline: none;
+      border-color: #1a73e8;
+    }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #ffffff;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1a73e8;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .search-bar-container {
+      flex: 1;
+      max-width: 500px;
+      margin: 0 20px;
+    }
+    .search-bar-container input {
+      margin: 0;
+    }
+
+    /* Navigation */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-user {
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      color: #1a73e8;
+      text-decoration: underline;
+    }
+
+    /* Layout Containers */
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    /* Authentication Box */
+    .auth-box {
+      max-width: 380px;
+      margin: 60px auto;
+      padding: 24px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+    }
+    .auth-box h2 {
+      margin-bottom: 16px;
+      font-size: 22px;
+      text-align: center;
+    }
+    .auth-box label {
+      font-size: 13px;
+      font-weight: bold;
+      color: #5f6368;
+    }
+    .error-msg {
+      color: #d93025;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    /* Post Box & Feed */
+    .create-post-card {
+      border: 1px solid #dadce0;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .post-card {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      background-color: #ffffff;
+    }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .author-name {
+      font-weight: bold;
+      color: #1a73e8;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .author-name:hover {
+      text-decoration: underline;
+    }
+    .post-date {
+      font-size: 12px;
+      color: #70757a;
+    }
+    .post-content {
+      font-size: 15px;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+    }
+    .post-footer {
+      border-top: 1px solid #f1f3f4;
+      padding-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Verification Badge */
+    .bot-badge {
+      background-color: #e8f0fe;
+      color: #1a73e8;
+      border: 1px solid #aecbfa;
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* Search Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #dadce0;
+      margin-bottom: 16px;
+    }
+    .tab-btn {
+      border: none;
+      background: none;
+      border-radius: 0;
+      padding: 10px 20px;
+      border-bottom: 3px solid transparent;
+      color: #5f6368;
+      font-weight: bold;
+    }
+    .tab-btn.active {
+      border-bottom-color: #1a73e8;
+      color: #1a73e8;
+      background: none;
+      box-shadow: none;
+    }
+
+    /* Profile Header */
+    .profile-header {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .profile-stats {
+      display: flex;
+      gap: 24px;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #5f6368;
+    }
+    .profile-stats-clickable {
+      cursor: pointer;
+      color: #1a73e8;
+      text-decoration: underline;
+    }
+    .profile-stats-clickable:hover {
+      color: #1557b0;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-card {
+      background-color: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #dadce0;
+      width: 90%;
+      max-width: 450px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      padding: 16px;
+      border-bottom: 1px solid #dadce0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      margin: 0;
+    }
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .user-list-item {
+      border: 1px solid #dadce0;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 20px;
+      color: #70757a;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER NAVBAR -->
+  <header id="app-header" class="hidden">
+    <div class="logo" onclick="navigateTo('feed')">Arnos</div>
+    
+    <div class="search-bar-container">
+      <input type="text" id="search-input" placeholder="Search profile or post..." autocomplete="off" spellcheck="false" dir="ltr">
+    </div>
+
+    <nav>
+      <button onclick="navigateTo('feed')">Home</button>
+      <span id="nav-user-link" class="nav-user" onclick="viewProfile(currentUserData ? currentUserData.username : '')"></span>
+      <button onclick="logout()">Log out</button>
+    </nav>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <div class="container">
+
+    <!-- INITIAL LOADING VIEW -->
+    <div id="view-loading" class="loading-spinner">
+      Loading Arnos...
+    </div>
+
+    <!-- AUTHENTICATION VIEW -->
+    <div id="view-auth" class="auth-box hidden">
+      <h2 id="auth-title">Arnos Sign Up</h2>
+      <div id="auth-error" class="error-msg hidden"></div>
+
+      <!-- Sign Up Form -->
+      <form id="form-signup" onsubmit="handleSignup(event)">
+        <label>Username</label>
+        <input type="text" id="signup-username" required placeholder="Enter name">
+
+        <label>Password</label>
+        <input type="password" id="signup-password" required placeholder="Enter password (min 6 characters)">
+
+        <label>Date of Birth</label>
+        <input type="date" id="signup-dob" required>
+
+        <button type="submit" id="btn-signup" class="btn-primary" style="width: 100%; margin-top: 8px;">Create</button>
+        <p style="text-align: center; font-size: 13px; margin-top: 16px;">
+          Already have an account? <a href="#" onclick="toggleAuth('login')" style="color: #1a73e8;">Sign in</a>
+        </p>
+      </form>
+
+      <!-- Sign In Form -->
+      <form id="form-login" onsubmit="handleLogin(event)" class="hidden">
+        <label>Username</label>
+        <input type="text" id="login-username" required placeholder="Enter name">
+
+        <label>Password</label>
+        <input type="password" id="login-password" required placeholder="Enter password">
+
+        <button type="submit" id="btn-login" class="btn-primary" style="width: 100%; margin-top: 8px;">Sign In</button>
+        <p style="text-align: center; font-size: 13px; margin-top: 16px;">
+          Don't have an account? <a href="#" onclick="toggleAuth('signup')" style="color: #1a73e8;">Create one</a>
+        </p>
+      </form>
+    </div>
+
+    <!-- HOME FEED VIEW -->
+    <div id="view-feed" class="hidden">
+      <!-- Create Post Box -->
+      <div class="create-post-card">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">Create a post</h3>
+        <textarea id="post-input" rows="3" placeholder="What is on your mind?"></textarea>
+        <button id="btn-publish-post" onclick="submitPost()" class="btn-primary">Publish</button>
+      </div>
+
+      <!-- Feed Posts Container -->
+      <div id="feed-list"></div>
+    </div>
+
+    <!-- SEARCH VIEW -->
+    <div id="view-search" class="hidden">
+      <h3 style="margin-bottom: 12px;">Search Results for "<span id="search-query-text"></span>"</h3>
+      <div class="tabs">
+        <button id="tab-btn-profiles" class="tab-btn active" onclick="switchSearchTab('profiles')">
+          Profiles (<span id="count-profiles">0</span>)
+        </button>
+        <button id="tab-btn-posts" class="tab-btn" onclick="switchSearchTab('posts')">
+          Posts (<span id="count-posts">0</span>)
+        </button>
+      </div>
+
+      <div id="search-results-profiles"></div>
+      <div id="search-results-posts" class="hidden"></div>
+    </div>
+
+    <!-- PROFILE VIEW -->
+    <div id="view-profile" class="hidden">
+      <div class="profile-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <h2 id="profile-name-display" style="display: inline-block;"></h2>
+            <span id="profile-bot-tag" class="bot-badge hidden" style="margin-left: 6px;">[BOT]</span>
+            <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
+          </div>
+          <div id="profile-action-btn-area"></div>
+        </div>
+
+        <div class="profile-stats">
+          <span><strong id="stat-posts">0</strong> Posts</span>
+          <span class="profile-stats-clickable" onclick="openUserListModal('followers')"><strong id="stat-followers">0</strong> Followers</span>
+          <span class="profile-stats-clickable" onclick="openUserListModal('following')"><strong id="stat-following">0</strong> Following</span>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom: 12px;">User Posts</h3>
+      <div id="profile-posts-list"></div>
+    </div>
+
+  </div>
+
+  <!-- USER LIST MODAL -->
+  <div id="modal-user-list" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-user-list-title">Followers</h3>
+        <button onclick="closeUserListModal()" style="font-size: 12px; padding: 4px 8px;">✕ Close</button>
+      </div>
+      <div id="modal-user-list-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- FIREBASE MODULES -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithCustomToken, 
+      signInAnonymously, 
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc, 
+      collection, 
+      onSnapshot, 
+      addDoc 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Application ID and Configuration
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'arnos-app';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "AIzaSyCxFcZGxHBILooE1U_UsySdzPU_lCyt2Bw",
+          authDomain: "sitefjrebase.firebaseapp.com",
+          projectId: "sitefjrebase",
+          storageBucket: "sitefjrebase.firebasestorage.app",
+          messagingSenderId: "667261334607",
+          appId: "1:667261334607:web:dec574c7521bb0f885a63a"
+        };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Global State
+    let authUser = null;
+    let currentUserData = null;
+    let usersMap = {};
+    let postsList = [];
+    let activeSearchTab = 'profiles';
+    let currentProfileUsername = null;
+
+    // Helper Paths
+    const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
+    const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
+    const publicPostsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'posts');
+    const publicPostDoc = (postId) => doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId);
+
+    window.currentUserData = currentUserData;
+
+    // Initialize Firebase Auth
+    async function initAuth() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (err) {
+        console.error("Auth init error:", err);
+        try { await signInAnonymously(auth); } catch (e) { console.error(e); }
+      }
+    }
+
+    // Monitor Firebase Authentication State
+    onAuthStateChanged(auth, async (user) => {
+      authUser = user;
+      document.getElementById('view-loading').classList.add('hidden');
+
+      if (!user) {
+        showAuthInterface();
+        return;
+      }
+
+      // Check for saved local session
+      const savedUsername = localStorage.getItem('arnos_logged_username');
+      if (savedUsername) {
+        try {
+          const userSnap = await getDoc(publicUserDoc(savedUsername));
+          if (userSnap.exists()) {
+            currentUserData = userSnap.data();
+            window.currentUserData = currentUserData;
+            showMainInterface();
+            return;
+          }
+        } catch (e) {
+          console.error("Error fetching stored profile:", e);
+        }
+      }
+
+      showAuthInterface();
+    });
+
+    // Setup Realtime Firestore Listeners
+    function setupListeners() {
+      if (!authUser) return;
+
+      // Listen for Users
+      onSnapshot(publicUsersColl(), (snapshot) => {
+        usersMap = {};
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          usersMap[data.username.toLowerCase()] = data;
+        });
+
+        ensureBotAccountExists();
+
+        if (currentUserData && usersMap[currentUserData.username.toLowerCase()]) {
+          currentUserData = usersMap[currentUserData.username.toLowerCase()];
+          window.currentUserData = currentUserData;
+        }
+
+        refreshCurrentView();
+      }, (error) => {
+        console.error("Users listener error:", error);
+      });
+
+      // Listen for Posts
+      onSnapshot(publicPostsColl(), (snapshot) => {
+        postsList = [];
+        snapshot.forEach(docSnap => {
+          postsList.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        postsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        refreshCurrentView();
+      }, (error) => {
+        console.error("Posts listener error:", error);
+      });
+    }
+
+    // Initialize Official Arnos [BOT] Account & Welcome Post
+    async function ensureBotAccountExists() {
+      if (!authUser) return;
+      const botUsername = "Arnos";
+      const botKey = botUsername.toLowerCase();
+
+      if (!usersMap[botKey]) {
+        const botData = {
+          username: botUsername,
+          password: "system_protected_password_arnos",
+          dob: "2026-01-01",
+          isBot: true,
+          followers: [],
+          following: []
+        };
+        try {
+          await setDoc(publicUserDoc(botUsername), botData);
+          await addDoc(publicPostsColl(), {
+            author: botUsername,
+            content: "Welcome to Arnos! Accounts and posts are saved live to Firebase. You can publish posts, view profiles, follow users, and like posts seamlessly!",
+            timestamp: new Date().toISOString(),
+            likes: []
+          });
+        } catch (err) {
+          console.error("Failed to initialize Bot in Firebase:", err);
+        }
+      }
+    }
+
+    // UI View Refresher (Does NOT wipe or reset search input element)
+    function refreshCurrentView() {
+      if (document.getElementById('view-auth').classList.contains('hidden') === false) return;
+
+      if (!document.getElementById('view-feed').classList.contains('hidden')) {
+        renderFeed();
+      } else if (!document.getElementById('view-profile').classList.contains('hidden')) {
+        if (currentProfileUsername) renderProfile(currentProfileUsername);
+      } else if (!document.getElementById('view-search').classList.contains('hidden')) {
+        const query = document.getElementById('search-input').value;
+        renderSearch(query);
+      }
+    }
+
+    // AUTH FUNCTIONS
+    window.toggleAuth = function(mode) {
+      document.getElementById('auth-error').classList.add('hidden');
+      if (mode === 'login') {
+        document.getElementById('auth-title').innerText = "Arnos Sign In";
+        document.getElementById('form-signup').classList.add('hidden');
+        document.getElementById('form-login').classList.remove('hidden');
+      } else {
+        document.getElementById('auth-title').innerText = "Arnos Sign Up";
+        document.getElementById('form-signup').classList.remove('hidden');
+        document.getElementById('form-login').classList.add('hidden');
+      }
+    };
+
+    window.handleSignup = async function(e) {
+      e.preventDefault();
+      if (!authUser) await initAuth();
+
+      const name = document.getElementById('signup-username').value.trim();
+      const pwd = document.getElementById('signup-password').value;
+      const dob = document.getElementById('signup-dob').value;
+      const btn = document.getElementById('btn-signup');
+
+      if (!name || !pwd || !dob) {
+        showAuthErr("Please fill in all fields.");
+        return;
+      }
+
+      if (pwd.length < 6) {
+        showAuthErr("Password must be at least 6 characters.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Creating...";
+
+      try {
+        const docSnap = await getDoc(publicUserDoc(name));
+        if (docSnap.exists()) {
+          showAuthErr("Username already exists in Firebase. Please log in.");
+          btn.disabled = false;
+          btn.innerText = "Create";
+          return;
+        }
+
+        const newUserData = {
+          username: name,
+          password: pwd,
+          dob: dob,
+          isBot: false,
+          followers: [],
+          following: []
+        };
+
+        await setDoc(publicUserDoc(name), newUserData);
+
+        currentUserData = newUserData;
+        window.currentUserData = currentUserData;
+        localStorage.setItem('arnos_logged_username', name);
+
+        showMainInterface();
+      } catch (err) {
+        console.error("Signup Firebase Error:", err);
+        showAuthErr("Failed to create account in Firebase. " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Create";
+      }
+    };
+
+    window.handleLogin = async function(e) {
+      e.preventDefault();
+      if (!authUser) await initAuth();
+
+      const name = document.getElementById('login-username').value.trim();
+      const pwd = document.getElementById('login-password').value;
+      const btn = document.getElementById('btn-login');
+
+      if (!name || !pwd) {
+        showAuthErr("Please fill in all fields.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Signing in...";
+
+      try {
+        const userSnap = await getDoc(publicUserDoc(name));
+        if (!userSnap.exists()) {
+          showAuthErr("User not found in Firebase.");
+          btn.disabled = false;
+          btn.innerText = "Sign In";
+          return;
+        }
+
+        const userData = userSnap.data();
+        if (userData.password !== pwd) {
+          showAuthErr("Invalid password.");
+          btn.disabled = false;
+          btn.innerText = "Sign In";
+          return;
+        }
+
+        currentUserData = userData;
+        window.currentUserData = userData;
+        localStorage.setItem('arnos_logged_username', userData.username);
+
+        showMainInterface();
+      } catch (err) {
+        console.error("Login Firebase Error:", err);
+        showAuthErr("Error checking account in Firebase.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Sign In";
+      }
+    };
+
+    window.logout = function() {
+      localStorage.removeItem('arnos_logged_username');
+      currentUserData = null;
+      window.currentUserData = null;
+      showAuthInterface();
+    };
+
+    function showAuthErr(msg) {
+      const err = document.getElementById('auth-error');
+      err.innerText = msg;
+      err.classList.remove('hidden');
+    }
+
+    function showAuthInterface() {
+      document.getElementById('app-header').classList.add('hidden');
+      document.getElementById('view-auth').classList.remove('hidden');
+      document.getElementById('view-feed').classList.add('hidden');
+      document.getElementById('view-search').classList.add('hidden');
+      document.getElementById('view-profile').classList.add('hidden');
+    }
+
+    function showMainInterface() {
+      document.getElementById('app-header').classList.remove('hidden');
+      document.getElementById('view-auth').classList.add('hidden');
+      document.getElementById('nav-user-link').innerText = currentUserData.username;
+      
+      setupListeners();
+      navigateTo('feed');
+    }
+
+    /* NAVIGATION */
+    window.navigateTo = function(view, arg = null) {
+      document.getElementById('view-feed').classList.add('hidden');
+      document.getElementById('view-search').classList.add('hidden');
+      document.getElementById('view-profile').classList.add('hidden');
+
+      if (view === 'feed') {
+        document.getElementById('view-feed').classList.remove('hidden');
+        renderFeed();
+      } else if (view === 'profile') {
+        document.getElementById('view-profile').classList.remove('hidden');
+        currentProfileUsername = arg || (currentUserData ? currentUserData.username : '');
+        renderProfile(currentProfileUsername);
+      } else if (view === 'search') {
+        document.getElementById('view-search').classList.remove('hidden');
+        renderSearch(arg || document.getElementById('search-input').value);
+      }
+    };
+
+    /* TIME FORMATTING (DD/MM/YYYY HH:MM) */
+    function formatTime(iso) {
+      const d = new Date(iso);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      const hrs = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hrs}:${mins}`;
+    }
+
+    /* POST CREATION */
+    window.submitPost = async function() {
+      if (!authUser || !currentUserData) return;
+      const textEl = document.getElementById('post-input');
+      const content = textEl.value.trim();
+      const btn = document.getElementById('btn-publish-post');
+
+      if (!content) return;
+
+      btn.disabled = true;
+      btn.innerText = "Publishing...";
+
+      try {
+        await addDoc(publicPostsColl(), {
+          author: currentUserData.username,
+          content: content,
+          timestamp: new Date().toISOString(),
+          likes: []
+        });
+
+        textEl.value = '';
+      } catch (err) {
+        console.error("Error creating post in Firebase:", err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Publish";
+      }
+    };
+
+    /* LIKE / UNLIKE */
+    window.toggleLike = async function(postId) {
+      if (!authUser || !currentUserData) return;
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let likes = post.likes ? [...post.likes] : [];
+      const idx = likes.indexOf(currentUserData.username);
+
+      if (idx === -1) {
+        likes.push(currentUserData.username);
+      } else {
+        likes.splice(idx, 1);
+      }
+
+      try {
+        await updateDoc(publicPostDoc(postId), { likes: likes });
+      } catch (err) {
+        console.error("Error updating likes in Firebase:", err);
+      }
+    };
+
+    /* FOLLOW / UNFOLLOW (Self-Follow restricted) */
+    window.toggleFollow = async function(targetName) {
+      if (!authUser || !currentUserData) return;
+      if (targetName.toLowerCase() === currentUserData.username.toLowerCase()) return;
+
+      const targetKey = targetName.toLowerCase();
+      const targetUser = usersMap[targetKey];
+      if (!targetUser) return;
+
+      let myFollowing = currentUserData.following ? [...currentUserData.following] : [];
+      let targetFollowers = targetUser.followers ? [...targetUser.followers] : [];
+
+      const isFollowing = myFollowing.includes(targetUser.username);
+
+      if (isFollowing) {
+        myFollowing = myFollowing.filter(x => x !== targetUser.username);
+        targetFollowers = targetFollowers.filter(x => x !== currentUserData.username);
+      } else {
+        myFollowing.push(targetUser.username);
+        targetFollowers.push(currentUserData.username);
+      }
+
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { following: myFollowing });
+        await updateDoc(publicUserDoc(targetUser.username), { followers: targetFollowers });
+      } catch (err) {
+        console.error("Error updating follow status in Firebase:", err);
+      }
+    };
+
+    /* BUILD POST HTML CARD */
+    function buildPostCard(post) {
+      const authorKey = post.author ? post.author.toLowerCase() : '';
+      const authorObj = usersMap[authorKey];
+      const isBot = authorObj && authorObj.isBot;
+      const isLiked = post.likes && currentUserData && post.likes.includes(currentUserData.username);
+      const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
+      const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(post.author);
+
+      const div = document.createElement('div');
+      div.className = 'post-card';
+      div.innerHTML = `
+        <div class="post-header">
+          <div class="author-info">
+            <span class="author-name" onclick="viewProfile('${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
+            ${isBot ? `<span class="bot-badge">[BOT]</span>` : ''}
+            <span class="post-date">• ${formatTime(post.timestamp)}</span>
+          </div>
+          ${!isSelf ? `
+            <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size: 12px; padding: 4px 8px;">
+              ${isFollowing ? 'Unfollow' : 'Follow'}
+            </button>
+          ` : ''}
+        </div>
+        <div class="post-content">${escapeHtml(post.content)}</div>
+        <div class="post-footer">
+          <button onclick="toggleLike('${post.id}')" style="font-size: 13px;">
+            ${isLiked ? '♥ Liked' : '♡ Like'} (${post.likes ? post.likes.length : 0})
+          </button>
+        </div>
+      `;
+      return div;
+    }
+
+    function renderFeed() {
+      const list = document.getElementById('feed-list');
+      list.innerHTML = '';
+
+      if (postsList.length === 0) {
+        list.innerHTML = '<p style="color:#70757a;">No posts in Firebase yet.</p>';
+        return;
+      }
+
+      postsList.forEach(p => list.appendChild(buildPostCard(p)));
+    }
+
+    /* PROFILE VIEW */
+    window.viewProfile = function(name) {
+      navigateTo('profile', name);
+    };
+
+    function renderProfile(name) {
+      const userKey = name.toLowerCase();
+      const user = usersMap[userKey];
+      
+      if (!user) {
+        document.getElementById('profile-name-display').innerText = name;
+        document.getElementById('profile-dob-display').innerText = "User not found";
+        document.getElementById('profile-posts-list').innerHTML = '';
+        return;
+      }
+
+      const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
+      const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(user.username);
+
+      document.getElementById('profile-name-display').innerText = user.username;
+      const botTag = document.getElementById('profile-bot-tag');
+      if (user.isBot) {
+        botTag.classList.remove('hidden');
+      } else {
+        botTag.classList.add('hidden');
+      }
+
+      document.getElementById('profile-dob-display').innerText = "Born: " + (user.dob || 'N/A');
+
+      const userPosts = postsList.filter(p => p.author && p.author.toLowerCase() === userKey);
+      document.getElementById('stat-posts').innerText = userPosts.length;
+      document.getElementById('stat-followers').innerText = user.followers ? user.followers.length : 0;
+      document.getElementById('stat-following').innerText = user.following ? user.following.length : 0;
+
+      const actionArea = document.getElementById('profile-action-btn-area');
+      actionArea.innerHTML = '';
+      
+      if (!isSelf) {
+        const btn = document.createElement('button');
+        btn.innerText = isFollowing ? 'Unfollow' : 'Follow';
+        btn.onclick = () => toggleFollow(user.username);
+        if (!isFollowing) btn.className = 'btn-primary';
+        actionArea.appendChild(btn);
+      }
+
+      const list = document.getElementById('profile-posts-list');
+      list.innerHTML = '';
+      if (userPosts.length === 0) {
+        list.innerHTML = '<p style="color:#70757a;">This user has not posted anything yet.</p>';
+      } else {
+        userPosts.forEach(p => list.appendChild(buildPostCard(p)));
+      }
+    }
+
+    /* FOLLOWERS / FOLLOWING MODAL LIST */
+    window.openUserListModal = function(type) {
+      if (!currentProfileUsername) return;
+      const userKey = currentProfileUsername.toLowerCase();
+      const user = usersMap[userKey];
+      if (!user) return;
+
+      const listNames = type === 'followers' ? (user.followers || []) : (user.following || []);
+      const titleEl = document.getElementById('modal-user-list-title');
+      const bodyEl = document.getElementById('modal-user-list-body');
+
+      titleEl.innerText = type === 'followers' ? `Followers of ${user.username}` : `Accounts ${user.username} Follows`;
+      bodyEl.innerHTML = '';
+
+      if (listNames.length === 0) {
+        bodyEl.innerHTML = `<p style="color:#70757a; text-align:center; padding: 12px;">No ${type} found.</p>`;
+      } else {
+        listNames.forEach(name => {
+          const uKey = name.toLowerCase();
+          const uObj = usersMap[uKey] || { username: name, isBot: false };
+          const isSelf = currentUserData && uObj.username.toLowerCase() === currentUserData.username.toLowerCase();
+          const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(uObj.username);
+
+          const div = document.createElement('div');
+          div.className = 'user-list-item';
+          div.innerHTML = `
+            <div>
+              <span class="author-name" onclick="closeUserListModal(); viewProfile('${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
+              ${uObj.isBot ? `<span class="bot-badge">[BOT]</span>` : ''}
+            </div>
+            ${!isSelf ? `
+              <button onclick="toggleFollow('${escapeStr(uObj.username)}')" style="font-size: 12px;">
+                ${isFollowing ? 'Unfollow' : 'Follow'}
+              </button>
+            ` : ''}
+          `;
+          bodyEl.appendChild(div);
+        });
+      }
+
+      document.getElementById('modal-user-list').classList.remove('hidden');
+    };
+
+    window.closeUserListModal = function() {
+      document.getElementById('modal-user-list').classList.add('hidden');
+    };
+
+    /* FIXED SEARCH FUNCTIONALITY (Prevents Reversal Bug) */
+    window.switchSearchTab = function(tab) {
+      activeSearchTab = tab;
+      const profDiv = document.getElementById('search-results-profiles');
+      const postsDiv = document.getElementById('search-results-posts');
+      const btnProf = document.getElementById('tab-btn-profiles');
+      const btnPosts = document.getElementById('tab-btn-posts');
+
+      if (tab === 'profiles') {
+        profDiv.classList.remove('hidden');
+        postsDiv.classList.add('hidden');
+        btnProf.classList.add('active');
+        btnPosts.classList.remove('active');
+      } else {
+        profDiv.classList.add('hidden');
+        postsDiv.classList.remove('hidden');
+        btnPosts.classList.add('active');
+        btnProf.classList.remove('active');
+      }
+    };
+
+    function renderSearch(query) {
+      document.getElementById('search-query-text').innerText = query;
+      const q = query.toLowerCase();
+
+      // Search Profiles
+      const matchedUserKeys = Object.keys(usersMap).filter(k => k.includes(q));
+      document.getElementById('count-profiles').innerText = matchedUserKeys.length;
+
+      const profContainer = document.getElementById('search-results-profiles');
+      profContainer.innerHTML = '';
+
+      if (matchedUserKeys.length === 0) {
+        profContainer.innerHTML = '<p style="color:#70757a;">No profiles found.</p>';
+      } else {
+        matchedUserKeys.forEach(uKey => {
+          const uObj = usersMap[uKey];
+          const isSelf = currentUserData && uObj.username.toLowerCase() === currentUserData.username.toLowerCase();
+          const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(uObj.username);
+
+          const div = document.createElement('div');
+          div.style.cssText = 'border: 1px solid #dadce0; padding: 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;';
+          div.innerHTML = `
+            <div>
+              <span class="author-name" onclick="viewProfile('${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
+              ${uObj.isBot ? `<span class="bot-badge">[BOT]</span>` : ''}
+            </div>
+            ${!isSelf ? `
+              <button onclick="toggleFollow('${escapeStr(uObj.username)}')" style="font-size: 12px;">
+                ${isFollowing ? 'Unfollow' : 'Follow'}
+              </button>
+            ` : ''}
+          `;
+          profContainer.appendChild(div);
+        });
+      }
+
+      // Search Posts
+      const matchedPosts = postsList.filter(p => p.content.toLowerCase().includes(q) || (p.author && p.author.toLowerCase().includes(q)));
+      document.getElementById('count-posts').innerText = matchedPosts.length;
+
+      const postsContainer = document.getElementById('search-results-posts');
+      postsContainer.innerHTML = '';
+
+      if (matchedPosts.length === 0) {
+        postsContainer.innerHTML = '<p style="color:#70757a;">No posts found.</p>';
+      } else {
+        matchedPosts.forEach(p => postsContainer.appendChild(buildPostCard(p)));
+      }
+    }
+
+    /* UTILITIES */
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeStr(str) {
+      return String(str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+    // Attach Event Listeners Once
+    window.onload = function() {
+      const searchInput = document.getElementById('search-input');
+      
+      // Standard stable LTR typing listener
+      searchInput.addEventListener('input', function(e) {
+        const value = e.target.value;
+        if (value.trim().length > 0) {
+          if (document.getElementById('view-search').classList.contains('hidden')) {
+            document.getElementById('view-feed').classList.add('hidden');
+            document.getElementById('view-profile').classList.add('hidden');
+            document.getElementById('view-search').classList.remove('hidden');
+          }
+          renderSearch(value);
+        } else {
+          if (!document.getElementById('view-search').classList.contains('hidden')) {
+            navigateTo('feed');
+          }
+        }
+      });
+
+      initAuth();
+    };
+  </script>
+</body>
+</html>
+```
