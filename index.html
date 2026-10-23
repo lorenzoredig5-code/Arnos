@@ -31,6 +31,7 @@
       background-color: #f8f9fa; border: 1px solid #dadce0; border-radius: 4px; color: #3c4043;
       font-family: Arial, sans-serif; font-size: 13px; padding: 6px 12px; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;
+      user-select: none; -webkit-user-select: none;
     }
     button:hover { background-color: #f1f3f4; color: #202124; }
     button.btn-primary { background-color: #1a73e8; border-color: #1a73e8; color: #ffffff; font-weight: bold; }
@@ -50,7 +51,7 @@
 
     /* CONTAINER & CARDS */
     .container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
-    .card { background-color: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .card { background-color: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 16px; position: relative; }
 
     .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .author-name { font-weight: bold; color: #1a73e8; cursor: pointer; }
@@ -63,6 +64,22 @@
     .bot-badge {
       background-color: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa;
       font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: bold; margin-left: 4px;
+    }
+
+    /* EMOJI REACTION POPUP */
+    .reaction-picker {
+      position: absolute; background: #ffffff; border: 1px solid #dadce0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 24px; padding: 6px 10px;
+      display: flex; gap: 8px; z-index: 200; transform: translateY(-45px); animation: fadeIn 0.15s ease-in-out;
+    }
+    .reaction-picker span {
+      font-size: 20px; cursor: pointer; transition: transform 0.1s; display: inline-block;
+    }
+    .reaction-picker span:hover { transform: scale(1.3); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-35px); }
+      to { opacity: 1; transform: translateY(-45px); }
     }
 
     /* COMMENTS SECTION */
@@ -94,7 +111,7 @@
     .hidden { display: none !important; }
   </style>
 </head>
-<body>
+<body onclick="hideAllReactionPickers()">
 
   <!-- HEADER -->
   <header id="app-header" class="hidden">
@@ -266,7 +283,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CRIAR / EDITAR PRODUTO (ATUALIZADO COM INFORMAÇÕES DO FACEBOOK) -->
+  <!-- MODAL: CRIAR / EDITAR PRODUTO -->
   <div id="modal-product" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -276,15 +293,12 @@
       <div class="modal-body">
         <input type="hidden" id="prod-edit-id">
 
-        <!-- TÍTULO -->
         <label style="font-size: 12px; font-weight: bold;">Title *</label>
         <input type="text" id="prod-name" required placeholder="Ex: Tênis Nike Tam 40" dir="ltr">
 
-        <!-- PREÇO -->
         <label style="font-size: 12px; font-weight: bold;">Price (€ / R$) *</label>
         <input type="number" id="prod-price" step="0.01" required placeholder="0.00" dir="ltr">
 
-        <!-- CATEGORIA (FACEBOOK) -->
         <label style="font-size: 12px; font-weight: bold;">Category *</label>
         <select id="prod-category">
           <option value="Electronics">Electronics & Appliances</option>
@@ -295,7 +309,6 @@
           <option value="Others">Others</option>
         </select>
 
-        <!-- CONDIÇÃO (FACEBOOK) -->
         <label style="font-size: 12px; font-weight: bold;">Condition *</label>
         <select id="prod-condition">
           <option value="New">New</option>
@@ -304,18 +317,15 @@
           <option value="Used - Fair">Used - Fair</option>
         </select>
 
-        <!-- LOCALIZAÇÃO -->
         <label style="font-size: 12px; font-weight: bold;">Location *</label>
         <input type="text" id="prod-location" required placeholder="Ex: Lisboa, Portugal ou São Paulo, BR" dir="ltr">
 
-        <!-- DISPONIBILIDADE (FACEBOOK) -->
         <label style="font-size: 12px; font-weight: bold;">Availability</label>
         <select id="prod-availability">
           <option value="Single Item">List as Single Item</option>
           <option value="In Stock">List as In Stock</option>
         </select>
 
-        <!-- OPÇÕES DE ENTREGA (FACEBOOK) -->
         <label style="font-size: 12px; font-weight: bold;">Delivery Method</label>
         <select id="prod-delivery">
           <option value="Local Pickup">Public Meeting / Local Pickup Only</option>
@@ -323,22 +333,18 @@
           <option value="Shipping">Shipping Available</option>
         </select>
 
-        <!-- ETIQUETAS / TAGS (FACEBOOK) -->
         <label style="font-size: 12px; font-weight: bold;">Product Tags / SKU (Optional)</label>
         <input type="text" id="prod-tags" placeholder="Ex: nike, tenis, sapato, novo" dir="ltr">
 
-        <!-- DESCRIÇÃO -->
         <label style="font-size: 12px; font-weight: bold;">Description</label>
         <textarea id="prod-desc" rows="3" placeholder="Describe brand, size, status, reason for selling..." dir="ltr"></textarea>
 
-        <!-- FOTOS DO PRODUTO (ATÉ 10 FOTOS / IMAGEM) -->
         <label style="font-size: 12px; font-weight: bold;">Product Images (Up to 10 photos)</label>
         <input type="file" id="prod-image-file" accept="image/*" style="margin-bottom: 8px;">
         <div id="prod-img-preview" style="margin-bottom: 12px;"></div>
 
         <button id="btn-save-product" onclick="saveProduct()" class="btn-primary" style="width: 100%;">Salvar e Publicar Produto</button>
 
-        <!-- CAIXA DE REGRAS EM INGLÊS CONFORME SOLICITADO -->
         <div class="rules-box">
           <strong style="display:block; margin-bottom:4px; font-size:13px;">⚠️ Marketplace Listing Policies & Prohibited Items:</strong>
           <p style="margin-bottom:4px;">To protect our community, items listed on this Marketplace must comply with our safety guidelines.</p>
@@ -421,6 +427,9 @@
     let selectedImageBase64 = null;
     let activeChatKey = null;
     let activeMsgSubTab = 'profile';
+
+    let pressTimer = null;
+    let isLongPress = false;
 
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
@@ -543,7 +552,7 @@
         ];
         try {
           await addDoc(publicPostsColl(), {
-            author: botName, content: msgs[Math.floor(Math.random() * msgs.length)], timestamp: now.toISOString(), likes: [], comments: []
+            author: botName, content: msgs[Math.floor(Math.random() * msgs.length)], timestamp: now.toISOString(), reactions: {}, comments: []
           });
         } catch (e) {}
       }
@@ -735,14 +744,116 @@
       } catch (e) {}
     };
 
-    // POSTS, LIKES & COMMENTS
+    // REACTION SYSTEM (SISTEMA DE REAÇÕES COM EMOJIS COMPARTILHADO COM POSTS E MARKETPLACE)
+    const EMOJI_OPTIONS = ['❤️', '😂', '😮', '😢', '😡', '👍', '🔥', '🎉'];
+
+    window.startReactPress = function(e, itemId, type) {
+      e.stopPropagation();
+      isLongPress = false;
+      pressTimer = setTimeout(() => {
+        isLongPress = true;
+        showReactionPicker(itemId, type);
+      }, 500); // 500ms para considerar segurar
+    };
+
+    window.cancelReactPress = function() {
+      if (pressTimer) clearTimeout(pressTimer);
+    };
+
+    window.handleReactClick = function(e, itemId, type) {
+      e.stopPropagation();
+      if (isLongPress) return; // Se foi clique longo, não executa clique rápido
+      toggleReaction(itemId, '❤️', type);
+    };
+
+    function showReactionPicker(itemId, type) {
+      hideAllReactionPickers();
+      const container = document.getElementById(`react-picker-area-${type}-${itemId}`);
+      if (!container) return;
+
+      const picker = document.createElement('div');
+      picker.className = 'reaction-picker';
+      picker.onclick = (e) => e.stopPropagation();
+
+      EMOJI_OPTIONS.forEach(emoji => {
+        const span = document.createElement('span');
+        span.innerText = emoji;
+        span.onclick = (e) => {
+          e.stopPropagation();
+          toggleReaction(itemId, emoji, type);
+          hideAllReactionPickers();
+        };
+        picker.appendChild(span);
+      });
+
+      container.appendChild(picker);
+    }
+
+    window.hideAllReactionPickers = function() {
+      document.querySelectorAll('.reaction-picker').forEach(el => el.remove());
+    };
+
+    window.toggleReaction = async function(itemId, emoji, type) {
+      if (!currentUserData) return;
+
+      const isPost = type === 'post';
+      const targetDoc = isPost ? publicPostDoc(itemId) : publicProductDoc(itemId);
+      const targetList = isPost ? postsList : productsList;
+      const item = targetList.find(i => i.id === itemId);
+
+      if (!item) return;
+
+      // Reactions é um Objeto: { "username": "❤️" }
+      let reactions = item.reactions ? { ...item.reactions } : {};
+
+      // Se já suportar o array "likes" antigo, converte
+      if (!item.reactions && item.likes) {
+        item.likes.forEach(u => reactions[u] = '❤️');
+      }
+
+      const myUser = currentUserData.username;
+
+      // Se já reagiu com esse exato emoji, remove a reação (descurtir)
+      if (reactions[myUser] === emoji) {
+        delete reactions[myUser];
+      } else {
+        // Altera ou adiciona apenas 1 emoji por usuário
+        reactions[myUser] = emoji;
+      }
+
+      try {
+        await updateDoc(targetDoc, { reactions });
+      } catch (e) {}
+    };
+
+    function calculateTopReactions(reactionsObj) {
+      if (!reactionsObj) return { top3: [], totalCount: 0, myEmoji: null };
+
+      const myUser = currentUserData ? currentUserData.username : '';
+      const counts = {};
+      let totalCount = 0;
+      let myEmoji = reactionsObj[myUser] || null;
+
+      Object.values(reactionsObj).forEach(emoji => {
+        counts[emoji] = (counts[emoji] || 0) + 1;
+        totalCount++;
+      });
+
+      // Ordena emojis por popularidade
+      const sortedEmojis = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+      const top3 = sortedEmojis.slice(0, 3);
+
+      return { top3, totalCount, myEmoji };
+    }
+
+    // POSTS
     window.submitPost = async function() {
       if (!currentUserData) return;
       const textEl = document.getElementById('post-input');
       const content = textEl.value.trim();
       if (!content) return;
       try {
-        await addDoc(publicPostsColl(), { author: currentUserData.username, content, timestamp: new Date().toISOString(), likes: [], comments: [] });
+        await addDoc(publicPostsColl(), { author: currentUserData.username, content, timestamp: new Date().toISOString(), reactions: {}, comments: [] });
         textEl.value = '';
       } catch (e) {}
     };
@@ -750,20 +861,6 @@
     window.deletePost = async function(postId) {
       if (!confirm("Apagar post?")) return;
       try { await deleteDoc(publicPostDoc(postId)); } catch (e) {}
-    };
-
-    window.toggleLike = async function(postId) {
-      if (!currentUserData) return;
-      const post = postsList.find(p => p.id === postId);
-      if (!post) return;
-
-      let likes = post.likes ? [...post.likes] : [];
-      const idx = likes.indexOf(currentUserData.username);
-
-      if (idx === -1) likes.push(currentUserData.username);
-      else likes.splice(idx, 1);
-
-      try { await updateDoc(publicPostDoc(postId), { likes }); } catch (e) {}
     };
 
     window.toggleCommentBox = function(postId) {
@@ -808,9 +905,9 @@
       const isBot = authorObj && authorObj.isBot;
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
       const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(post.author);
-      const isLiked = post.likes && currentUserData && post.likes.includes(currentUserData.username);
-      const likesCount = post.likes ? post.likes.length : 0;
       const comments = post.comments || [];
+
+      const { top3, totalCount, myEmoji } = calculateTopReactions(post.reactions);
 
       const div = document.createElement('div');
       div.className = 'card';
@@ -832,10 +929,24 @@
         </div>
         <div class="item-content">${escapeHtml(post.content)}</div>
         
-        <div style="display:flex; gap:12px; margin-bottom:8px;">
-          <button onclick="toggleLike('${post.id}')">
-            ${isLiked ? '♥ Curtido' : '♡ Curtir'} (${likesCount})
+        <div style="display:flex; gap:12px; margin-bottom:8px; align-items:center; position:relative;">
+          <div id="react-picker-area-post-${post.id}" style="position:relative;"></div>
+          <button 
+            onmousedown="startReactPress(event, '${post.id}', 'post')" 
+            onmouseup="cancelReactPress()" 
+            mouseleave="cancelReactPress()" 
+            ontouchstart="startReactPress(event, '${post.id}', 'post')" 
+            ontouchend="cancelReactPress()"
+            onclick="handleReactClick(event, '${post.id}', 'post')"
+          >
+            ${myEmoji ? `${myEmoji} Curtido` : '♡ Curtir'}
           </button>
+          
+          <!-- TOP 3 EMOJIS E TOTAL -->
+          <span style="font-size:13px; color:#5f6368; cursor:default;">
+            ${top3.join('')} <strong>${totalCount}</strong>
+          </span>
+
           <button onclick="toggleCommentBox('${post.id}')">
             💬 Comentários (${comments.length})
           </button>
@@ -939,7 +1050,7 @@
 
       const productPayload = {
         seller: currentUserData.username,
-        name, price, category, condition, location, availability, delivery, tags, description: desc, imageUrl,
+        name, price, category, condition, location, availability, delivery, tags, description: desc, imageUrl, reactions: {},
         timestamp: new Date().toISOString()
       };
 
@@ -1018,6 +1129,8 @@
 
     function buildProductCard(prod) {
       const isSelf = currentUserData && prod.seller.toLowerCase() === currentUserData.username.toLowerCase();
+      const { top3, totalCount, myEmoji } = calculateTopReactions(prod.reactions);
+
       const div = document.createElement('div');
       div.className = 'card';
       div.innerHTML = `
@@ -1033,14 +1146,33 @@
         </div>
         <div class="product-location">📍 ${escapeHtml(prod.location)} (${escapeHtml(prod.delivery || 'Local Pickup')})</div>
         <p class="item-content" style="margin-top:6px;">${escapeHtml(prod.description)}</p>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
+        
+        <!-- BOTOES E REACOES COM EMOJIS NO MARKETPLACE -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <div style="display:flex; gap:8px; align-items:center;">
             ${!isSelf ? `
               <button class="btn-primary" onclick="buyProduct('${prod.id}')">Comprar</button>
             ` : `
               <button class="btn-danger" onclick="deleteProduct('${prod.id}')">Apagar</button>
             `}
+
+            <div id="react-picker-area-prod-${prod.id}" style="position:relative;"></div>
+            <button 
+              onmousedown="startReactPress(event, '${prod.id}', 'prod')" 
+              onmouseup="cancelReactPress()" 
+              mouseleave="cancelReactPress()" 
+              ontouchstart="startReactPress(event, '${prod.id}', 'prod')" 
+              ontouchend="cancelReactPress()"
+              onclick="handleReactClick(event, '${prod.id}', 'prod')"
+            >
+              ${myEmoji ? `${myEmoji} Curtido` : '♡ Curtir'}
+            </button>
+
+            <span style="font-size:13px; color:#5f6368; cursor:default;">
+              ${top3.join('')} <strong>${totalCount}</strong>
+            </span>
           </div>
+
           ${!isSelf ? `<button class="btn-warning" onclick="openReportModal('${prod.id}', '${escapeStr(prod.name)}', '${escapeStr(prod.seller)}')">⚠️ Denunciar</button>` : ''}
         </div>
       `;
