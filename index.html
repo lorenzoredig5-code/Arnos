@@ -60,6 +60,11 @@
     .product-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
     .product-price { font-size: 18px; font-weight: bold; color: #188038; margin-bottom: 4px; }
 
+    /* COMMENTS SECTION */
+    .comments-section { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
+    .comment-item { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; }
+    .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+
     /* TABS */
     .tabs { display: flex; border-bottom: 1px solid #dadce0; margin-bottom: 16px; overflow-x: auto; }
     .tab-btn { border: none; background: none; border-radius: 0; padding: 8px 16px; border-bottom: 3px solid transparent; color: #5f6368; font-weight: bold; white-space: nowrap; }
@@ -196,12 +201,13 @@
             <h2 id="profile-name-display" style="display: inline-block;"></h2>
             <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
           </div>
+          <div id="profile-action-btn-area"></div>
         </div>
 
         <div class="profile-stats">
           <span><strong id="stat-posts">0</strong> Posts</span>
-          <span><strong id="stat-followers">0</strong> Followers</span>
-          <span><strong id="stat-following">0</strong> Following</span>
+          <span style="cursor:pointer; color:#1a73e8; text-decoration:underline;" onclick="openUserListModal('followers')"><strong id="stat-followers">0</strong> Seguidores</span>
+          <span style="cursor:pointer; color:#1a73e8; text-decoration:underline;" onclick="openUserListModal('following')"><strong id="stat-following">0</strong> Seguindo</span>
         </div>
       </div>
 
@@ -216,6 +222,17 @@
       <div id="profile-reports-list" class="hidden"></div>
     </div>
 
+  </div>
+
+  <!-- MODAL: LISTA DE SEGUIDORES / SEGUINDO -->
+  <div id="modal-user-list" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-user-list-title">Lista</h3>
+        <button onclick="closeUserListModal()">✕</button>
+      </div>
+      <div id="modal-user-list-body" class="modal-body"></div>
+    </div>
   </div>
 
   <!-- MODAL: CRIAR / EDITAR PRODUTO -->
@@ -513,14 +530,41 @@
       }
     };
 
-    // POSTS
+    // FOLLOW / UNFOLLOW SYSTEM
+    window.toggleFollow = async function(targetUsername) {
+      if (!currentUserData || targetUsername.toLowerCase() === currentUserData.username.toLowerCase()) return;
+
+      const targetKey = targetUsername.toLowerCase();
+      const targetUser = usersMap[targetKey];
+      if (!targetUser) return;
+
+      let myFollowing = currentUserData.following ? [...currentUserData.following] : [];
+      let targetFollowers = targetUser.followers ? [...targetUser.followers] : [];
+
+      const isFollowing = myFollowing.includes(targetUser.username);
+
+      if (isFollowing) {
+        myFollowing = myFollowing.filter(u => u !== targetUser.username);
+        targetFollowers = targetFollowers.filter(u => u !== currentUserData.username);
+      } else {
+        myFollowing.push(targetUser.username);
+        targetFollowers.push(currentUserData.username);
+      }
+
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { following: myFollowing });
+        await updateDoc(publicUserDoc(targetUser.username), { followers: targetFollowers });
+      } catch (e) { console.error("Erro ao seguir:", e); }
+    };
+
+    // POSTS, LIKES & COMMENTS
     window.submitPost = async function() {
       if (!currentUserData) return;
       const textEl = document.getElementById('post-input');
       const content = textEl.value.trim();
       if (!content) return;
       try {
-        await addDoc(publicPostsColl(), { author: currentUserData.username, content, timestamp: new Date().toISOString(), likes: [] });
+        await addDoc(publicPostsColl(), { author: currentUserData.username, content, timestamp: new Date().toISOString(), likes: [], comments: [] });
         textEl.value = '';
       } catch (e) {}
     };
@@ -530,19 +574,115 @@
       try { await deleteDoc(publicPostDoc(postId)); } catch (e) {}
     };
 
+    window.toggleLike = async function(postId) {
+      if (!currentUserData) return;
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let likes = post.likes ? [...post.likes] : [];
+      const idx = likes.indexOf(currentUserData.username);
+
+      if (idx === -1) likes.push(currentUserData.username);
+      else likes.splice(idx, 1);
+
+      try { await updateDoc(publicPostDoc(postId), { likes }); } catch (e) {}
+    };
+
+    window.toggleCommentBox = function(postId) {
+      const box = document.getElementById(`comments-box-${postId}`);
+      if (box) box.classList.toggle('hidden');
+    };
+
+    window.addComment = async function(postId) {
+      if (!currentUserData) return;
+      const input = document.getElementById(`comment-input-${postId}`);
+      const text = input.value.trim();
+      if (!text) return;
+
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let comments = post.comments ? [...post.comments] : [];
+      comments.push({
+        id: 'c_' + Date.now(),
+        author: currentUserData.username,
+        text: text,
+        timestamp: new Date().toISOString()
+      });
+
+      try {
+        await updateDoc(publicPostDoc(postId), { comments });
+        input.value = '';
+      } catch (e) {}
+    };
+
+    window.deleteComment = async function(postId, commentId) {
+      if (!currentUserData) return;
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let comments = post.comments ? post.comments.filter(c => c.id !== commentId) : [];
+      try { await updateDoc(publicPostDoc(postId), { comments }); } catch (e) {}
+    };
+
     function buildPostCard(post) {
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
+      const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(post.author);
+      const isLiked = post.likes && currentUserData && post.likes.includes(currentUserData.username);
+      const likesCount = post.likes ? post.likes.length : 0;
+      const comments = post.comments || [];
+
       const div = document.createElement('div');
       div.className = 'card';
       div.innerHTML = `
         <div class="item-header">
-          <span class="author-name" onclick="navigateTo('profile', '${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
+          <div>
+            <span class="author-name" onclick="navigateTo('profile', '${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
+            ${!isSelf ? `
+              <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size:11px; padding:2px 8px; margin-left:6px;">
+                ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
+              </button>
+            ` : ''}
+          </div>
           <div>
             <span class="item-date">${new Date(post.timestamp).toLocaleString()}</span>
             ${isSelf ? `<button onclick="deletePost('${post.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
           </div>
         </div>
         <div class="item-content">${escapeHtml(post.content)}</div>
+        
+        <div style="display:flex; gap:12px; margin-bottom:8px;">
+          <button onclick="toggleLike('${post.id}')">
+            ${isLiked ? '♥ Curtido' : '♡ Curtir'} (${likesCount})
+          </button>
+          <button onclick="toggleCommentBox('${post.id}')">
+            💬 Comentários (${comments.length})
+          </button>
+        </div>
+
+        <div id="comments-box-${post.id}" class="comments-section hidden">
+          <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <input type="text" id="comment-input-${post.id}" placeholder="Escreva um comentário..." dir="ltr" style="margin-bottom:0;">
+            <button class="btn-primary" onclick="addComment('${post.id}')">Enviar</button>
+          </div>
+          <div id="comments-list-${post.id}">
+            ${comments.length === 0 ? '<p style="color:#70757a; font-size:12px;">Sem comentários ainda.</p>' : ''}
+            ${comments.map(c => `
+              <div class="comment-item">
+                <div class="comment-header">
+                  <strong>${escapeHtml(c.author)}</strong>
+                  <div>
+                    <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
+                    ${currentUserData && c.author.toLowerCase() === currentUserData.username.toLowerCase() ? `
+                      <button onclick="deleteComment('${post.id}', '${c.id}')" style="font-size:10px; padding:1px 4px; color:#d93025; border:none; background:none; cursor:pointer;">✕ Apagar</button>
+                    ` : ''}
+                  </div>
+                </div>
+                <div>${escapeHtml(c.text)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
       `;
       return div;
     }
@@ -639,7 +779,7 @@
       } catch (e) { alert("Erro ao enviar mensagem."); }
     };
 
-    // DENÚNCIAS DE PRODUTOS
+    // REPORT MODAL
     window.openReportModal = function(prodId, prodName, sellerName) {
       document.getElementById('report-prod-id').value = prodId;
       document.getElementById('report-prod-name').value = prodName;
@@ -650,9 +790,7 @@
       document.getElementById('modal-report').classList.remove('hidden');
     };
 
-    window.closeReportModal = function() {
-      document.getElementById('modal-report').classList.add('hidden');
-    };
+    window.closeReportModal = function() { document.getElementById('modal-report').classList.add('hidden'); };
 
     window.toggleReportOtherText = function() {
       const cat = document.getElementById('report-category').value;
@@ -671,15 +809,10 @@
 
       try {
         await addDoc(publicReportsColl(), {
-          productId: prodId,
-          productName: productName,
-          seller: seller,
-          reporter: currentUserData.username,
-          reason: reason,
-          timestamp: new Date().toISOString(),
-          banned: false
+          productId: prodId, productName, seller,
+          reporter: currentUserData.username, reason,
+          timestamp: new Date().toISOString(), banned: false
         });
-
         closeReportModal();
         alert("Sua denúncia foi feita. Aguarde no máximo de 2 a 7 dias para analisarmos da sua denúncia.");
       } catch (e) { alert("Erro ao enviar denúncia."); }
@@ -742,14 +875,11 @@
         m.buyer.toLowerCase() === currentUserData.username.toLowerCase()
       );
 
-      // Agrupar conversas por Produto + Outro Utilizador
       const groups = {};
       userMsgs.forEach(m => {
         const otherUser = m.seller.toLowerCase() === currentUserData.username.toLowerCase() ? m.buyer : m.seller;
         const key = `${m.productName}___${otherUser.toLowerCase()}`;
-        if (!groups[key]) {
-          groups[key] = { productName: m.productName, otherUser: otherUser, lastMsg: m, msgs: [] };
-        }
+        if (!groups[key]) groups[key] = { productName: m.productName, otherUser: otherUser, lastMsg: m, msgs: [] };
         groups[key].msgs.push(m);
         groups[key].lastMsg = m;
       });
@@ -778,15 +908,8 @@
       });
     }
 
-    function openChatView(key) {
-      activeChatKey = key;
-      renderMessages();
-    }
-
-    window.closeChatView = function() {
-      activeChatKey = null;
-      renderMessages();
-    };
+    function openChatView(key) { activeChatKey = key; renderMessages(); }
+    window.closeChatView = function() { activeChatKey = null; renderMessages(); };
 
     function renderChatView(key) {
       const parts = key.split('___');
@@ -830,15 +953,54 @@
 
       try {
         await addDoc(publicMessagesColl(), {
-          buyer: currentUserData.username,
-          seller: otherUser,
-          productName: prodName,
-          message: msg,
-          timestamp: new Date().toISOString(),
-          read: false
+          buyer: currentUserData.username, seller: otherUser,
+          productName: prodName, message: msg,
+          timestamp: new Date().toISOString(), read: false
         });
         input.value = '';
       } catch (e) {}
+    };
+
+    // USER LIST MODAL (FOLLOWERS / FOLLOWING)
+    window.openUserListModal = function(type) {
+      if (!currentProfileUsername) return;
+      const userKey = currentProfileUsername.toLowerCase();
+      const user = usersMap[userKey];
+      if (!user) return;
+
+      const listNames = type === 'followers' ? (user.followers || []) : (user.following || []);
+      const titleEl = document.getElementById('modal-user-list-title');
+      const bodyEl = document.getElementById('modal-user-list-body');
+
+      titleEl.innerText = type === 'followers' ? `Seguidores de ${user.username}` : `Contas que ${user.username} segue`;
+      bodyEl.innerHTML = '';
+
+      if (listNames.length === 0) {
+        bodyEl.innerHTML = `<p style="color:#70757a; text-align:center; padding:12px;">Ninguém nesta lista.</p>`;
+      } else {
+        listNames.forEach(name => {
+          const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
+          const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(name);
+
+          const div = document.createElement('div');
+          div.style.cssText = 'border:1px solid #dadce0; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;';
+          div.innerHTML = `
+            <span class="author-name" onclick="closeUserListModal(); navigateTo('profile', '${escapeStr(name)}')">${escapeHtml(name)}</span>
+            ${!isSelf ? `
+              <button onclick="toggleFollow('${escapeStr(name)}')" style="font-size:12px;">
+                ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
+              </button>
+            ` : ''}
+          `;
+          bodyEl.appendChild(div);
+        });
+      }
+
+      document.getElementById('modal-user-list').classList.remove('hidden');
+    };
+
+    window.closeUserListModal = function() {
+      document.getElementById('modal-user-list').classList.add('hidden');
     };
 
     // SEARCH & PROFILE
@@ -857,9 +1019,21 @@
       const profDiv = document.getElementById('search-results-profiles');
       profDiv.innerHTML = matchedUsers.length === 0 ? '<p style="color:#70757a;">Nenhum perfil.</p>' : '';
       matchedUsers.forEach(k => {
+        const uObj = usersMap[k];
+        const isSelf = currentUserData && uObj.username.toLowerCase() === currentUserData.username.toLowerCase();
+        const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(uObj.username);
+
         const div = document.createElement('div');
         div.className = 'card';
-        div.innerHTML = `<span class="author-name" onclick="navigateTo('profile', '${escapeStr(usersMap[k].username)}')">${escapeHtml(usersMap[k].username)}</span>`;
+        div.style.cssText = 'display:flex; justify-content:space-between; align-items:center;';
+        div.innerHTML = `
+          <span class="author-name" onclick="navigateTo('profile', '${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
+          ${!isSelf ? `
+            <button onclick="toggleFollow('${escapeStr(uObj.username)}')" style="font-size:12px;">
+              ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
+            </button>
+          ` : ''}
+        `;
         profDiv.appendChild(div);
       });
 
@@ -894,10 +1068,25 @@
       document.getElementById('profile-name-display').innerText = user.username;
       document.getElementById('profile-dob-display').innerText = "Nascimento: " + (user.dob || 'N/A');
 
+      const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
+      const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(user.username);
+
+      const actionArea = document.getElementById('profile-action-btn-area');
+      actionArea.innerHTML = '';
+      if (!isSelf) {
+        const btn = document.createElement('button');
+        btn.innerText = isFollowing ? 'Deixar de seguir' : 'Seguir';
+        btn.onclick = () => toggleFollow(user.username);
+        if (!isFollowing) btn.className = 'btn-primary';
+        actionArea.appendChild(btn);
+      }
+
       const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
       const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
 
       document.getElementById('stat-posts').innerText = userPosts.length;
+      document.getElementById('stat-followers').innerText = user.followers ? user.followers.length : 0;
+      document.getElementById('stat-following').innerText = user.following ? user.following.length : 0;
 
       const postsDiv = document.getElementById('profile-posts-list');
       postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Sem publicações.</p>' : '';
@@ -907,10 +1096,9 @@
       vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Sem produtos à venda.</p>' : '';
       userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
 
-      // Render Histórico de Denúncias
       const reportsDiv = document.getElementById('profile-reports-list');
       const myReports = reportsList.filter(r => r.reporter.toLowerCase() === userKey);
-      reportsDiv.innerHTML = myReports.length === 0 ? '<p style="color:#70757a;">Você ainda não fez nenhuma denúncia.</p>' : '';
+      reportsDiv.innerHTML = myReports.length === 0 ? '<p style="color:#70757a;">Nenhuma denúncia realizada.</p>' : '';
 
       myReports.forEach(r => {
         const div = document.createElement('div');
