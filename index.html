@@ -76,10 +76,11 @@
     .tab-btn.active { border-bottom-color: #1a73e8; color: #1a73e8; }
 
     /* CHAT BOX */
-    .chat-container { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
-    .chat-bubble { padding: 8px 12px; border-radius: 12px; max-width: 75%; font-size: 13px; }
-    .chat-bubble.mine { background-color: #e8f0fe; align-self: flex-end; color: #1a73e8; }
-    .chat-bubble.other { background-color: #f1f3f4; align-self: flex-start; }
+    .chat-container { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; border: 1px solid #dadce0; padding: 12px; border-radius: 8px; margin-bottom: 12px; background-color: #fcfcfc; }
+    .chat-bubble { padding: 8px 12px; border-radius: 12px; max-width: 75%; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+    .chat-bubble.mine { background-color: #e8f0fe; align-self: flex-end; color: #1a73e8; border-bottom-right-radius: 2px; }
+    .chat-bubble.other { background-color: #ffffff; align-self: flex-start; color: #202124; border: 1px solid #dadce0; border-bottom-left-radius: 2px; }
+    .chat-sender-tag { font-size: 10px; font-weight: bold; margin-bottom: 2px; color: #5f6368; display: block; }
 
     /* MODAL */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
@@ -217,7 +218,7 @@
           <div id="profile-action-btn-area" style="display:flex; gap:6px;"></div>
         </div>
 
-        <div class="profile-stats">
+        <div class="profile-stats" style="display:flex; gap:16px; margin-top:12px; font-size:13px; color:#5f6368;">
           <span><strong id="stat-posts">0</strong> Posts</span>
           <span style="cursor:pointer; color:#1a73e8; text-decoration:underline;" onclick="openUserListModal('followers')"><strong id="stat-followers">0</strong> Seguidores</span>
           <span style="cursor:pointer; color:#1a73e8; text-decoration:underline;" onclick="openUserListModal('following')"><strong id="stat-following">0</strong> Seguindo</span>
@@ -481,12 +482,27 @@
       }
     }
 
+    // ATUALIZAÇÃO DO BADGE COM CONTAGEM EXATA DE MENSAGENS NÃO LIDAS
     function updateUnreadBadge() {
       if (!currentUserData) return;
-      const unreadCount = messagesList.filter(m => m.seller.toLowerCase() === currentUserData.username.toLowerCase() && !m.read).length;
+
+      const myUser = currentUserData.username.toLowerCase();
+      
+      // Conta todas as mensagens não lidas enviadas por outros para o utilizador atual
+      const unreadCount = messagesList.filter(m => {
+        const sender = (m.sender || m.buyer || '').toLowerCase();
+        const isTargetUser = (m.seller.toLowerCase() === myUser || m.buyer.toLowerCase() === myUser);
+        const isNotMine = sender !== myUser;
+        return isTargetUser && isNotMine && !m.read;
+      }).length;
+
       const badge = document.getElementById('msg-badge');
-      if (unreadCount > 0) { badge.innerText = unreadCount; badge.classList.remove('hidden'); }
-      else { badge.classList.add('hidden'); }
+      if (unreadCount > 0) { 
+        badge.innerText = unreadCount; 
+        badge.classList.remove('hidden'); 
+      } else { 
+        badge.classList.add('hidden'); 
+      }
     }
 
     function refreshCurrentView() {
@@ -616,9 +632,10 @@
 
       try {
         await addDoc(publicMessagesColl(), {
+          sender: currentUserData.username,
           buyer: currentUserData.username,
           seller: targetUser,
-          productName: '[Perfil]', // Marcador para mensagem de perfil
+          productName: '[Perfil]',
           message: text,
           timestamp: new Date().toISOString(),
           read: false
@@ -869,6 +886,7 @@
 
       try {
         await addDoc(publicMessagesColl(), {
+          sender: currentUserData.username,
           buyer: currentUserData.username,
           seller: prod.seller,
           productName: prod.name,
@@ -953,7 +971,7 @@
       productsList.forEach(p => list.appendChild(buildProductCard(p)));
     }
 
-    // MESSAGES CONVERSATIONS (PERFIL vs MARKETPLACE)
+    // MESSAGES CONVERSATIONS
     window.switchMsgTab = function(tab) {
       activeMsgSubTab = tab;
       document.getElementById('msg-tab-profile').classList.toggle('active', tab === 'profile');
@@ -983,7 +1001,6 @@
         m.buyer.toLowerCase() === currentUserData.username.toLowerCase()
       );
 
-      // Filtrar por aba de Mensagem de Perfil ou Marketplace
       const filteredMsgs = userMsgs.filter(m => {
         const isProfileMsg = m.productName === '[Perfil]';
         return activeMsgSubTab === 'profile' ? isProfileMsg : !isProfileMsg;
@@ -1006,16 +1023,24 @@
 
       keys.forEach(k => {
         const g = groups[k];
+        const myUser = currentUserData.username.toLowerCase();
+        
+        // Verifica se há mensagens não lidas nesta conversa específica
+        const hasUnread = g.msgs.some(m => {
+          const sender = (m.sender || m.buyer || '').toLowerCase();
+          return sender !== myUser && !m.read;
+        });
+
         const div = document.createElement('div');
         div.className = 'card';
-        div.style.cursor = 'pointer';
+        div.style.cssText = 'cursor:pointer; position:relative;';
         div.onclick = () => openChatView(k);
         div.innerHTML = `
           <div class="item-header">
             <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : `📦 Produto: ${escapeHtml(g.productName)}`}</h3>
             <span class="item-date">${new Date(g.lastMsg.timestamp).toLocaleTimeString()}</span>
           </div>
-          <p style="font-size: 13px; color: #5f6368;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong></p>
+          <p style="font-size: 13px; color: #5f6368;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
           <p style="font-size: 13px; margin-top: 4px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message)}"</p>
         `;
         convListDiv.appendChild(div);
@@ -1042,14 +1067,21 @@
       container.innerHTML = '';
 
       chatMsgs.forEach(m => {
-        if (m.seller.toLowerCase() === currentUserData.username.toLowerCase() && !m.read) {
+        const myUser = currentUserData.username.toLowerCase();
+        const senderName = m.sender || (m.buyer.toLowerCase() === myUser ? currentUserData.username : otherUser);
+        const isMine = senderName.toLowerCase() === myUser;
+
+        // MARCAR MENSAGEM COMO LIDA CASO TENHA SIDO ENVIADA POR OUTRA PESSOA
+        if (!isMine && !m.read) {
           updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
         }
 
-        const isMine = m.buyer.toLowerCase() === currentUserData.username.toLowerCase();
         const bubble = document.createElement('div');
         bubble.className = `chat-bubble ${isMine ? 'mine' : 'other'}`;
-        bubble.innerText = m.message;
+        bubble.innerHTML = `
+          ${!isMine ? `<span class="chat-sender-tag">${escapeHtml(senderName)}</span>` : ''}
+          ${escapeHtml(m.message)}
+        `;
         container.appendChild(bubble);
       });
 
@@ -1067,9 +1099,13 @@
 
       try {
         await addDoc(publicMessagesColl(), {
-          buyer: currentUserData.username, seller: otherUser,
-          productName: prodName, message: msg,
-          timestamp: new Date().toISOString(), read: false
+          sender: currentUserData.username,
+          buyer: currentUserData.username, 
+          seller: otherUser,
+          productName: prodName, 
+          message: msg,
+          timestamp: new Date().toISOString(), 
+          read: false
         });
         input.value = '';
       } catch (e) {}
@@ -1196,14 +1232,12 @@
       const actionArea = document.getElementById('profile-action-btn-area');
       actionArea.innerHTML = '';
       if (!isSelf && !user.isBot) {
-        // Botão Seguir / Deixar de Seguir
         const btnFollow = document.createElement('button');
         btnFollow.innerText = isFollowing ? 'Deixar de seguir' : 'Seguir';
         btnFollow.onclick = () => toggleFollow(user.username);
         if (!isFollowing) btnFollow.className = 'btn-primary';
         actionArea.appendChild(btnFollow);
 
-        // Botão Enviar Mensagem Direta
         const btnMsg = document.createElement('button');
         btnMsg.innerText = '💬 Enviar Mensagem';
         btnMsg.onclick = () => openDirectMsgModal(user.username);
