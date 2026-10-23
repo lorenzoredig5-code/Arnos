@@ -6,280 +6,79 @@
   <title>Arnos</title>
   <style>
     /* RESET & BASE STYLES */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #f8f9fa;
-      color: #222222;
-      line-height: 1.5;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, Helvetica, sans-serif; background-color: #f8f9fa; color: #222222; line-height: 1.5; }
 
-    /* HEADER & NAVIGATION FIXES */
+    /* HEADER & NAVIGATION */
     header {
-      border-bottom: 1px solid #dadce0;
-      padding: 10px 16px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      background-color: #ffffff;
-      gap: 10px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      border-bottom: 1px solid #dadce0; padding: 10px 16px; display: flex; flex-wrap: wrap;
+      align-items: center; justify-content: space-between; background-color: #ffffff; gap: 10px;
+      position: sticky; top: 0; z-index: 100;
     }
-    .logo {
-      font-size: 22px;
-      font-weight: bold;
-      color: #1a73e8;
-      cursor: pointer;
-    }
-    .search-bar-container {
-      flex: 1 1 200px;
-      max-width: 400px;
-      display: flex;
-      align-items: center;
-    }
+    .logo { font-size: 22px; font-weight: bold; color: #1a73e8; cursor: pointer; }
+    .search-bar-container { flex: 1 1 200px; max-width: 400px; display: flex; align-items: center; }
 
-    /* SEARCH INPUT FIXES */
-    input[type="text"], input[type="password"], input[type="date"], input[type="number"], textarea {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      background-color: #ffffff;
-      color: #222222;
-      direction: ltr !important;
-      text-align: left !important;
-      unicode-bidi: normal !important;
-      box-sizing: border-box;
+    /* INPUTS */
+    input[type="text"], input[type="password"], input[type="date"], input[type="number"], select, textarea {
+      width: 100%; padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px;
+      font-family: Arial, sans-serif; font-size: 14px; background-color: #ffffff; color: #222222;
+      direction: ltr !important; text-align: left !important; box-sizing: border-box; margin-bottom: 8px;
     }
-    input[type="text"]:focus, input[type="password"]:focus, input[type="date"]:focus, textarea:focus {
-      outline: none;
-      border-color: #1a73e8;
-      box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
-    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
 
     /* BUTTONS */
-    button, input[type="submit"] {
-      background-color: #f8f9fa;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      color: #3c4043;
-      font-family: Arial, sans-serif;
-      font-size: 13px;
-      padding: 6px 12px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      white-space: nowrap;
+    button {
+      background-color: #f8f9fa; border: 1px solid #dadce0; border-radius: 4px; color: #3c4043;
+      font-family: Arial, sans-serif; font-size: 13px; padding: 6px 12px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;
     }
-    button:hover {
-      background-color: #f1f3f4;
-      border-color: #dadce0;
-      color: #202124;
-    }
-    button.btn-primary {
-      background-color: #1a73e8;
-      border: 1px solid #1a73e8;
-      color: #ffffff;
-      font-weight: bold;
-    }
-    button.btn-primary:hover {
-      background-color: #1557b0;
-    }
-    button.btn-danger {
-      background-color: #d93025;
-      border: 1px solid #d93025;
-      color: #ffffff;
-    }
+    button:hover { background-color: #f1f3f4; color: #202124; }
+    button.btn-primary { background-color: #1a73e8; border-color: #1a73e8; color: #ffffff; font-weight: bold; }
+    button.btn-primary:hover { background-color: #1557b0; }
+    button.btn-danger { background-color: #d93025; border-color: #d93025; color: #ffffff; }
+    button.btn-warning { background-color: #f2994a; border-color: #f2994a; color: #ffffff; }
 
-    nav {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .nav-user {
-      font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-      color: #1a73e8;
-      text-decoration: underline;
-    }
+    nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
 
-    /* NOTIFICATION BADGE */
-    .badge-container {
-      position: relative;
-      display: inline-block;
-    }
+    /* BADGE */
+    .badge-container { position: relative; display: inline-block; }
     .badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background-color: #d93025;
-      color: #ffffff;
-      border: 2px solid #ffffff;
-      border-radius: 50%;
-      padding: 2px 6px;
-      font-size: 10px;
-      font-weight: bold;
-      min-width: 18px;
-      text-align: center;
+      position: absolute; top: -6px; right: -6px; background-color: #d93025; color: #ffffff;
+      border: 2px solid #ffffff; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold;
     }
 
-    /* LAYOUT CONTAINERS */
-    .container {
-      max-width: 800px;
-      margin: 16px auto;
-      padding: 0 12px;
-    }
+    /* CONTAINER & CARDS */
+    .container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
+    .card { background-color: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
 
-    /* CARD STYLES */
-    .card {
-      background-color: #ffffff;
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
+    .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .author-name { font-weight: bold; color: #1a73e8; cursor: pointer; }
+    .author-name:hover { text-decoration: underline; }
+    .item-date { font-size: 12px; color: #70757a; }
+    .item-content { font-size: 14px; margin-bottom: 12px; white-space: pre-wrap; }
+    .product-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
+    .product-price { font-size: 18px; font-weight: bold; color: #188038; margin-bottom: 4px; }
 
-    /* POST & PRODUCT CARDS */
-    .item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .author-name {
-      font-weight: bold;
-      color: #1a73e8;
-      cursor: pointer;
-    }
-    .author-name:hover {
-      text-decoration: underline;
-    }
-    .item-date {
-      font-size: 12px;
-      color: #70757a;
-    }
-    .item-content {
-      font-size: 14px;
-      margin-bottom: 12px;
-      white-space: pre-wrap;
-    }
-    .product-img {
-      width: 100%;
-      max-height: 300px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-bottom: 10px;
-      border: 1px solid #eee;
-    }
-    .product-price {
-      font-size: 18px;
-      font-weight: bold;
-      color: #188038;
-      margin-bottom: 4px;
-    }
-    .product-location {
-      font-size: 12px;
-      color: #5f6368;
-      margin-bottom: 8px;
-    }
+    /* TABS */
+    .tabs { display: flex; border-bottom: 1px solid #dadce0; margin-bottom: 16px; overflow-x: auto; }
+    .tab-btn { border: none; background: none; border-radius: 0; padding: 8px 16px; border-bottom: 3px solid transparent; color: #5f6368; font-weight: bold; white-space: nowrap; }
+    .tab-btn.active { border-bottom-color: #1a73e8; color: #1a73e8; }
 
-    /* TABS FIX */
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid #dadce0;
-      margin-bottom: 16px;
-      overflow-x: auto;
-    }
-    .tab-btn {
-      border: none;
-      background: none;
-      border-radius: 0;
-      padding: 8px 16px;
-      border-bottom: 3px solid transparent;
-      color: #5f6368;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-    .tab-btn.active {
-      border-bottom-color: #1a73e8;
-      color: #1a73e8;
-      background: none;
-    }
-
-    /* PROFILE HEADER */
-    .profile-stats {
-      display: flex;
-      gap: 16px;
-      margin-top: 12px;
-      font-size: 13px;
-      color: #5f6368;
-    }
-    .profile-stats-clickable {
-      cursor: pointer;
-      color: #1a73e8;
-      text-decoration: underline;
-    }
+    /* CHAT BOX */
+    .chat-container { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+    .chat-bubble { padding: 8px 12px; border-radius: 12px; max-width: 75%; font-size: 13px; }
+    .chat-bubble.mine { background-color: #e8f0fe; align-self: flex-end; color: #1a73e8; }
+    .chat-bubble.other { background-color: #f1f3f4; align-self: flex-start; }
 
     /* MODAL */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .modal-card {
-      background-color: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #dadce0;
-      width: 90%;
-      max-width: 480px;
-      max-height: 85vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .modal-header {
-      padding: 12px 16px;
-      border-bottom: 1px solid #dadce0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .modal-body {
-      padding: 16px;
-      overflow-y: auto;
-      flex: 1;
-    }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-card { background: #fff; border-radius: 8px; border: 1px solid #dadce0; width: 90%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; }
+    .modal-header { padding: 12px 16px; border-bottom: 1px solid #dadce0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
 
-    .auth-box {
-      max-width: 360px;
-      margin: 40px auto;
-      padding: 24px;
-      background-color: #fff;
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-    }
-    .error-msg {
-      color: #d93025;
-      font-size: 13px;
-      margin-bottom: 12px;
-    }
+    .auth-box { max-width: 360px; margin: 40px auto; padding: 24px; background-color: #fff; border: 1px solid #dadce0; border-radius: 8px; }
+    .error-msg { color: #d93025; font-size: 13px; margin-bottom: 12px; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -290,7 +89,7 @@
     <div class="logo" onclick="navigateTo('feed')">Arnos</div>
     
     <div class="search-bar-container">
-      <input type="text" id="search-input" placeholder="Pesquisar perfil, post ou produto..." autocomplete="off" spellcheck="false" dir="ltr">
+      <input type="text" id="search-input" placeholder="Pesquisar perfil, post ou produto..." autocomplete="off" dir="ltr">
     </div>
 
     <nav>
@@ -309,9 +108,7 @@
   <!-- CONTAINER PRINCIPAL -->
   <div class="container">
 
-    <div id="view-loading" style="text-align: center; padding: 40px; color: #70757a;">
-      A carregar Arnos...
-    </div>
+    <div id="view-loading" style="text-align: center; padding: 40px; color: #70757a;">Carregando Arnos...</div>
 
     <!-- AUTH VIEW -->
     <div id="view-auth" class="auth-box hidden">
@@ -321,13 +118,10 @@
       <form id="form-signup" onsubmit="handleSignup(event)">
         <label style="font-size:12px; font-weight:bold;">Utilizador</label>
         <input type="text" id="signup-username" required placeholder="Nome de utilizador" dir="ltr">
-
         <label style="font-size:12px; font-weight:bold;">Palavra-passe</label>
         <input type="password" id="signup-password" required placeholder="Mínimo 6 caracteres" dir="ltr">
-
         <label style="font-size:12px; font-weight:bold;">Data de Nascimento</label>
         <input type="date" id="signup-dob" required style="margin-bottom: 12px;">
-
         <button type="submit" id="btn-signup" class="btn-primary" style="width: 100%;">Criar Conta</button>
         <p style="text-align: center; font-size: 13px; margin-top: 16px;">
           Já tens conta? <a href="#" onclick="toggleAuth('login')" style="color: #1a73e8;">Entrar</a>
@@ -337,10 +131,8 @@
       <form id="form-login" onsubmit="handleLogin(event)" class="hidden">
         <label style="font-size:12px; font-weight:bold;">Utilizador</label>
         <input type="text" id="login-username" required placeholder="Nome de utilizador" dir="ltr">
-
         <label style="font-size:12px; font-weight:bold;">Palavra-passe</label>
         <input type="password" id="login-password" required placeholder="Palavra-passe" dir="ltr">
-
         <button type="submit" id="btn-login" class="btn-primary" style="width: 100%;">Entrar</button>
         <p style="text-align: center; font-size: 13px; margin-top: 16px;">
           Não tens conta? <a href="#" onclick="toggleAuth('signup')" style="color: #1a73e8;">Criar uma</a>
@@ -370,22 +162,25 @@
     <!-- MESSAGES VIEW -->
     <div id="view-messages" class="hidden">
       <h2 style="margin-bottom: 16px;">Mensagens do Marketplace</h2>
-      <div id="messages-list"></div>
+      <div id="messages-conversations-list"></div>
+      <div id="messages-chat-view" class="hidden">
+        <button onclick="closeChatView()" style="margin-bottom: 12px;">← Voltar para Conversas</button>
+        <h3 id="chat-title" style="margin-bottom: 8px;"></h3>
+        <div id="chat-bubbles" class="chat-container"></div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." dir="ltr" style="margin-bottom:0;">
+          <button class="btn-primary" onclick="sendChatMessage()">Enviar</button>
+        </div>
+      </div>
     </div>
 
     <!-- SEARCH VIEW -->
     <div id="view-search" class="hidden">
       <h3 style="margin-bottom: 12px;">Resultados para "<span id="search-query-text"></span>"</h3>
       <div class="tabs">
-        <button id="tab-btn-profiles" class="tab-btn active" onclick="switchSearchTab('profiles')">
-          Perfis (<span id="count-profiles">0</span>)
-        </button>
-        <button id="tab-btn-posts" class="tab-btn" onclick="switchSearchTab('posts')">
-          Posts (<span id="count-posts">0</span>)
-        </button>
-        <button id="tab-btn-products" class="tab-btn" onclick="switchSearchTab('products')">
-          Marketplace (<span id="count-products">0</span>)
-        </button>
+        <button id="tab-btn-profiles" class="tab-btn active" onclick="switchSearchTab('profiles')">Perfis (<span id="count-profiles">0</span>)</button>
+        <button id="tab-btn-posts" class="tab-btn" onclick="switchSearchTab('posts')">Posts (<span id="count-posts">0</span>)</button>
+        <button id="tab-btn-products" class="tab-btn" onclick="switchSearchTab('products')">Marketplace (<span id="count-products">0</span>)</button>
       </div>
 
       <div id="search-results-profiles"></div>
@@ -401,23 +196,24 @@
             <h2 id="profile-name-display" style="display: inline-block;"></h2>
             <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
           </div>
-          <div id="profile-action-btn-area"></div>
         </div>
 
         <div class="profile-stats">
           <span><strong id="stat-posts">0</strong> Posts</span>
-          <span class="profile-stats-clickable" onclick="openUserListModal('followers')"><strong id="stat-followers">0</strong> Followers</span>
-          <span class="profile-stats-clickable" onclick="openUserListModal('following')"><strong id="stat-following">0</strong> Following</span>
+          <span><strong id="stat-followers">0</strong> Followers</span>
+          <span><strong id="stat-following">0</strong> Following</span>
         </div>
       </div>
 
       <div class="tabs">
         <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
         <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
+        <button id="profile-tab-reports" class="tab-btn" onclick="switchProfileTab('reports')">Histórico de Denúncias</button>
       </div>
 
       <div id="profile-posts-list"></div>
       <div id="profile-vitrine-list" class="hidden"></div>
+      <div id="profile-reports-list" class="hidden"></div>
     </div>
 
   </div>
@@ -431,36 +227,50 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="prod-edit-id">
-        
         <label style="font-size: 12px; font-weight: bold;">Nome do Produto</label>
         <input type="text" id="prod-name" required placeholder="Ex: Tênis Nike" dir="ltr">
-
         <label style="font-size: 12px; font-weight: bold;">Preço (€ / R$)</label>
         <input type="number" id="prod-price" step="0.01" required placeholder="0.00" dir="ltr">
-
         <label style="font-size: 12px; font-weight: bold;">Localização</label>
         <input type="text" id="prod-location" required placeholder="Ex: Lisboa, Portugal" dir="ltr">
-
         <label style="font-size: 12px; font-weight: bold;">Descrição</label>
         <textarea id="prod-desc" rows="3" placeholder="Detalhes do produto..." dir="ltr"></textarea>
-
         <label style="font-size: 12px; font-weight: bold;">Imagem do Produto</label>
         <input type="file" id="prod-image-file" accept="image/*" style="margin-bottom: 8px;">
         <div id="prod-img-preview" style="margin-bottom: 12px;"></div>
-
         <button id="btn-save-product" onclick="saveProduct()" class="btn-primary" style="width: 100%;">Salvar Produto</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: SEGUIDORES / SEGUINDO -->
-  <div id="modal-user-list" class="modal-overlay hidden">
+  <!-- MODAL: DENUNCIAR PRODUTO -->
+  <div id="modal-report" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modal-user-list-title">Lista</h3>
-        <button onclick="closeUserListModal()">✕</button>
+        <h3>Denunciar Produto</h3>
+        <button onclick="closeReportModal()">✕</button>
       </div>
-      <div id="modal-user-list-body" class="modal-body"></div>
+      <div class="modal-body">
+        <input type="hidden" id="report-prod-id">
+        <input type="hidden" id="report-prod-name">
+        <input type="hidden" id="report-seller-name">
+
+        <label style="font-size: 12px; font-weight: bold;">Motivo da Denúncia</label>
+        <select id="report-category" onchange="toggleReportOtherText()">
+          <option value="Conteúdo Sexual">Conteúdo Sexual</option>
+          <option value="Drogas Ilegais">Drogas Ilegais</option>
+          <option value="Fraude / Golpe">Fraude / Golpe</option>
+          <option value="Violência / Ódio">Violência / Ódio</option>
+          <option value="Outros">Outros</option>
+        </select>
+
+        <div id="report-other-container" class="hidden">
+          <label style="font-size: 12px; font-weight: bold;">Descreva o motivo</label>
+          <textarea id="report-other-text" rows="3" placeholder="Explique detalhadamente o que aconteceu..." dir="ltr"></textarea>
+        </div>
+
+        <button onclick="submitReport()" class="btn-danger" style="width: 100%; margin-top: 10px;">Confirmar Denúncia</button>
+      </div>
     </div>
   </div>
 
@@ -492,9 +302,10 @@
     let postsList = [];
     let productsList = [];
     let messagesList = [];
-    let activeSearchTab = 'profiles';
+    let reportsList = [];
     let currentProfileUsername = null;
     let selectedImageBase64 = null;
+    let activeChatKey = null;
 
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
@@ -504,6 +315,7 @@
     const publicProductDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
     const publicMessagesColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'messages');
     const publicMessageDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'messages', id);
+    const publicReportsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'reports');
 
     window.currentUserData = currentUserData;
 
@@ -522,11 +334,7 @@
     onAuthStateChanged(auth, async (user) => {
       authUser = user;
       document.getElementById('view-loading').classList.add('hidden');
-
-      if (!user) {
-        showAuthInterface();
-        return;
-      }
+      if (!user) { showAuthInterface(); return; }
 
       const savedUsername = localStorage.getItem('arnos_logged_username');
       if (savedUsername) {
@@ -548,11 +356,7 @@
 
       onSnapshot(publicUsersColl(), (snapshot) => {
         usersMap = {};
-        snapshot.forEach(docSnap => {
-          const data = docSnap.data();
-          usersMap[data.username.toLowerCase()] = data;
-        });
-
+        snapshot.forEach(docSnap => usersMap[docSnap.data().username.toLowerCase()] = docSnap.data());
         if (currentUserData && usersMap[currentUserData.username.toLowerCase()]) {
           currentUserData = usersMap[currentUserData.username.toLowerCase()];
           window.currentUserData = currentUserData;
@@ -577,8 +381,14 @@
       onSnapshot(publicMessagesColl(), (snapshot) => {
         messagesList = [];
         snapshot.forEach(docSnap => messagesList.push({ id: docSnap.id, ...docSnap.data() }));
-        messagesList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        messagesList.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         updateUnreadBadge();
+        refreshCurrentView();
+      });
+
+      onSnapshot(publicReportsColl(), (snapshot) => {
+        reportsList = [];
+        snapshot.forEach(docSnap => reportsList.push({ id: docSnap.id, ...docSnap.data() }));
         refreshCurrentView();
       });
     }
@@ -597,7 +407,6 @@
 
     function refreshCurrentView() {
       if (!document.getElementById('view-auth').classList.contains('hidden')) return;
-
       if (!document.getElementById('view-feed').classList.contains('hidden')) renderFeed();
       else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
       else if (!document.getElementById('view-messages').classList.contains('hidden')) renderMessages();
@@ -610,18 +419,12 @@
       }
     }
 
-    // AUTH HANDLERS
+    // AUTH
     window.toggleAuth = function(mode) {
       document.getElementById('auth-error').classList.add('hidden');
-      if (mode === 'login') {
-        document.getElementById('auth-title').innerText = "Arnos Entrar";
-        document.getElementById('form-signup').classList.add('hidden');
-        document.getElementById('form-login').classList.remove('hidden');
-      } else {
-        document.getElementById('auth-title').innerText = "Arnos Criar Conta";
-        document.getElementById('form-signup').classList.remove('hidden');
-        document.getElementById('form-login').classList.add('hidden');
-      }
+      document.getElementById('auth-title').innerText = mode === 'login' ? "Arnos Entrar" : "Arnos Criar Conta";
+      document.getElementById('form-signup').classList.toggle('hidden', mode === 'login');
+      document.getElementById('form-login').classList.toggle('hidden', mode !== 'login');
     };
 
     window.handleSignup = async function(e) {
@@ -630,35 +433,18 @@
       const name = document.getElementById('signup-username').value.trim();
       const pwd = document.getElementById('signup-password').value;
       const dob = document.getElementById('signup-dob').value;
-      const btn = document.getElementById('btn-signup');
-
       if (!name || !pwd || !dob) return showAuthErr("Preencha todos os campos.");
-      if (pwd.length < 6) return showAuthErr("A palavra-passe deve ter pelo menos 6 caracteres.");
-
-      btn.disabled = true;
-      btn.innerText = "A criar...";
 
       try {
         const docSnap = await getDoc(publicUserDoc(name));
-        if (docSnap.exists()) {
-          showAuthErr("Este nome de utilizador já existe.");
-          btn.disabled = false;
-          btn.innerText = "Criar Conta";
-          return;
-        }
-
+        if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
         const newUserData = { username: name, password: pwd, dob: dob, followers: [], following: [] };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', name);
         showMainInterface();
-      } catch (err) {
-        showAuthErr("Erro ao criar conta.");
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Criar Conta";
-      }
+      } catch (err) { showAuthErr("Erro ao criar conta."); }
     };
 
     window.handleLogin = async function(e) {
@@ -666,45 +452,26 @@
       if (!authUser) await initAuth();
       const name = document.getElementById('login-username').value.trim();
       const pwd = document.getElementById('login-password').value;
-      const btn = document.getElementById('btn-login');
-
-      if (!name || !pwd) return showAuthErr("Preencha todos os campos.");
-
-      btn.disabled = true;
-      btn.innerText = "A entrar...";
 
       try {
         const userSnap = await getDoc(publicUserDoc(name));
-        if (!userSnap.exists() || userSnap.data().password !== pwd) {
-          showAuthErr("Utilizador ou palavra-passe incorreta.");
-          btn.disabled = false;
-          btn.innerText = "Entrar";
-          return;
-        }
-
+        if (!userSnap.exists() || userSnap.data().password !== pwd) return showAuthErr("Credenciais incorretas.");
         currentUserData = userSnap.data();
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', currentUserData.username);
         showMainInterface();
-      } catch (err) {
-        showAuthErr("Erro ao entrar.");
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Entrar";
-      }
+      } catch (err) { showAuthErr("Erro ao entrar."); }
     };
 
     window.logout = function() {
       localStorage.removeItem('arnos_logged_username');
-      currentUserData = null;
-      window.currentUserData = null;
+      currentUserData = null; window.currentUserData = null;
       showAuthInterface();
     };
 
     function showAuthErr(msg) {
       const err = document.getElementById('auth-error');
-      err.innerText = msg;
-      err.classList.remove('hidden');
+      err.innerText = msg; err.classList.remove('hidden');
     }
 
     function showAuthInterface() {
@@ -733,17 +500,10 @@
       document.getElementById('view-search').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
 
-      if (view === 'feed') {
-        document.getElementById('view-feed').classList.remove('hidden');
-        document.getElementById('search-input').value = '';
-        renderFeed();
-      } else if (view === 'marketplace') {
-        document.getElementById('view-marketplace').classList.remove('hidden');
-        renderMarketplace();
-      } else if (view === 'messages') {
-        document.getElementById('view-messages').classList.remove('hidden');
-        renderMessages();
-      } else if (view === 'profile') {
+      if (view === 'feed') { document.getElementById('view-feed').classList.remove('hidden'); renderFeed(); }
+      else if (view === 'marketplace') { document.getElementById('view-marketplace').classList.remove('hidden'); renderMarketplace(); }
+      else if (view === 'messages') { document.getElementById('view-messages').classList.remove('hidden'); renderMessages(); }
+      else if (view === 'profile') {
         document.getElementById('view-profile').classList.remove('hidden');
         currentProfileUsername = arg || (currentUserData ? currentUserData.username : '');
         renderProfile(currentProfileUsername);
@@ -759,28 +519,15 @@
       const textEl = document.getElementById('post-input');
       const content = textEl.value.trim();
       if (!content) return;
-
-      const btn = document.getElementById('btn-publish-post');
-      btn.disabled = true;
-
       try {
-        await addDoc(publicPostsColl(), {
-          author: currentUserData.username,
-          content: content,
-          timestamp: new Date().toISOString(),
-          likes: []
-        });
+        await addDoc(publicPostsColl(), { author: currentUserData.username, content, timestamp: new Date().toISOString(), likes: [] });
         textEl.value = '';
-      } catch (e) {} finally {
-        btn.disabled = false;
-      }
+      } catch (e) {}
     };
 
     window.deletePost = async function(postId) {
-      if (!confirm("Tens a certeza que queres apagar este post para sempre?")) return;
-      try {
-        await deleteDoc(publicPostDoc(postId));
-      } catch (e) {}
+      if (!confirm("Apagar post?")) return;
+      try { await deleteDoc(publicPostDoc(postId)); } catch (e) {}
     };
 
     function buildPostCard(post) {
@@ -802,15 +549,11 @@
 
     function renderFeed() {
       const list = document.getElementById('feed-list');
-      list.innerHTML = '';
-      if (postsList.length === 0) {
-        list.innerHTML = '<p style="color:#70757a;">Nenhuma publicação encontrada.</p>';
-        return;
-      }
+      list.innerHTML = postsList.length === 0 ? '<p style="color:#70757a;">Sem posts.</p>' : '';
       postsList.forEach(p => list.appendChild(buildPostCard(p)));
     }
 
-    // MARKETPLACE & CLOUDINARY UPLOAD
+    // MARKETPLACE & CLOUDINARY
     document.getElementById('prod-image-file').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -828,19 +571,11 @@
       formData.append('file', file);
       formData.append('upload_preset', 'ml_default');
       formData.append('api_key', '752794814119293');
-
       try {
-        // Substitui 'ml_default' pelo teu Cloud Name no Cloudinary caso seja diferente
-        const res = await fetch('https://api.cloudinary.com/v1_1/ml_default/image/upload', {
-          method: 'POST',
-          body: formData
-        });
-        if (res.ok) {
-          const data = await res.json();
-          return data.secure_url;
-        }
+        const res = await fetch('https://api.cloudinary.com/v1_1/ml_default/image/upload', { method: 'POST', body: formData });
+        if (res.ok) { const data = await res.json(); return data.secure_url; }
       } catch (e) {}
-      return selectedImageBase64; // Backup em Base64
+      return selectedImageBase64;
     }
 
     window.openCreateProductModal = function() {
@@ -856,24 +591,7 @@
       document.getElementById('modal-product').classList.remove('hidden');
     };
 
-    window.openEditProductModal = function(prodId) {
-      const prod = productsList.find(p => p.id === prodId);
-      if (!prod) return;
-
-      document.getElementById('modal-product-title').innerText = 'Editar Produto';
-      document.getElementById('prod-edit-id').value = prod.id;
-      document.getElementById('prod-name').value = prod.name;
-      document.getElementById('prod-price').value = prod.price;
-      document.getElementById('prod-location').value = prod.location;
-      document.getElementById('prod-desc').value = prod.description;
-      selectedImageBase64 = prod.imageUrl || null;
-      document.getElementById('prod-img-preview').innerHTML = selectedImageBase64 ? `<img src="${selectedImageBase64}" style="max-width:100%; max-height:150px;">` : '';
-      document.getElementById('modal-product').classList.remove('hidden');
-    };
-
-    window.closeProductModal = function() {
-      document.getElementById('modal-product').classList.add('hidden');
-    };
+    window.closeProductModal = function() { document.getElementById('modal-product').classList.add('hidden'); };
 
     window.saveProduct = async function() {
       const name = document.getElementById('prod-name').value.trim();
@@ -883,56 +601,30 @@
       const editId = document.getElementById('prod-edit-id').value;
       const fileInput = document.getElementById('prod-image-file');
 
-      if (!name || isNaN(price) || !location) {
-        alert("Preencha o nome, preço e localização.");
-        return;
-      }
-
-      const btn = document.getElementById('btn-save-product');
-      btn.disabled = true;
-      btn.innerText = "A guardar...";
+      if (!name || isNaN(price) || !location) return alert("Preencha nome, preço e localização.");
 
       let imageUrl = selectedImageBase64 || '';
-      if (fileInput.files.length > 0) {
-        imageUrl = await uploadToCloudinary(fileInput.files[0]);
-      }
+      if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]);
 
       try {
         if (editId) {
-          await updateDoc(publicProductDoc(editId), {
-            name, price, location, description: desc, imageUrl
-          });
+          await updateDoc(publicProductDoc(editId), { name, price, location, description: desc, imageUrl });
         } else {
-          await addDoc(publicProductsColl(), {
-            seller: currentUserData.username,
-            name, price, location, description: desc, imageUrl,
-            timestamp: new Date().toISOString()
-          });
+          await addDoc(publicProductsColl(), { seller: currentUserData.username, name, price, location, description: desc, imageUrl, timestamp: new Date().toISOString() });
         }
         closeProductModal();
-      } catch (e) {
-        alert("Erro ao guardar produto.");
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Salvar Produto";
-      }
+      } catch (e) { alert("Erro ao salvar produto."); }
     };
 
     window.deleteProduct = async function(id) {
-      if (!confirm("Tens a certeza que queres apagar este produto?")) return;
-      try {
-        await deleteDoc(publicProductDoc(id));
-      } catch (e) {}
+      if (!confirm("Apagar produto?")) return;
+      try { await deleteDoc(publicProductDoc(id)); } catch (e) {}
     };
 
     window.buyProduct = async function(prodId) {
       const prod = productsList.find(p => p.id === prodId);
       if (!prod || !currentUserData) return;
-
-      if (prod.seller.toLowerCase() === currentUserData.username.toLowerCase()) {
-        alert("Não podes comprar o teu próprio produto.");
-        return;
-      }
+      if (prod.seller.toLowerCase() === currentUserData.username.toLowerCase()) return alert("Não podes comprar o teu produto.");
 
       try {
         await addDoc(publicMessagesColl(), {
@@ -944,9 +636,53 @@
           read: false
         });
         alert(`Mensagem enviada para ${prod.seller}!`);
-      } catch (e) {
-        alert("Erro ao enviar mensagem.");
-      }
+      } catch (e) { alert("Erro ao enviar mensagem."); }
+    };
+
+    // DENÚNCIAS DE PRODUTOS
+    window.openReportModal = function(prodId, prodName, sellerName) {
+      document.getElementById('report-prod-id').value = prodId;
+      document.getElementById('report-prod-name').value = prodName;
+      document.getElementById('report-seller-name').value = sellerName;
+      document.getElementById('report-category').value = 'Conteúdo Sexual';
+      document.getElementById('report-other-text').value = '';
+      toggleReportOtherText();
+      document.getElementById('modal-report').classList.remove('hidden');
+    };
+
+    window.closeReportModal = function() {
+      document.getElementById('modal-report').classList.add('hidden');
+    };
+
+    window.toggleReportOtherText = function() {
+      const cat = document.getElementById('report-category').value;
+      document.getElementById('report-other-container').classList.toggle('hidden', cat !== 'Outros');
+    };
+
+    window.submitReport = async function() {
+      const prodId = document.getElementById('report-prod-id').value;
+      const productName = document.getElementById('report-prod-name').value;
+      const seller = document.getElementById('report-seller-name').value;
+      const category = document.getElementById('report-category').value;
+      const otherText = document.getElementById('report-other-text').value.trim();
+
+      const reason = category === 'Outros' ? otherText : category;
+      if (!reason) return alert("Por favor explique o motivo da denúncia.");
+
+      try {
+        await addDoc(publicReportsColl(), {
+          productId: prodId,
+          productName: productName,
+          seller: seller,
+          reporter: currentUserData.username,
+          reason: reason,
+          timestamp: new Date().toISOString(),
+          banned: false
+        });
+
+        closeReportModal();
+        alert("Sua denúncia foi feita. Aguarde no máximo de 2 a 7 dias para analisarmos da sua denúncia.");
+      } catch (e) { alert("Erro ao enviar denúncia."); }
     };
 
     function buildProductCard(prod) {
@@ -963,13 +699,15 @@
         <div class="product-price">€ ${prod.price.toFixed(2)}</div>
         <div class="product-location">📍 ${escapeHtml(prod.location)}</div>
         <p class="item-content">${escapeHtml(prod.description)}</p>
-        <div>
-          ${!isSelf ? `
-            <button class="btn-primary" onclick="buyProduct('${prod.id}')">Comprar</button>
-          ` : `
-            <button onclick="openEditProductModal('${prod.id}')">Editar</button>
-            <button class="btn-danger" onclick="deleteProduct('${prod.id}')">Apagar</button>
-          `}
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            ${!isSelf ? `
+              <button class="btn-primary" onclick="buyProduct('${prod.id}')">Comprar</button>
+            ` : `
+              <button class="btn-danger" onclick="deleteProduct('${prod.id}')">Apagar</button>
+            `}
+          </div>
+          ${!isSelf ? `<button class="btn-warning" onclick="openReportModal('${prod.id}', '${escapeStr(prod.name)}', '${escapeStr(prod.seller)}')">⚠️ Denunciar</button>` : ''}
         </div>
       `;
       return div;
@@ -977,18 +715,26 @@
 
     function renderMarketplace() {
       const list = document.getElementById('marketplace-list');
-      list.innerHTML = '';
-      if (productsList.length === 0) {
-        list.innerHTML = '<p style="color:#70757a;">Nenhum produto no Marketplace.</p>';
-        return;
-      }
+      list.innerHTML = productsList.length === 0 ? '<p style="color:#70757a;">Nenhum produto no Marketplace.</p>' : '';
       productsList.forEach(p => list.appendChild(buildProductCard(p)));
     }
 
-    // MESSAGES
+    // MESSAGES CONVERSATIONS
     function renderMessages() {
-      const list = document.getElementById('messages-list');
-      list.innerHTML = '';
+      const convListDiv = document.getElementById('messages-conversations-list');
+      const chatViewDiv = document.getElementById('messages-chat-view');
+
+      if (activeChatKey) {
+        convListDiv.classList.add('hidden');
+        chatViewDiv.classList.remove('hidden');
+        renderChatView(activeChatKey);
+        return;
+      }
+
+      convListDiv.classList.remove('hidden');
+      chatViewDiv.classList.add('hidden');
+      convListDiv.innerHTML = '';
+
       if (!currentUserData) return;
 
       const userMsgs = messagesList.filter(m => 
@@ -996,92 +742,154 @@
         m.buyer.toLowerCase() === currentUserData.username.toLowerCase()
       );
 
-      if (userMsgs.length === 0) {
-        list.innerHTML = '<p style="color:#70757a;">Nenhuma mensagem recebida ou enviada.</p>';
+      // Agrupar conversas por Produto + Outro Utilizador
+      const groups = {};
+      userMsgs.forEach(m => {
+        const otherUser = m.seller.toLowerCase() === currentUserData.username.toLowerCase() ? m.buyer : m.seller;
+        const key = `${m.productName}___${otherUser.toLowerCase()}`;
+        if (!groups[key]) {
+          groups[key] = { productName: m.productName, otherUser: otherUser, lastMsg: m, msgs: [] };
+        }
+        groups[key].msgs.push(m);
+        groups[key].lastMsg = m;
+      });
+
+      const keys = Object.keys(groups);
+      if (keys.length === 0) {
+        convListDiv.innerHTML = '<p style="color:#70757a;">Nenhuma conversa encontrada.</p>';
         return;
       }
 
-      userMsgs.forEach(m => {
-        const isSeller = m.seller.toLowerCase() === currentUserData.username.toLowerCase();
-        if (isSeller && !m.read) {
-          updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
-        }
-
+      keys.forEach(k => {
+        const g = groups[k];
         const div = document.createElement('div');
         div.className = 'card';
+        div.style.cursor = 'pointer';
+        div.onclick = () => openChatView(k);
         div.innerHTML = `
           <div class="item-header">
-            <strong>${isSeller ? `De: ${escapeHtml(m.buyer)}` : `Para: ${escapeHtml(m.seller)}`}</strong>
-            <span class="item-date">${new Date(m.timestamp).toLocaleString()}</span>
+            <h3>📦 ${escapeHtml(g.productName)}</h3>
+            <span class="item-date">${new Date(g.lastMsg.timestamp).toLocaleTimeString()}</span>
           </div>
-          <p style="margin: 8px 0; font-size: 14px;"><strong>Produto:</strong> ${escapeHtml(m.productName)}</p>
-          <p style="background: #f1f3f4; padding: 10px; border-radius: 4px; font-style: italic;">"${escapeHtml(m.message)}"</p>
+          <p style="font-size: 13px; color: #5f6368;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong></p>
+          <p style="font-size: 13px; margin-top: 4px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message)}"</p>
         `;
-        list.appendChild(div);
+        convListDiv.appendChild(div);
       });
     }
 
-    // SEARCH
+    function openChatView(key) {
+      activeChatKey = key;
+      renderMessages();
+    }
+
+    window.closeChatView = function() {
+      activeChatKey = null;
+      renderMessages();
+    };
+
+    function renderChatView(key) {
+      const parts = key.split('___');
+      const prodName = parts[0];
+      const otherUser = parts[1];
+
+      document.getElementById('chat-title').innerText = `Produto: ${prodName} (com ${otherUser})`;
+
+      const chatMsgs = messagesList.filter(m => {
+        const isUserMatch = (m.seller.toLowerCase() === currentUserData.username.toLowerCase() && m.buyer.toLowerCase() === otherUser) ||
+                            (m.buyer.toLowerCase() === currentUserData.username.toLowerCase() && m.seller.toLowerCase() === otherUser);
+        return m.productName === prodName && isUserMatch;
+      });
+
+      const container = document.getElementById('chat-bubbles');
+      container.innerHTML = '';
+
+      chatMsgs.forEach(m => {
+        if (m.seller.toLowerCase() === currentUserData.username.toLowerCase() && !m.read) {
+          updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
+        }
+
+        const isMine = m.buyer.toLowerCase() === currentUserData.username.toLowerCase();
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${isMine ? 'mine' : 'other'}`;
+        bubble.innerText = m.message;
+        container.appendChild(bubble);
+      });
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    window.sendChatMessage = async function() {
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg || !activeChatKey) return;
+
+      const parts = activeChatKey.split('___');
+      const prodName = parts[0];
+      const otherUser = parts[1];
+
+      try {
+        await addDoc(publicMessagesColl(), {
+          buyer: currentUserData.username,
+          seller: otherUser,
+          productName: prodName,
+          message: msg,
+          timestamp: new Date().toISOString(),
+          read: false
+        });
+        input.value = '';
+      } catch (e) {}
+    };
+
+    // SEARCH & PROFILE
     window.switchSearchTab = function(tab) {
-      activeSearchTab = tab;
       document.getElementById('search-results-profiles').classList.toggle('hidden', tab !== 'profiles');
       document.getElementById('search-results-posts').classList.toggle('hidden', tab !== 'posts');
       document.getElementById('search-results-products').classList.toggle('hidden', tab !== 'products');
-
-      document.getElementById('tab-btn-profiles').classList.toggle('active', tab === 'profiles');
-      document.getElementById('tab-btn-posts').classList.toggle('active', tab === 'posts');
-      document.getElementById('tab-btn-products').classList.toggle('active', tab === 'products');
     };
 
     function renderSearch(query) {
       document.getElementById('search-query-text').innerText = query;
       const q = query.toLowerCase();
 
-      // Profiles
       const matchedUsers = Object.keys(usersMap).filter(k => k.includes(q));
       document.getElementById('count-profiles').innerText = matchedUsers.length;
       const profDiv = document.getElementById('search-results-profiles');
-      profDiv.innerHTML = matchedUsers.length === 0 ? '<p style="color:#70757a;">Nenhum perfil encontrado.</p>' : '';
+      profDiv.innerHTML = matchedUsers.length === 0 ? '<p style="color:#70757a;">Nenhum perfil.</p>' : '';
       matchedUsers.forEach(k => {
-        const u = usersMap[k];
         const div = document.createElement('div');
         div.className = 'card';
-        div.innerHTML = `<span class="author-name" onclick="navigateTo('profile', '${escapeStr(u.username)}')">${escapeHtml(u.username)}</span>`;
+        div.innerHTML = `<span class="author-name" onclick="navigateTo('profile', '${escapeStr(usersMap[k].username)}')">${escapeHtml(usersMap[k].username)}</span>`;
         profDiv.appendChild(div);
       });
 
-      // Posts
-      const matchedPosts = postsList.filter(p => p.content.toLowerCase().includes(q) || p.author.toLowerCase().includes(q));
+      const matchedPosts = postsList.filter(p => p.content.toLowerCase().includes(q));
       document.getElementById('count-posts').innerText = matchedPosts.length;
       const postsDiv = document.getElementById('search-results-posts');
-      postsDiv.innerHTML = matchedPosts.length === 0 ? '<p style="color:#70757a;">Nenhum post encontrado.</p>' : '';
+      postsDiv.innerHTML = matchedPosts.length === 0 ? '<p style="color:#70757a;">Nenhum post.</p>' : '';
       matchedPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
 
-      // Products
-      const matchedProds = productsList.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.seller.toLowerCase().includes(q));
+      const matchedProds = productsList.filter(p => p.name.toLowerCase().includes(q));
       document.getElementById('count-products').innerText = matchedProds.length;
       const prodsDiv = document.getElementById('search-results-products');
-      prodsDiv.innerHTML = matchedProds.length === 0 ? '<p style="color:#70757a;">Nenhum produto encontrado.</p>' : '';
+      prodsDiv.innerHTML = matchedProds.length === 0 ? '<p style="color:#70757a;">Nenhum produto.</p>' : '';
       matchedProds.forEach(p => prodsDiv.appendChild(buildProductCard(p)));
     }
 
-    // PROFILE
     window.switchProfileTab = function(tab) {
       document.getElementById('profile-posts-list').classList.toggle('hidden', tab !== 'posts');
       document.getElementById('profile-vitrine-list').classList.toggle('hidden', tab !== 'vitrine');
+      document.getElementById('profile-reports-list').classList.toggle('hidden', tab !== 'reports');
+
       document.getElementById('profile-tab-posts').classList.toggle('active', tab === 'posts');
       document.getElementById('profile-tab-vitrine').classList.toggle('active', tab === 'vitrine');
+      document.getElementById('profile-tab-reports').classList.toggle('active', tab === 'reports');
     };
 
     function renderProfile(name) {
       const userKey = name.toLowerCase();
       const user = usersMap[userKey];
-
-      if (!user) {
-        document.getElementById('profile-name-display').innerText = name;
-        document.getElementById('profile-dob-display').innerText = "Utilizador não encontrado.";
-        return;
-      }
+      if (!user) return;
 
       document.getElementById('profile-name-display').innerText = user.username;
       document.getElementById('profile-dob-display').innerText = "Nascimento: " + (user.dob || 'N/A');
@@ -1090,44 +898,48 @@
       const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
 
       document.getElementById('stat-posts').innerText = userPosts.length;
-      document.getElementById('stat-followers').innerText = user.followers ? user.followers.length : 0;
-      document.getElementById('stat-following').innerText = user.following ? user.following.length : 0;
 
-      // Render Posts
       const postsDiv = document.getElementById('profile-posts-list');
       postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Sem publicações.</p>' : '';
       userPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
 
-      // Render Vitrine
       const vitrineDiv = document.getElementById('profile-vitrine-list');
-      vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Este utilizador não tem produtos à venda.</p>' : '';
+      vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Sem produtos à venda.</p>' : '';
       userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
-    }
 
-    // UTILS
-    function escapeHtml(str) {
-      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-    function escapeStr(str) {
-      return String(str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
-    }
+      // Render Histórico de Denúncias
+      const reportsDiv = document.getElementById('profile-reports-list');
+      const myReports = reportsList.filter(r => r.reporter.toLowerCase() === userKey);
+      reportsDiv.innerHTML = myReports.length === 0 ? '<p style="color:#70757a;">Você ainda não fez nenhuma denúncia.</p>' : '';
 
-    // EVENT LISTENERS
-    window.onload = function() {
-      const searchInput = document.getElementById('search-input');
-      searchInput.addEventListener('input', function(e) {
-        const val = e.target.value;
-        if (val.length > 0) {
-          if (document.getElementById('view-search').classList.contains('hidden')) {
-            navigateTo('search', val);
-          } else {
-            renderSearch(val);
-          }
-        } else {
-          navigateTo('feed');
-        }
+      myReports.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <div class="item-header">
+            <strong>Produto: ${escapeHtml(r.productName)}</strong>
+            <span class="item-date">${new Date(r.timestamp).toLocaleDateString()}</span>
+          </div>
+          <p style="font-size:13px;"><strong>Motivo:</strong> ${escapeHtml(r.reason)}</p>
+          <p style="font-size:13px; margin-top:6px;">
+            <strong>Status:</strong> 
+            ${r.banned 
+              ? `<span style="color:#d93025; font-weight:bold;">Denúncia feita, esse produto foi banido.</span>` 
+              : `<span style="color:#f2994a; font-weight:bold;">Em análise (Aguarde de 2 a 7 dias)</span>`}
+          </p>
+        `;
+        reportsDiv.appendChild(div);
       });
+    }
 
+    function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function escapeStr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
+
+    window.onload = function() {
+      document.getElementById('search-input').addEventListener('input', function(e) {
+        if (e.target.value.length > 0) navigateTo('search', e.target.value);
+        else navigateTo('feed');
+      });
       initAuth();
     };
   </script>
