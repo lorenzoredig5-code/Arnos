@@ -59,6 +59,11 @@
     .item-content { font-size: 14px; margin-bottom: 12px; white-space: pre-wrap; }
     .product-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
     .product-price { font-size: 18px; font-weight: bold; color: #188038; margin-bottom: 4px; }
+    
+    .bot-badge {
+      background-color: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa;
+      font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: bold; margin-left: 4px;
+    }
 
     /* COMMENTS SECTION */
     .comments-section { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
@@ -166,8 +171,15 @@
 
     <!-- MESSAGES VIEW -->
     <div id="view-messages" class="hidden">
-      <h2 style="margin-bottom: 16px;">Mensagens do Marketplace</h2>
+      <h2 style="margin-bottom: 12px;">Mensagens / Marketplace</h2>
+      
+      <div class="tabs">
+        <button id="msg-tab-profile" class="tab-btn active" onclick="switchMsgTab('profile')">Mensagens de Perfis</button>
+        <button id="msg-tab-marketplace" class="tab-btn" onclick="switchMsgTab('marketplace')">Mensagens do Marketplace</button>
+      </div>
+
       <div id="messages-conversations-list"></div>
+      
       <div id="messages-chat-view" class="hidden">
         <button onclick="closeChatView()" style="margin-bottom: 12px;">← Voltar para Conversas</button>
         <h3 id="chat-title" style="margin-bottom: 8px;"></h3>
@@ -199,9 +211,10 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
             <h2 id="profile-name-display" style="display: inline-block;"></h2>
+            <span id="profile-bot-badge" class="bot-badge hidden">BOT</span>
             <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
           </div>
-          <div id="profile-action-btn-area"></div>
+          <div id="profile-action-btn-area" style="display:flex; gap:6px;"></div>
         </div>
 
         <div class="profile-stats">
@@ -222,6 +235,22 @@
       <div id="profile-reports-list" class="hidden"></div>
     </div>
 
+  </div>
+
+  <!-- MODAL: ENVIAR MENSAGEM DIRETA DE PERFIL -->
+  <div id="modal-direct-msg" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-msg-target-name">Enviar Mensagem</h3>
+        <button onclick="closeDirectMsgModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="direct-msg-target-username">
+        <label style="font-size: 12px; font-weight: bold;">Sua Mensagem</label>
+        <textarea id="direct-msg-text" rows="4" placeholder="Escreva a sua mensagem aqui..." dir="ltr"></textarea>
+        <button onclick="sendDirectMessageFromProfile()" class="btn-primary" style="width: 100%; margin-top: 8px;">Enviar Mensagem</button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL: LISTA DE SEGUIDORES / SEGUINDO -->
@@ -323,6 +352,7 @@
     let currentProfileUsername = null;
     let selectedImageBase64 = null;
     let activeChatKey = null;
+    let activeMsgSubTab = 'profile';
 
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
@@ -374,6 +404,7 @@
       onSnapshot(publicUsersColl(), (snapshot) => {
         usersMap = {};
         snapshot.forEach(docSnap => usersMap[docSnap.data().username.toLowerCase()] = docSnap.data());
+        ensureArnosBotExists();
         if (currentUserData && usersMap[currentUserData.username.toLowerCase()]) {
           currentUserData = usersMap[currentUserData.username.toLowerCase()];
           window.currentUserData = currentUserData;
@@ -385,6 +416,7 @@
         postsList = [];
         snapshot.forEach(docSnap => postsList.push({ id: docSnap.id, ...docSnap.data() }));
         postsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        checkAndPostArnosDaily();
         refreshCurrentView();
       });
 
@@ -410,16 +442,51 @@
       });
     }
 
+    async function ensureArnosBotExists() {
+      const botName = "Arnos";
+      const botKey = botName.toLowerCase();
+      if (!usersMap[botKey]) {
+        try {
+          await setDoc(publicUserDoc(botName), {
+            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, followers: [], following: []
+          });
+        } catch(e) {}
+      }
+    }
+
+    async function checkAndPostArnosDaily() {
+      if (!authUser) return;
+      const botName = "Arnos";
+      const arnosPosts = postsList.filter(p => p.author.toLowerCase() === botName.toLowerCase());
+      const now = new Date();
+      let shouldPost = false;
+
+      if (arnosPosts.length === 0) shouldPost = true;
+      else {
+        const lastPostDate = new Date(arnosPosts[0].timestamp);
+        if ((now - lastPostDate) / (1000 * 60 * 60) >= 24) shouldPost = true;
+      }
+
+      if (shouldPost) {
+        const msgs = [
+          "Olá comunidade Arnos! Não se esqueçam de conferir as novidades no Marketplace hoje. 🛒✨",
+          "Dica do Arnos: Mantenham os vossos perfis atualizados e explorem a vitrine de outros utilizadores! 🚀",
+          "Mais um dia espetacular na rede Arnos! Publique fotos e interaja com os teus amigos. 💡"
+        ];
+        try {
+          await addDoc(publicPostsColl(), {
+            author: botName, content: msgs[Math.floor(Math.random() * msgs.length)], timestamp: now.toISOString(), likes: [], comments: []
+          });
+        } catch (e) {}
+      }
+    }
+
     function updateUnreadBadge() {
       if (!currentUserData) return;
       const unreadCount = messagesList.filter(m => m.seller.toLowerCase() === currentUserData.username.toLowerCase() && !m.read).length;
       const badge = document.getElementById('msg-badge');
-      if (unreadCount > 0) {
-        badge.innerText = unreadCount;
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-      }
+      if (unreadCount > 0) { badge.innerText = unreadCount; badge.classList.remove('hidden'); }
+      else { badge.classList.add('hidden'); }
     }
 
     function refreshCurrentView() {
@@ -455,7 +522,7 @@
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, dob: dob, followers: [], following: [] };
+        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, followers: [], following: [] };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
@@ -530,6 +597,37 @@
       }
     };
 
+    // MENSAGEM DIRETA DE PERFIL
+    window.openDirectMsgModal = function(targetName) {
+      document.getElementById('modal-msg-target-name').innerText = `Mensagem para ${targetName}`;
+      document.getElementById('direct-msg-target-username').value = targetName;
+      document.getElementById('direct-msg-text').value = '';
+      document.getElementById('modal-direct-msg').classList.remove('hidden');
+    };
+
+    window.closeDirectMsgModal = function() {
+      document.getElementById('modal-direct-msg').classList.add('hidden');
+    };
+
+    window.sendDirectMessageFromProfile = async function() {
+      const targetUser = document.getElementById('direct-msg-target-username').value;
+      const text = document.getElementById('direct-msg-text').value.trim();
+      if (!text || !currentUserData) return;
+
+      try {
+        await addDoc(publicMessagesColl(), {
+          buyer: currentUserData.username,
+          seller: targetUser,
+          productName: '[Perfil]', // Marcador para mensagem de perfil
+          message: text,
+          timestamp: new Date().toISOString(),
+          read: false
+        });
+        closeDirectMsgModal();
+        alert(`Mensagem enviada para ${targetUser}!`);
+      } catch (e) { alert("Erro ao enviar mensagem."); }
+    };
+
     // FOLLOW / UNFOLLOW SYSTEM
     window.toggleFollow = async function(targetUsername) {
       if (!currentUserData || targetUsername.toLowerCase() === currentUserData.username.toLowerCase()) return;
@@ -554,7 +652,7 @@
       try {
         await updateDoc(publicUserDoc(currentUserData.username), { following: myFollowing });
         await updateDoc(publicUserDoc(targetUser.username), { followers: targetFollowers });
-      } catch (e) { console.error("Erro ao seguir:", e); }
+      } catch (e) {}
     };
 
     // POSTS, LIKES & COMMENTS
@@ -626,6 +724,8 @@
     };
 
     function buildPostCard(post) {
+      const authorObj = usersMap[post.author.toLowerCase()];
+      const isBot = authorObj && authorObj.isBot;
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
       const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(post.author);
       const isLiked = post.likes && currentUserData && post.likes.includes(currentUserData.username);
@@ -638,7 +738,8 @@
         <div class="item-header">
           <div>
             <span class="author-name" onclick="navigateTo('profile', '${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
-            ${!isSelf ? `
+            ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
+            ${!isSelf && !isBot ? `
               <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size:11px; padding:2px 8px; margin-left:6px;">
                 ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
               </button>
@@ -852,7 +953,14 @@
       productsList.forEach(p => list.appendChild(buildProductCard(p)));
     }
 
-    // MESSAGES CONVERSATIONS
+    // MESSAGES CONVERSATIONS (PERFIL vs MARKETPLACE)
+    window.switchMsgTab = function(tab) {
+      activeMsgSubTab = tab;
+      document.getElementById('msg-tab-profile').classList.toggle('active', tab === 'profile');
+      document.getElementById('msg-tab-marketplace').classList.toggle('active', tab === 'marketplace');
+      renderMessages();
+    };
+
     function renderMessages() {
       const convListDiv = document.getElementById('messages-conversations-list');
       const chatViewDiv = document.getElementById('messages-chat-view');
@@ -875,8 +983,14 @@
         m.buyer.toLowerCase() === currentUserData.username.toLowerCase()
       );
 
+      // Filtrar por aba de Mensagem de Perfil ou Marketplace
+      const filteredMsgs = userMsgs.filter(m => {
+        const isProfileMsg = m.productName === '[Perfil]';
+        return activeMsgSubTab === 'profile' ? isProfileMsg : !isProfileMsg;
+      });
+
       const groups = {};
-      userMsgs.forEach(m => {
+      filteredMsgs.forEach(m => {
         const otherUser = m.seller.toLowerCase() === currentUserData.username.toLowerCase() ? m.buyer : m.seller;
         const key = `${m.productName}___${otherUser.toLowerCase()}`;
         if (!groups[key]) groups[key] = { productName: m.productName, otherUser: otherUser, lastMsg: m, msgs: [] };
@@ -886,7 +1000,7 @@
 
       const keys = Object.keys(groups);
       if (keys.length === 0) {
-        convListDiv.innerHTML = '<p style="color:#70757a;">Nenhuma conversa encontrada.</p>';
+        convListDiv.innerHTML = `<p style="color:#70757a;">Nenhuma conversa em ${activeMsgSubTab === 'profile' ? 'Mensagens de Perfis' : 'Mensagens do Marketplace'}.</p>`;
         return;
       }
 
@@ -898,7 +1012,7 @@
         div.onclick = () => openChatView(k);
         div.innerHTML = `
           <div class="item-header">
-            <h3>📦 ${escapeHtml(g.productName)}</h3>
+            <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : `📦 Produto: ${escapeHtml(g.productName)}`}</h3>
             <span class="item-date">${new Date(g.lastMsg.timestamp).toLocaleTimeString()}</span>
           </div>
           <p style="font-size: 13px; color: #5f6368;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong></p>
@@ -916,7 +1030,7 @@
       const prodName = parts[0];
       const otherUser = parts[1];
 
-      document.getElementById('chat-title').innerText = `Produto: ${prodName} (com ${otherUser})`;
+      document.getElementById('chat-title').innerText = prodName === '[Perfil]' ? `Conversa Direta com ${otherUser}` : `Produto: ${prodName} (com ${otherUser})`;
 
       const chatMsgs = messagesList.filter(m => {
         const isUserMatch = (m.seller.toLowerCase() === currentUserData.username.toLowerCase() && m.buyer.toLowerCase() === otherUser) ||
@@ -1021,14 +1135,18 @@
       matchedUsers.forEach(k => {
         const uObj = usersMap[k];
         const isSelf = currentUserData && uObj.username.toLowerCase() === currentUserData.username.toLowerCase();
+        const isBot = uObj.isBot;
         const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(uObj.username);
 
         const div = document.createElement('div');
         div.className = 'card';
         div.style.cssText = 'display:flex; justify-content:space-between; align-items:center;';
         div.innerHTML = `
-          <span class="author-name" onclick="navigateTo('profile', '${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
-          ${!isSelf ? `
+          <div>
+            <span class="author-name" onclick="navigateTo('profile', '${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
+            ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
+          </div>
+          ${!isSelf && !isBot ? `
             <button onclick="toggleFollow('${escapeStr(uObj.username)}')" style="font-size:12px;">
               ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
             </button>
@@ -1067,18 +1185,29 @@
 
       document.getElementById('profile-name-display').innerText = user.username;
       document.getElementById('profile-dob-display').innerText = "Nascimento: " + (user.dob || 'N/A');
+      
+      const botBadge = document.getElementById('profile-bot-badge');
+      if (user.isBot) botBadge.classList.remove('hidden');
+      else botBadge.classList.add('hidden');
 
       const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
       const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(user.username);
 
       const actionArea = document.getElementById('profile-action-btn-area');
       actionArea.innerHTML = '';
-      if (!isSelf) {
-        const btn = document.createElement('button');
-        btn.innerText = isFollowing ? 'Deixar de seguir' : 'Seguir';
-        btn.onclick = () => toggleFollow(user.username);
-        if (!isFollowing) btn.className = 'btn-primary';
-        actionArea.appendChild(btn);
+      if (!isSelf && !user.isBot) {
+        // Botão Seguir / Deixar de Seguir
+        const btnFollow = document.createElement('button');
+        btnFollow.innerText = isFollowing ? 'Deixar de seguir' : 'Seguir';
+        btnFollow.onclick = () => toggleFollow(user.username);
+        if (!isFollowing) btnFollow.className = 'btn-primary';
+        actionArea.appendChild(btnFollow);
+
+        // Botão Enviar Mensagem Direta
+        const btnMsg = document.createElement('button');
+        btnMsg.innerText = '💬 Enviar Mensagem';
+        btnMsg.onclick = () => openDirectMsgModal(user.username);
+        actionArea.appendChild(btnMsg);
       }
 
       const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
