@@ -827,10 +827,11 @@
       const formData = new FormData();
       formData.append('file', file);
       formData.append('upload_preset', 'ml_default');
-      formData.append('api_key', '7521bb0f885a63a');
+      formData.append('api_key', '752794814119293');
 
       try {
-        const res = await fetch('https://api.cloudinary.com/v1_1/demo/image/upload', {
+        // Substitui 'ml_default' pelo teu Cloud Name no Cloudinary caso seja diferente
+        const res = await fetch('https://api.cloudinary.com/v1_1/ml_default/image/upload', {
           method: 'POST',
           body: formData
         });
@@ -839,7 +840,7 @@
           return data.secure_url;
         }
       } catch (e) {}
-      return selectedImageBase64; // Fallback
+      return selectedImageBase64; // Backup em Base64
     }
 
     window.openCreateProductModal = function() {
