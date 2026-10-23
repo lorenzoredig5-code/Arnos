@@ -84,12 +84,13 @@
 
     /* MODAL */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-card { background: #fff; border-radius: 8px; border: 1px solid #dadce0; width: 90%; max-width: 480px; max-height: 85vh; display: flex; flex-direction: column; }
+    .modal-card { background: #fff; border-radius: 8px; border: 1px solid #dadce0; width: 90%; max-width: 520px; max-height: 90vh; display: flex; flex-direction: column; }
     .modal-header { padding: 12px 16px; border-bottom: 1px solid #dadce0; display: flex; justify-content: space-between; align-items: center; }
     .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
 
     .auth-box { max-width: 360px; margin: 40px auto; padding: 24px; background-color: #fff; border: 1px solid #dadce0; border-radius: 8px; }
     .error-msg { color: #d93025; font-size: 13px; margin-bottom: 12px; }
+    .rules-box { background-color: #fce8e6; border: 1px solid #f5c6cb; border-radius: 6px; padding: 12px; margin-top: 12px; font-size: 12px; color: #a50e0e; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -265,7 +266,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CRIAR / EDITAR PRODUTO -->
+  <!-- MODAL: CRIAR / EDITAR PRODUTO (ATUALIZADO COM INFORMAÇÕES DO FACEBOOK) -->
   <div id="modal-product" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -274,18 +275,82 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="prod-edit-id">
-        <label style="font-size: 12px; font-weight: bold;">Nome do Produto</label>
-        <input type="text" id="prod-name" required placeholder="Ex: Tênis Nike" dir="ltr">
-        <label style="font-size: 12px; font-weight: bold;">Preço (€ / R$)</label>
+
+        <!-- TÍTULO -->
+        <label style="font-size: 12px; font-weight: bold;">Title *</label>
+        <input type="text" id="prod-name" required placeholder="Ex: Tênis Nike Tam 40" dir="ltr">
+
+        <!-- PREÇO -->
+        <label style="font-size: 12px; font-weight: bold;">Price (€ / R$) *</label>
         <input type="number" id="prod-price" step="0.01" required placeholder="0.00" dir="ltr">
-        <label style="font-size: 12px; font-weight: bold;">Localização</label>
-        <input type="text" id="prod-location" required placeholder="Ex: Lisboa, Portugal" dir="ltr">
-        <label style="font-size: 12px; font-weight: bold;">Descrição</label>
-        <textarea id="prod-desc" rows="3" placeholder="Detalhes do produto..." dir="ltr"></textarea>
-        <label style="font-size: 12px; font-weight: bold;">Imagem do Produto</label>
+
+        <!-- CATEGORIA (FACEBOOK) -->
+        <label style="font-size: 12px; font-weight: bold;">Category *</label>
+        <select id="prod-category">
+          <option value="Electronics">Electronics & Appliances</option>
+          <option value="Clothing">Clothing & Accessories</option>
+          <option value="Home">Home & Garden</option>
+          <option value="Vehicles">Vehicles & Parts</option>
+          <option value="Hobbies">Hobbies, Books & Music</option>
+          <option value="Others">Others</option>
+        </select>
+
+        <!-- CONDIÇÃO (FACEBOOK) -->
+        <label style="font-size: 12px; font-weight: bold;">Condition *</label>
+        <select id="prod-condition">
+          <option value="New">New</option>
+          <option value="Used - Like New">Used - Like New</option>
+          <option value="Used - Good">Used - Good</option>
+          <option value="Used - Fair">Used - Fair</option>
+        </select>
+
+        <!-- LOCALIZAÇÃO -->
+        <label style="font-size: 12px; font-weight: bold;">Location *</label>
+        <input type="text" id="prod-location" required placeholder="Ex: Lisboa, Portugal ou São Paulo, BR" dir="ltr">
+
+        <!-- DISPONIBILIDADE (FACEBOOK) -->
+        <label style="font-size: 12px; font-weight: bold;">Availability</label>
+        <select id="prod-availability">
+          <option value="Single Item">List as Single Item</option>
+          <option value="In Stock">List as In Stock</option>
+        </select>
+
+        <!-- OPÇÕES DE ENTREGA (FACEBOOK) -->
+        <label style="font-size: 12px; font-weight: bold;">Delivery Method</label>
+        <select id="prod-delivery">
+          <option value="Local Pickup">Public Meeting / Local Pickup Only</option>
+          <option value="Door Pickup">Door Pickup</option>
+          <option value="Shipping">Shipping Available</option>
+        </select>
+
+        <!-- ETIQUETAS / TAGS (FACEBOOK) -->
+        <label style="font-size: 12px; font-weight: bold;">Product Tags / SKU (Optional)</label>
+        <input type="text" id="prod-tags" placeholder="Ex: nike, tenis, sapato, novo" dir="ltr">
+
+        <!-- DESCRIÇÃO -->
+        <label style="font-size: 12px; font-weight: bold;">Description</label>
+        <textarea id="prod-desc" rows="3" placeholder="Describe brand, size, status, reason for selling..." dir="ltr"></textarea>
+
+        <!-- FOTOS DO PRODUTO (ATÉ 10 FOTOS / IMAGEM) -->
+        <label style="font-size: 12px; font-weight: bold;">Product Images (Up to 10 photos)</label>
         <input type="file" id="prod-image-file" accept="image/*" style="margin-bottom: 8px;">
         <div id="prod-img-preview" style="margin-bottom: 12px;"></div>
-        <button id="btn-save-product" onclick="saveProduct()" class="btn-primary" style="width: 100%;">Salvar Produto</button>
+
+        <button id="btn-save-product" onclick="saveProduct()" class="btn-primary" style="width: 100%;">Salvar e Publicar Produto</button>
+
+        <!-- CAIXA DE REGRAS EM INGLÊS CONFORME SOLICITADO -->
+        <div class="rules-box">
+          <strong style="display:block; margin-bottom:4px; font-size:13px;">⚠️ Marketplace Listing Policies & Prohibited Items:</strong>
+          <p style="margin-bottom:4px;">To protect our community, items listed on this Marketplace must comply with our safety guidelines.</p>
+          <ul style="margin-left: 18px; line-height: 1.4;">
+            <li><strong>Pets & Animals:</strong> Sales or adoption of animals are strictly prohibited.</li>
+            <li><strong>Weapons & Ammunition:</strong> Firearms, explosives, knives, or tactical gear are strictly banned.</li>
+            <li><strong>Alcohol, Drugs & Medications:</strong> Prescription drugs, illegal substances, alcohol, and medical devices are not allowed.</li>
+            <li><strong>Services:</strong> Only physical products can be listed. Services or jobs are prohibited.</li>
+            <li><strong>Replicas & Counterfeits:</strong> Counterfeit, fake, or knockoff brand products are illegal and prohibited.</li>
+          </ul>
+        </div>
+
       </div>
     </div>
   </div>
@@ -305,9 +370,11 @@
         <label style="font-size: 12px; font-weight: bold;">Motivo da Denúncia</label>
         <select id="report-category" onchange="toggleReportOtherText()">
           <option value="Conteúdo Sexual">Conteúdo Sexual</option>
-          <option value="Drogas Ilegais">Drogas Ilegais</option>
+          <option value="Drogas / Medicamentos">Drogas / Medicamentos</option>
+          <option value="Animais">Venda de Animais</option>
+          <option value="Armas / Munições">Armas / Munições</option>
+          <option value="Produtos Falsificados">Réplicas / Produtos Falsificados</option>
           <option value="Fraude / Golpe">Fraude / Golpe</option>
-          <option value="Violência / Ódio">Violência / Ódio</option>
           <option value="Outros">Outros</option>
         </select>
 
@@ -482,13 +549,9 @@
       }
     }
 
-    // ATUALIZAÇÃO DO BADGE COM CONTAGEM EXATA DE MENSAGENS NÃO LIDAS
     function updateUnreadBadge() {
       if (!currentUserData) return;
-
       const myUser = currentUserData.username.toLowerCase();
-      
-      // Conta todas as mensagens não lidas enviadas por outros para o utilizador atual
       const unreadCount = messagesList.filter(m => {
         const sender = (m.sender || m.buyer || '').toLowerCase();
         const isTargetUser = (m.seller.toLowerCase() === myUser || m.buyer.toLowerCase() === myUser);
@@ -841,7 +904,12 @@
       document.getElementById('prod-edit-id').value = '';
       document.getElementById('prod-name').value = '';
       document.getElementById('prod-price').value = '';
+      document.getElementById('prod-category').value = 'Electronics';
+      document.getElementById('prod-condition').value = 'New';
       document.getElementById('prod-location').value = '';
+      document.getElementById('prod-availability').value = 'Single Item';
+      document.getElementById('prod-delivery').value = 'Local Pickup';
+      document.getElementById('prod-tags').value = '';
       document.getElementById('prod-desc').value = '';
       document.getElementById('prod-image-file').value = '';
       document.getElementById('prod-img-preview').innerHTML = '';
@@ -854,21 +922,32 @@
     window.saveProduct = async function() {
       const name = document.getElementById('prod-name').value.trim();
       const price = parseFloat(document.getElementById('prod-price').value);
+      const category = document.getElementById('prod-category').value;
+      const condition = document.getElementById('prod-condition').value;
       const location = document.getElementById('prod-location').value.trim();
+      const availability = document.getElementById('prod-availability').value;
+      const delivery = document.getElementById('prod-delivery').value;
+      const tags = document.getElementById('prod-tags').value.trim();
       const desc = document.getElementById('prod-desc').value.trim();
       const editId = document.getElementById('prod-edit-id').value;
       const fileInput = document.getElementById('prod-image-file');
 
-      if (!name || isNaN(price) || !location) return alert("Preencha nome, preço e localização.");
+      if (!name || isNaN(price) || !location) return alert("Please fill Title, Price and Location.");
 
       let imageUrl = selectedImageBase64 || '';
       if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]);
 
+      const productPayload = {
+        seller: currentUserData.username,
+        name, price, category, condition, location, availability, delivery, tags, description: desc, imageUrl,
+        timestamp: new Date().toISOString()
+      };
+
       try {
         if (editId) {
-          await updateDoc(publicProductDoc(editId), { name, price, location, description: desc, imageUrl });
+          await updateDoc(publicProductDoc(editId), productPayload);
         } else {
-          await addDoc(publicProductsColl(), { seller: currentUserData.username, name, price, location, description: desc, imageUrl, timestamp: new Date().toISOString() });
+          await addDoc(publicProductsColl(), productPayload);
         }
         closeProductModal();
       } catch (e) { alert("Erro ao salvar produto."); }
@@ -949,8 +1028,11 @@
         ${prod.imageUrl ? `<img src="${escapeHtml(prod.imageUrl)}" class="product-img">` : ''}
         <h3>${escapeHtml(prod.name)}</h3>
         <div class="product-price">€ ${prod.price.toFixed(2)}</div>
-        <div class="product-location">📍 ${escapeHtml(prod.location)}</div>
-        <p class="item-content">${escapeHtml(prod.description)}</p>
+        <div style="font-size: 12px; color: #5f6368; margin-bottom: 6px;">
+          🏷️ <strong>Category:</strong> ${escapeHtml(prod.category || 'General')} | <strong>Condition:</strong> ${escapeHtml(prod.condition || 'New')}
+        </div>
+        <div class="product-location">📍 ${escapeHtml(prod.location)} (${escapeHtml(prod.delivery || 'Local Pickup')})</div>
+        <p class="item-content" style="margin-top:6px;">${escapeHtml(prod.description)}</p>
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
             ${!isSelf ? `
@@ -1025,7 +1107,6 @@
         const g = groups[k];
         const myUser = currentUserData.username.toLowerCase();
         
-        // Verifica se há mensagens não lidas nesta conversa específica
         const hasUnread = g.msgs.some(m => {
           const sender = (m.sender || m.buyer || '').toLowerCase();
           return sender !== myUser && !m.read;
@@ -1071,7 +1152,6 @@
         const senderName = m.sender || (m.buyer.toLowerCase() === myUser ? currentUserData.username : otherUser);
         const isMine = senderName.toLowerCase() === myUser;
 
-        // MARCAR MENSAGEM COMO LIDA CASO TENHA SIDO ENVIADA POR OUTRA PESSOA
         if (!isMine && !m.read) {
           updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
         }
