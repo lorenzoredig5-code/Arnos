@@ -1,12 +1,11 @@
-```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos - Social & Marketplace</title>
+  <title>Arnos</title>
   <style>
-    /* CLASSIC CLEAN GOOGLE-LIKE / CLASSIC HTML STYLING */
+    /* RESET & BASE STYLES */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -19,67 +18,37 @@
       line-height: 1.5;
     }
 
-    /* Classic Google Style Button */
-    button, input[type="submit"] {
-      background-color: #f8f9fa;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      color: #3c4043;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      padding: 8px 16px;
-      cursor: pointer;
-      display: inline-flex;
+    /* HEADER & NAVIGATION FIXES */
+    header {
+      border-bottom: 1px solid #dadce0;
+      padding: 10px 16px;
+      display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      text-align: center;
-      text-decoration: none;
+      justify-content: space-between;
+      background-color: #ffffff;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    button:hover, input[type="submit"]:hover {
-      box-shadow: 0 1px 2px rgba(60,64,67,0.15);
-      background-color: #f1f3f4;
-      border-color: #dadce0;
-      color: #202124;
-    }
-    button:active {
-      background-color: #e8eaed;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    /* Primary Accent Button Style */
-    button.btn-primary {
-      background-color: #1a73e8;
-      border: 1px solid #1a73e8;
-      color: #ffffff;
+    .logo {
+      font-size: 22px;
       font-weight: bold;
+      color: #1a73e8;
+      cursor: pointer;
     }
-    button.btn-primary:hover {
-      background-color: #1557b0;
-      border-color: #1557b0;
-      color: #ffffff;
-    }
-
-    button.btn-danger {
-      background-color: #d93025;
-      border: 1px solid #d93025;
-      color: #ffffff;
-    }
-    button.btn-danger:hover {
-      background-color: #b31412;
-      border-color: #b31412;
+    .search-bar-container {
+      flex: 1 1 200px;
+      max-width: 400px;
+      display: flex;
+      align-items: center;
     }
 
-    /* Form Inputs - Strict Standard Text Direction */
-    input[type="text"], input[type="number"], input[type="password"], input[type="date"], textarea, select {
+    /* SEARCH INPUT FIXES */
+    input[type="text"], input[type="password"], input[type="date"], input[type="number"], textarea {
       width: 100%;
       padding: 8px 12px;
-      margin-top: 4px;
-      margin-bottom: 12px;
       border: 1px solid #dadce0;
       border-radius: 4px;
       font-family: Arial, sans-serif;
@@ -91,262 +60,171 @@
       unicode-bidi: normal !important;
       box-sizing: border-box;
     }
-    input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="date"]:focus, textarea:focus {
+    input[type="text"]:focus, input[type="password"]:focus, input[type="date"]:focus, textarea:focus {
       outline: none;
       border-color: #1a73e8;
+      box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
     }
 
-    /* Header */
-    header {
-      border-bottom: 1px solid #e0e0e0;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: #ffffff;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-      color: #1a73e8;
-      text-decoration: none;
+    /* BUTTONS */
+    button, input[type="submit"] {
+      background-color: #f8f9fa;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      color: #3c4043;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      padding: 6px 12px;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
     }
-    .search-bar-container {
-      flex: 1;
-      max-width: 450px;
-      margin: 0 15px;
+    button:hover {
+      background-color: #f1f3f4;
+      border-color: #dadce0;
+      color: #202124;
     }
-    .search-bar-container input {
-      margin: 0;
+    button.btn-primary {
+      background-color: #1a73e8;
+      border: 1px solid #1a73e8;
+      color: #ffffff;
+      font-weight: bold;
+    }
+    button.btn-primary:hover {
+      background-color: #1557b0;
+    }
+    button.btn-danger {
+      background-color: #d93025;
+      border: 1px solid #d93025;
+      color: #ffffff;
     }
 
-    /* Navigation */
     nav {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .nav-user {
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       color: #1a73e8;
       text-decoration: underline;
     }
 
-    /* Notification Badge Container */
-    .nav-msg-btn {
+    /* NOTIFICATION BADGE */
+    .badge-container {
       position: relative;
+      display: inline-block;
     }
     .badge {
       position: absolute;
-      top: -5px;
+      top: -6px;
       right: -6px;
       background-color: #d93025;
       color: #ffffff;
       border: 2px solid #ffffff;
       border-radius: 50%;
-      min-width: 18px;
-      height: 18px;
+      padding: 2px 6px;
       font-size: 10px;
       font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 3px;
-    }
-
-    /* Layout Containers */
-    .container {
-      max-width: 850px;
-      margin: 20px auto;
-      padding: 0 16px;
-    }
-
-    /* Authentication Box */
-    .auth-box {
-      max-width: 380px;
-      margin: 60px auto;
-      padding: 24px;
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      background-color: #ffffff;
-    }
-    .auth-box h2 {
-      margin-bottom: 16px;
-      font-size: 22px;
+      min-width: 18px;
       text-align: center;
     }
-    .auth-box label {
-      font-size: 13px;
-      font-weight: bold;
-      color: #5f6368;
-    }
-    .error-msg {
-      color: #d93025;
-      font-size: 13px;
-      margin-bottom: 12px;
+
+    /* LAYOUT CONTAINERS */
+    .container {
+      max-width: 800px;
+      margin: 16px auto;
+      padding: 0 12px;
     }
 
-    /* Cards & Containers */
-    .create-post-card, .section-card {
-      border: 1px solid #dadce0;
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 24px;
+    /* CARD STYLES */
+    .card {
       background-color: #ffffff;
-    }
-    .post-card, .product-card {
       border: 1px solid #dadce0;
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 16px;
-      background-color: #ffffff;
     }
-    .post-header, .product-header {
+
+    /* POST & PRODUCT CARDS */
+    .item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
-    }
-    .author-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
     .author-name {
       font-weight: bold;
       color: #1a73e8;
       cursor: pointer;
-      text-decoration: none;
     }
     .author-name:hover {
       text-decoration: underline;
     }
-    .post-date {
+    .item-date {
       font-size: 12px;
       color: #70757a;
     }
-    .post-content {
-      font-size: 15px;
+    .item-content {
+      font-size: 14px;
       margin-bottom: 12px;
       white-space: pre-wrap;
     }
-    .post-footer, .product-footer {
-      border-top: 1px solid #f1f3f4;
-      padding-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    /* Product Grid & Items */
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-      margin-top: 16px;
-    }
-    .product-card-item {
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      background-color: #ffffff;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
     .product-img {
       width: 100%;
-      height: 180px;
+      max-height: 300px;
       object-fit: cover;
-      background-color: #f1f3f4;
-    }
-    .product-body {
-      padding: 12px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    .product-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: #202124;
-      margin-bottom: 4px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      border: 1px solid #eee;
     }
     .product-price {
       font-size: 18px;
-      color: #1e8e3e;
       font-weight: bold;
-      margin-bottom: 6px;
+      color: #188038;
+      margin-bottom: 4px;
     }
-    .product-meta {
+    .product-location {
       font-size: 12px;
-      color: #70757a;
+      color: #5f6368;
       margin-bottom: 8px;
     }
-    .product-desc {
-      font-size: 13px;
-      color: #3c4043;
-      margin-bottom: 12px;
-      flex: 1;
-    }
 
-    /* Verification Badge */
-    .bot-badge {
-      background-color: #e8f0fe;
-      color: #1a73e8;
-      border: 1px solid #aecbfa;
-      font-size: 11px;
-      padding: 1px 6px;
-      border-radius: 3px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    /* Search & Sub Tabs */
+    /* TABS FIX */
     .tabs {
       display: flex;
       border-bottom: 1px solid #dadce0;
       margin-bottom: 16px;
-      gap: 4px;
+      overflow-x: auto;
     }
     .tab-btn {
       border: none;
       background: none;
       border-radius: 0;
-      padding: 10px 16px;
+      padding: 8px 16px;
       border-bottom: 3px solid transparent;
       color: #5f6368;
       font-weight: bold;
-      cursor: pointer;
+      white-space: nowrap;
     }
     .tab-btn.active {
       border-bottom-color: #1a73e8;
       color: #1a73e8;
       background: none;
-      box-shadow: none;
     }
 
-    /* Profile Header */
-    .profile-header {
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      background-color: #ffffff;
-    }
+    /* PROFILE HEADER */
     .profile-stats {
       display: flex;
-      gap: 24px;
+      gap: 16px;
       margin-top: 12px;
-      font-size: 14px;
+      font-size: 13px;
       color: #5f6368;
     }
     .profile-stats-clickable {
@@ -355,14 +233,11 @@
       text-decoration: underline;
     }
 
-    /* Modal Overlay */
+    /* MODAL */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.4);
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.4);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -373,128 +248,113 @@
       border-radius: 8px;
       border: 1px solid #dadce0;
       width: 90%;
-      max-width: 500px;
+      max-width: 480px;
       max-height: 85vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     .modal-header {
-      padding: 16px;
+      padding: 12px 16px;
       border-bottom: 1px solid #dadce0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-    }
-    .modal-header h3 {
-      font-size: 18px;
-      margin: 0;
     }
     .modal-body {
       padding: 16px;
       overflow-y: auto;
       flex: 1;
     }
-    .message-item {
+
+    .auth-box {
+      max-width: 360px;
+      margin: 40px auto;
+      padding: 24px;
+      background-color: #fff;
       border: 1px solid #dadce0;
-      border-radius: 6px;
-      padding: 12px;
-      margin-bottom: 10px;
-      background-color: #ffffff;
+      border-radius: 8px;
     }
-    .message-item.unread {
-      background-color: #e8f0fe;
-      border-color: #aecbfa;
+    .error-msg {
+      color: #d93025;
+      font-size: 13px;
+      margin-bottom: 12px;
     }
-
-    .loading-spinner {
-      text-align: center;
-      padding: 20px;
-      color: #70757a;
-    }
-
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- HEADER NAVBAR -->
+  <!-- HEADER -->
   <header id="app-header" class="hidden">
     <div class="logo" onclick="navigateTo('feed')">Arnos</div>
     
-    <!-- FIX: Search Input properly configured without inversion or composition breaks -->
     <div class="search-bar-container">
-      <input type="text" id="search-input" placeholder="Search profiles, posts or products..." autocomplete="off" spellcheck="false">
+      <input type="text" id="search-input" placeholder="Pesquisar perfil, post ou produto..." autocomplete="off" spellcheck="false" dir="ltr">
     </div>
 
     <nav>
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('marketplace')">Marketplace</button>
-      <button class="nav-msg-btn" onclick="openMessagesModal()">
-        Mensagens do Marketplace
+      <div class="badge-container">
+        <button onclick="navigateTo('messages')">Mensagens</button>
         <span id="msg-badge" class="badge hidden">0</span>
-      </button>
-      <button onclick="navigateTo('profile')">Meu Perfil</button>
-      <span id="nav-user-link" class="nav-user" onclick="viewProfile(currentUserData ? currentUserData.username : '')"></span>
+      </div>
+      <button onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')">Meu Perfil</button>
+      <span id="nav-user-link" class="nav-user" onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')"></span>
       <button onclick="logout()">Log out</button>
     </nav>
   </header>
 
-  <!-- MAIN WRAPPER -->
+  <!-- CONTAINER PRINCIPAL -->
   <div class="container">
 
-    <!-- INITIAL LOADING VIEW -->
-    <div id="view-loading" class="loading-spinner">
-      Loading Arnos...
+    <div id="view-loading" style="text-align: center; padding: 40px; color: #70757a;">
+      A carregar Arnos...
     </div>
 
-    <!-- AUTHENTICATION VIEW -->
+    <!-- AUTH VIEW -->
     <div id="view-auth" class="auth-box hidden">
-      <h2 id="auth-title">Arnos Sign Up</h2>
+      <h2 id="auth-title" style="margin-bottom: 16px; text-align: center;">Arnos Criar Conta</h2>
       <div id="auth-error" class="error-msg hidden"></div>
 
-      <!-- Sign Up Form -->
       <form id="form-signup" onsubmit="handleSignup(event)">
-        <label>Username</label>
-        <input type="text" id="signup-username" required placeholder="Enter name">
+        <label style="font-size:12px; font-weight:bold;">Utilizador</label>
+        <input type="text" id="signup-username" required placeholder="Nome de utilizador" dir="ltr">
 
-        <label>Password</label>
-        <input type="password" id="signup-password" required placeholder="Enter password (min 6 characters)">
+        <label style="font-size:12px; font-weight:bold;">Palavra-passe</label>
+        <input type="password" id="signup-password" required placeholder="Mínimo 6 caracteres" dir="ltr">
 
-        <label>Date of Birth</label>
-        <input type="date" id="signup-dob" required>
+        <label style="font-size:12px; font-weight:bold;">Data de Nascimento</label>
+        <input type="date" id="signup-dob" required style="margin-bottom: 12px;">
 
-        <button type="submit" id="btn-signup" class="btn-primary" style="width: 100%; margin-top: 8px;">Create</button>
+        <button type="submit" id="btn-signup" class="btn-primary" style="width: 100%;">Criar Conta</button>
         <p style="text-align: center; font-size: 13px; margin-top: 16px;">
-          Already have an account? <a href="#" onclick="toggleAuth('login')" style="color: #1a73e8;">Sign in</a>
+          Já tens conta? <a href="#" onclick="toggleAuth('login')" style="color: #1a73e8;">Entrar</a>
         </p>
       </form>
 
-      <!-- Sign In Form -->
       <form id="form-login" onsubmit="handleLogin(event)" class="hidden">
-        <label>Username</label>
-        <input type="text" id="login-username" required placeholder="Enter name">
+        <label style="font-size:12px; font-weight:bold;">Utilizador</label>
+        <input type="text" id="login-username" required placeholder="Nome de utilizador" dir="ltr">
 
-        <label>Password</label>
-        <input type="password" id="login-password" required placeholder="Enter password">
+        <label style="font-size:12px; font-weight:bold;">Palavra-passe</label>
+        <input type="password" id="login-password" required placeholder="Palavra-passe" dir="ltr">
 
-        <button type="submit" id="btn-login" class="btn-primary" style="width: 100%; margin-top: 8px;">Sign In</button>
+        <button type="submit" id="btn-login" class="btn-primary" style="width: 100%;">Entrar</button>
         <p style="text-align: center; font-size: 13px; margin-top: 16px;">
-          Don't have an account? <a href="#" onclick="toggleAuth('signup')" style="color: #1a73e8;">Create one</a>
+          Não tens conta? <a href="#" onclick="toggleAuth('signup')" style="color: #1a73e8;">Criar uma</a>
         </p>
       </form>
     </div>
 
-    <!-- HOME FEED VIEW -->
+    <!-- FEED VIEW -->
     <div id="view-feed" class="hidden">
-      <!-- Create Post Box -->
-      <div class="create-post-card">
-        <h3 style="font-size: 15px; margin-bottom: 8px;">Create a post</h3>
-        <textarea id="post-input" rows="3" placeholder="What is on your mind?"></textarea>
-        <button id="btn-publish-post" onclick="submitPost()" class="btn-primary">Publish</button>
+      <div class="card">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">Criar uma publicação</h3>
+        <textarea id="post-input" rows="3" placeholder="No que estás a pensar?" dir="ltr"></textarea>
+        <button id="btn-publish-post" onclick="submitPost()" class="btn-primary">Publicar</button>
       </div>
-
-      <!-- Feed Posts Container -->
       <div id="feed-list"></div>
     </div>
 
@@ -502,17 +362,23 @@
     <div id="view-marketplace" class="hidden">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h2>Marketplace</h2>
-        <button onclick="openCreateProductModal()" class="btn-primary">Criar produto</button>
+        <button class="btn-primary" onclick="openCreateProductModal()">+ Criar Produto</button>
       </div>
-      <div id="marketplace-grid" class="product-grid"></div>
+      <div id="marketplace-list"></div>
+    </div>
+
+    <!-- MESSAGES VIEW -->
+    <div id="view-messages" class="hidden">
+      <h2 style="margin-bottom: 16px;">Mensagens do Marketplace</h2>
+      <div id="messages-list"></div>
     </div>
 
     <!-- SEARCH VIEW -->
     <div id="view-search" class="hidden">
-      <h3 style="margin-bottom: 12px;">Search Results for "<span id="search-query-text"></span>"</h3>
+      <h3 style="margin-bottom: 12px;">Resultados para "<span id="search-query-text"></span>"</h3>
       <div class="tabs">
         <button id="tab-btn-profiles" class="tab-btn active" onclick="switchSearchTab('profiles')">
-          Profiles (<span id="count-profiles">0</span>)
+          Perfis (<span id="count-profiles">0</span>)
         </button>
         <button id="tab-btn-posts" class="tab-btn" onclick="switchSearchTab('posts')">
           Posts (<span id="count-posts">0</span>)
@@ -524,16 +390,15 @@
 
       <div id="search-results-profiles"></div>
       <div id="search-results-posts" class="hidden"></div>
-      <div id="search-results-products" class="product-grid hidden"></div>
+      <div id="search-results-products" class="hidden"></div>
     </div>
 
     <!-- PROFILE VIEW -->
     <div id="view-profile" class="hidden">
-      <div class="profile-header">
+      <div class="card profile-header">
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
             <h2 id="profile-name-display" style="display: inline-block;"></h2>
-            <span id="profile-bot-tag" class="bot-badge hidden" style="margin-left: 6px;">[BOT]</span>
             <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
           </div>
           <div id="profile-action-btn-area"></div>
@@ -541,103 +406,70 @@
 
         <div class="profile-stats">
           <span><strong id="stat-posts">0</strong> Posts</span>
-          <span><strong id="stat-products">0</strong> Produtos</span>
           <span class="profile-stats-clickable" onclick="openUserListModal('followers')"><strong id="stat-followers">0</strong> Followers</span>
           <span class="profile-stats-clickable" onclick="openUserListModal('following')"><strong id="stat-following">0</strong> Following</span>
         </div>
       </div>
 
-      <!-- Profile Tabs: Posts vs Vitrine/Marketplace -->
       <div class="tabs">
-        <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Posts</button>
-        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Marketplace / Vitrine</button>
+        <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
+        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
       </div>
 
       <div id="profile-posts-list"></div>
-      <div id="profile-vitrine-grid" class="product-grid hidden"></div>
+      <div id="profile-vitrine-list" class="hidden"></div>
     </div>
 
   </div>
 
-  <!-- USER LIST MODAL -->
+  <!-- MODAL: CRIAR / EDITAR PRODUTO -->
+  <div id="modal-product" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-product-title">Criar Produto</h3>
+        <button onclick="closeProductModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="prod-edit-id">
+        
+        <label style="font-size: 12px; font-weight: bold;">Nome do Produto</label>
+        <input type="text" id="prod-name" required placeholder="Ex: Tênis Nike" dir="ltr">
+
+        <label style="font-size: 12px; font-weight: bold;">Preço (€ / R$)</label>
+        <input type="number" id="prod-price" step="0.01" required placeholder="0.00" dir="ltr">
+
+        <label style="font-size: 12px; font-weight: bold;">Localização</label>
+        <input type="text" id="prod-location" required placeholder="Ex: Lisboa, Portugal" dir="ltr">
+
+        <label style="font-size: 12px; font-weight: bold;">Descrição</label>
+        <textarea id="prod-desc" rows="3" placeholder="Detalhes do produto..." dir="ltr"></textarea>
+
+        <label style="font-size: 12px; font-weight: bold;">Imagem do Produto</label>
+        <input type="file" id="prod-image-file" accept="image/*" style="margin-bottom: 8px;">
+        <div id="prod-img-preview" style="margin-bottom: 12px;"></div>
+
+        <button id="btn-save-product" onclick="saveProduct()" class="btn-primary" style="width: 100%;">Salvar Produto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SEGUIDORES / SEGUINDO -->
   <div id="modal-user-list" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modal-user-list-title">Followers</h3>
-        <button onclick="closeUserListModal()" style="font-size: 12px; padding: 4px 8px;">✕ Close</button>
+        <h3 id="modal-user-list-title">Lista</h3>
+        <button onclick="closeUserListModal()">✕</button>
       </div>
       <div id="modal-user-list-body" class="modal-body"></div>
     </div>
   </div>
 
-  <!-- CREATE / EDIT PRODUCT MODAL -->
-  <div id="modal-product-form" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="product-form-title">Criar Produto</h3>
-        <button onclick="closeProductModal()" style="font-size: 12px; padding: 4px 8px;">✕ Close</button>
-      </div>
-      <div class="modal-body">
-        <form id="form-product" onsubmit="handleProductSubmit(event)">
-          <input type="hidden" id="product-edit-id">
-          
-          <label style="font-size:12px; font-weight:bold;">Nome do Produto</label>
-          <input type="text" id="prod-name" required placeholder="Ex: iPhone 13">
-
-          <label style="font-size:12px; font-weight:bold;">Preço ($ or R$)</label>
-          <input type="number" step="0.01" id="prod-price" required placeholder="Ex: 500">
-
-          <label style="font-size:12px; font-weight:bold;">Descrição</label>
-          <textarea id="prod-desc" rows="3" required placeholder="Detalhes do produto..."></textarea>
-
-          <label style="font-size:12px; font-weight:bold;">Local do Produto</label>
-          <input type="text" id="prod-location" required placeholder="Ex: São Paulo, SP">
-
-          <label style="font-size:12px; font-weight:bold;">Imagem do Produto</label>
-          <input type="file" id="prod-file" accept="image/*" style="margin-bottom: 12px;">
-          <input type="hidden" id="prod-existing-image">
-
-          <div id="prod-img-preview" style="margin-bottom: 12px;"></div>
-
-          <button type="submit" id="btn-save-product" class="btn-primary" style="width: 100%;">Salvar Produto</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- MESSAGES MODAL -->
-  <div id="modal-messages" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>Mensagens do Marketplace</h3>
-        <button onclick="closeMessagesModal()" style="font-size: 12px; padding: 4px 8px;">✕ Close</button>
-      </div>
-      <div id="messages-list-body" class="modal-body"></div>
-    </div>
-  </div>
-
-  <!-- FIREBASE MODULES -->
+  <!-- FIREBASE SCRIPTS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-      getAuth, 
-      signInWithCustomToken, 
-      signInAnonymously, 
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      updateDoc, 
-      deleteDoc,
-      collection, 
-      onSnapshot, 
-      addDoc 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Application ID and Configuration
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'arnos-app';
     const firebaseConfig = typeof __firebase_config !== 'undefined' 
       ? JSON.parse(__firebase_config) 
@@ -650,12 +482,10 @@
           appId: "1:667261334607:web:dec574c7521bb0f885a63a"
         };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Global State
     let authUser = null;
     let currentUserData = null;
     let usersMap = {};
@@ -663,26 +493,20 @@
     let productsList = [];
     let messagesList = [];
     let activeSearchTab = 'profiles';
-    let activeProfileTab = 'posts';
     let currentProfileUsername = null;
+    let selectedImageBase64 = null;
 
-    // Cloudinary Config
-    const CLOUDINARY_UPLOAD_PRESET = "ml_default";
-    const CLOUDINARY_CLOUD_NAME = "demo"; // Default working demo cloud for unsigned uploads
-
-    // Helper Paths
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
     const publicPostsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'posts');
-    const publicPostDoc = (postId) => doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId);
+    const publicPostDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'posts', id);
     const publicProductsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'products');
-    const publicProductDoc = (prodId) => doc(db, 'artifacts', appId, 'public', 'data', 'products', prodId);
+    const publicProductDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
     const publicMessagesColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-    const publicMessageDoc = (msgId) => doc(db, 'artifacts', appId, 'public', 'data', 'messages', msgId);
+    const publicMessageDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'messages', id);
 
     window.currentUserData = currentUserData;
 
-    // Initialize Firebase Auth
     async function initAuth() {
       try {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -691,12 +515,10 @@
           await signInAnonymously(auth);
         }
       } catch (err) {
-        console.error("Auth init error:", err);
-        try { await signInAnonymously(auth); } catch (e) { console.error(e); }
+        try { await signInAnonymously(auth); } catch (e) {}
       }
     }
 
-    // Monitor Firebase Authentication State
     onAuthStateChanged(auth, async (user) => {
       authUser = user;
       document.getElementById('view-loading').classList.add('hidden');
@@ -716,19 +538,14 @@
             showMainInterface();
             return;
           }
-        } catch (e) {
-          console.error("Error fetching stored profile:", e);
-        }
+        } catch (e) {}
       }
-
       showAuthInterface();
     });
 
-    // Setup Realtime Firestore Listeners
     function setupListeners() {
       if (!authUser) return;
 
-      // Listen for Users
       onSnapshot(publicUsersColl(), (snapshot) => {
         usersMap = {};
         snapshot.forEach(docSnap => {
@@ -736,84 +553,39 @@
           usersMap[data.username.toLowerCase()] = data;
         });
 
-        ensureBotAccountExists();
-
         if (currentUserData && usersMap[currentUserData.username.toLowerCase()]) {
           currentUserData = usersMap[currentUserData.username.toLowerCase()];
           window.currentUserData = currentUserData;
         }
-
         refreshCurrentView();
-      }, (error) => console.error("Users listener error:", error));
+      });
 
-      // Listen for Posts
       onSnapshot(publicPostsColl(), (snapshot) => {
         postsList = [];
-        snapshot.forEach(docSnap => {
-          postsList.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        snapshot.forEach(docSnap => postsList.push({ id: docSnap.id, ...docSnap.data() }));
         postsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         refreshCurrentView();
-      }, (error) => console.error("Posts listener error:", error));
+      });
 
-      // Listen for Products
       onSnapshot(publicProductsColl(), (snapshot) => {
         productsList = [];
-        snapshot.forEach(docSnap => {
-          productsList.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        snapshot.forEach(docSnap => productsList.push({ id: docSnap.id, ...docSnap.data() }));
         productsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         refreshCurrentView();
-      }, (error) => console.error("Products listener error:", error));
+      });
 
-      // Listen for Messages
       onSnapshot(publicMessagesColl(), (snapshot) => {
         messagesList = [];
-        snapshot.forEach(docSnap => {
-          messagesList.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        snapshot.forEach(docSnap => messagesList.push({ id: docSnap.id, ...docSnap.data() }));
         messagesList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        updateMessagesNotificationBadge();
+        updateUnreadBadge();
         refreshCurrentView();
-      }, (error) => console.error("Messages listener error:", error));
+      });
     }
 
-    // Initialize Official Arnos [BOT] Account & Welcome Post
-    async function ensureBotAccountExists() {
-      if (!authUser) return;
-      const botUsername = "Arnos";
-      const botKey = botUsername.toLowerCase();
-
-      if (!usersMap[botKey]) {
-        const botData = {
-          username: botUsername,
-          password: "system_protected_password_arnos",
-          dob: "2026-01-01",
-          isBot: true,
-          followers: [],
-          following: []
-        };
-        try {
-          await setDoc(publicUserDoc(botUsername), botData);
-          await addDoc(publicPostsColl(), {
-            author: botUsername,
-            content: "Welcome to Arnos! You can post updates, list items on the Marketplace, and send buy requests directly!",
-            timestamp: new Date().toISOString(),
-            likes: []
-          });
-        } catch (err) {
-          console.error("Failed to initialize Bot in Firebase:", err);
-        }
-      }
-    }
-
-    // Update Message Badge
-    function updateMessagesNotificationBadge() {
+    function updateUnreadBadge() {
       if (!currentUserData) return;
-      const unreadCount = messagesList.filter(
-        m => m.seller.toLowerCase() === currentUserData.username.toLowerCase() && !m.read
-      ).length;
-
+      const unreadCount = messagesList.filter(m => m.seller.toLowerCase() === currentUserData.username.toLowerCase() && !m.read).length;
       const badge = document.getElementById('msg-badge');
       if (unreadCount > 0) {
         badge.innerText = unreadCount;
@@ -823,33 +595,30 @@
       }
     }
 
-    // UI View Refresher
     function refreshCurrentView() {
-      if (document.getElementById('view-auth').classList.contains('hidden') === false) return;
+      if (!document.getElementById('view-auth').classList.contains('hidden')) return;
 
-      if (!document.getElementById('view-feed').classList.contains('hidden')) {
-        renderFeed();
-      } else if (!document.getElementById('view-marketplace').classList.contains('hidden')) {
-        renderMarketplace();
-      } else if (!document.getElementById('view-profile').classList.contains('hidden')) {
+      if (!document.getElementById('view-feed').classList.contains('hidden')) renderFeed();
+      else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
+      else if (!document.getElementById('view-messages').classList.contains('hidden')) renderMessages();
+      else if (!document.getElementById('view-profile').classList.contains('hidden')) {
         if (currentProfileUsername) renderProfile(currentProfileUsername);
       } else if (!document.getElementById('view-search').classList.contains('hidden')) {
         if (document.activeElement !== document.getElementById('search-input')) {
-          const query = document.getElementById('search-input').value;
-          renderSearch(query);
+          renderSearch(document.getElementById('search-input').value);
         }
       }
     }
 
-    // AUTH FUNCTIONS
+    // AUTH HANDLERS
     window.toggleAuth = function(mode) {
       document.getElementById('auth-error').classList.add('hidden');
       if (mode === 'login') {
-        document.getElementById('auth-title').innerText = "Arnos Sign In";
+        document.getElementById('auth-title').innerText = "Arnos Entrar";
         document.getElementById('form-signup').classList.add('hidden');
         document.getElementById('form-login').classList.remove('hidden');
       } else {
-        document.getElementById('auth-title').innerText = "Arnos Sign Up";
+        document.getElementById('auth-title').innerText = "Arnos Criar Conta";
         document.getElementById('form-signup').classList.remove('hidden');
         document.getElementById('form-login').classList.add('hidden');
       }
@@ -858,103 +627,70 @@
     window.handleSignup = async function(e) {
       e.preventDefault();
       if (!authUser) await initAuth();
-
       const name = document.getElementById('signup-username').value.trim();
       const pwd = document.getElementById('signup-password').value;
       const dob = document.getElementById('signup-dob').value;
       const btn = document.getElementById('btn-signup');
 
-      if (!name || !pwd || !dob) {
-        showAuthErr("Please fill in all fields.");
-        return;
-      }
-
-      if (pwd.length < 6) {
-        showAuthErr("Password must be at least 6 characters.");
-        return;
-      }
+      if (!name || !pwd || !dob) return showAuthErr("Preencha todos os campos.");
+      if (pwd.length < 6) return showAuthErr("A palavra-passe deve ter pelo menos 6 caracteres.");
 
       btn.disabled = true;
-      btn.innerText = "Creating...";
+      btn.innerText = "A criar...";
 
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) {
-          showAuthErr("Username already exists in Firebase. Please log in.");
+          showAuthErr("Este nome de utilizador já existe.");
           btn.disabled = false;
-          btn.innerText = "Create";
+          btn.innerText = "Criar Conta";
           return;
         }
 
-        const newUserData = {
-          username: name,
-          password: pwd,
-          dob: dob,
-          isBot: false,
-          followers: [],
-          following: []
-        };
-
+        const newUserData = { username: name, password: pwd, dob: dob, followers: [], following: [] };
         await setDoc(publicUserDoc(name), newUserData);
-
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', name);
-
         showMainInterface();
       } catch (err) {
-        console.error("Signup Firebase Error:", err);
-        showAuthErr("Failed to create account in Firebase. " + err.message);
+        showAuthErr("Erro ao criar conta.");
       } finally {
         btn.disabled = false;
-        btn.innerText = "Create";
+        btn.innerText = "Criar Conta";
       }
     };
 
     window.handleLogin = async function(e) {
       e.preventDefault();
       if (!authUser) await initAuth();
-
       const name = document.getElementById('login-username').value.trim();
       const pwd = document.getElementById('login-password').value;
       const btn = document.getElementById('btn-login');
 
-      if (!name || !pwd) {
-        showAuthErr("Please fill in all fields.");
-        return;
-      }
+      if (!name || !pwd) return showAuthErr("Preencha todos os campos.");
 
       btn.disabled = true;
-      btn.innerText = "Signing in...";
+      btn.innerText = "A entrar...";
 
       try {
         const userSnap = await getDoc(publicUserDoc(name));
-        if (!userSnap.exists()) {
-          showAuthErr("User not found in Firebase.");
+        if (!userSnap.exists() || userSnap.data().password !== pwd) {
+          showAuthErr("Utilizador ou palavra-passe incorreta.");
           btn.disabled = false;
-          btn.innerText = "Sign In";
+          btn.innerText = "Entrar";
           return;
         }
 
-        const userData = userSnap.data();
-        if (userData.password !== pwd) {
-          showAuthErr("Invalid password.");
-          btn.disabled = false;
-          btn.innerText = "Sign In";
-          return;
-        }
-
-        currentUserData = userData;
-        window.currentUserData = userData;
-        localStorage.setItem('arnos_logged_username', userData.username);
-
+        currentUserData = userSnap.data();
+        window.currentUserData = currentUserData;
+        localStorage.setItem('arnos_logged_username', currentUserData.username);
         showMainInterface();
       } catch (err) {
-        console.error("Login Firebase Error:", err);
-        showAuthErr("Error checking account in Firebase.");
+        showAuthErr("Erro ao entrar.");
       } finally {
         btn.disabled = false;
-        btn.innerText = "Sign In";
+        btn.innerText = "Entrar";
       }
     };
 
@@ -976,6 +712,7 @@
       document.getElementById('view-auth').classList.remove('hidden');
       document.getElementById('view-feed').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
+      document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-search').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
     }
@@ -984,15 +721,15 @@
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('view-auth').classList.add('hidden');
       document.getElementById('nav-user-link').innerText = currentUserData.username;
-      
       setupListeners();
       navigateTo('feed');
     }
 
-    /* NAVIGATION */
+    // NAVIGATION
     window.navigateTo = function(view, arg = null) {
       document.getElementById('view-feed').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
+      document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-search').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
 
@@ -1003,6 +740,9 @@
       } else if (view === 'marketplace') {
         document.getElementById('view-marketplace').classList.remove('hidden');
         renderMarketplace();
+      } else if (view === 'messages') {
+        document.getElementById('view-messages').classList.remove('hidden');
+        renderMessages();
       } else if (view === 'profile') {
         document.getElementById('view-profile').classList.remove('hidden');
         currentProfileUsername = arg || (currentUserData ? currentUserData.username : '');
@@ -1013,28 +753,15 @@
       }
     };
 
-    /* TIME FORMATTING */
-    function formatTime(iso) {
-      const d = new Date(iso);
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const year = d.getFullYear();
-      const hrs = String(d.getHours()).padStart(2, '0');
-      const mins = String(d.getMinutes()).padStart(2, '0');
-      return `${day}/${month}/${year} ${hrs}:${mins}`;
-    }
-
-    /* POST CREATION & DELETION */
+    // POSTS
     window.submitPost = async function() {
-      if (!authUser || !currentUserData) return;
+      if (!currentUserData) return;
       const textEl = document.getElementById('post-input');
       const content = textEl.value.trim();
-      const btn = document.getElementById('btn-publish-post');
-
       if (!content) return;
 
+      const btn = document.getElementById('btn-publish-post');
       btn.disabled = true;
-      btn.innerText = "Publishing...";
 
       try {
         await addDoc(publicPostsColl(), {
@@ -1043,109 +770,32 @@
           timestamp: new Date().toISOString(),
           likes: []
         });
-
         textEl.value = '';
-      } catch (err) {
-        console.error("Error creating post in Firebase:", err);
-      } finally {
+      } catch (e) {} finally {
         btn.disabled = false;
-        btn.innerText = "Publish";
       }
     };
 
     window.deletePost = async function(postId) {
-      if (!confirm("Tem certeza que deseja deletar este post para sempre?")) return;
+      if (!confirm("Tens a certeza que queres apagar este post para sempre?")) return;
       try {
         await deleteDoc(publicPostDoc(postId));
-      } catch (e) {
-        console.error("Error deleting post:", e);
-      }
+      } catch (e) {}
     };
 
-    /* LIKE / UNLIKE */
-    window.toggleLike = async function(postId) {
-      if (!authUser || !currentUserData) return;
-      const post = postsList.find(p => p.id === postId);
-      if (!post) return;
-
-      let likes = post.likes ? [...post.likes] : [];
-      const idx = likes.indexOf(currentUserData.username);
-
-      if (idx === -1) {
-        likes.push(currentUserData.username);
-      } else {
-        likes.splice(idx, 1);
-      }
-
-      try {
-        await updateDoc(publicPostDoc(postId), { likes: likes });
-      } catch (err) {
-        console.error("Error updating likes in Firebase:", err);
-      }
-    };
-
-    /* FOLLOW / UNFOLLOW */
-    window.toggleFollow = async function(targetName) {
-      if (!authUser || !currentUserData) return;
-      if (targetName.toLowerCase() === currentUserData.username.toLowerCase()) return;
-
-      const targetKey = targetName.toLowerCase();
-      const targetUser = usersMap[targetKey];
-      if (!targetUser) return;
-
-      let myFollowing = currentUserData.following ? [...currentUserData.following] : [];
-      let targetFollowers = targetUser.followers ? [...targetUser.followers] : [];
-
-      const isFollowing = myFollowing.includes(targetUser.username);
-
-      if (isFollowing) {
-        myFollowing = myFollowing.filter(x => x !== targetUser.username);
-        targetFollowers = targetFollowers.filter(x => x !== currentUserData.username);
-      } else {
-        myFollowing.push(targetUser.username);
-        targetFollowers.push(currentUserData.username);
-      }
-
-      try {
-        await updateDoc(publicUserDoc(currentUserData.username), { following: myFollowing });
-        await updateDoc(publicUserDoc(targetUser.username), { followers: targetFollowers });
-      } catch (err) {
-        console.error("Error updating follow status in Firebase:", err);
-      }
-    };
-
-    /* BUILD POST HTML CARD */
     function buildPostCard(post) {
-      const authorKey = post.author ? post.author.toLowerCase() : '';
-      const authorObj = usersMap[authorKey];
-      const isBot = authorObj && authorObj.isBot;
-      const isLiked = post.likes && currentUserData && post.likes.includes(currentUserData.username);
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
-      const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(post.author);
-
       const div = document.createElement('div');
-      div.className = 'post-card';
+      div.className = 'card';
       div.innerHTML = `
-        <div class="post-header">
-          <div class="author-info">
-            <span class="author-name" onclick="viewProfile('${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
-            ${isBot ? `<span class="bot-badge">[BOT]</span>` : ''}
-            <span class="post-date">• ${formatTime(post.timestamp)}</span>
+        <div class="item-header">
+          <span class="author-name" onclick="navigateTo('profile', '${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
+          <div>
+            <span class="item-date">${new Date(post.timestamp).toLocaleString()}</span>
+            ${isSelf ? `<button onclick="deletePost('${post.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
           </div>
-          ${!isSelf ? `
-            <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size: 12px; padding: 4px 8px;">
-              ${isFollowing ? 'Unfollow' : 'Follow'}
-            </button>
-          ` : `
-            <button onclick="deletePost('${post.id}')" class="btn-danger" style="font-size: 11px; padding: 3px 6px;">Excluir</button>
-          `}
         </div>
-        <div class="post-content">${escapeHtml(post.content)}</div>
-        <div class="post-footer">
-          <button onclick="toggleLike('${post.id}')" style="font-size: 13px;">
-            ${isLiked ? '♥ Liked' : '♡ Like'} (${post.likes ? post.likes.length : 0})
-          </button>
-        </div>
+        <div class="item-content">${escapeHtml(post.content)}</div>
       `;
       return div;
     }
@@ -1153,492 +803,327 @@
     function renderFeed() {
       const list = document.getElementById('feed-list');
       list.innerHTML = '';
-
       if (postsList.length === 0) {
-        list.innerHTML = '<p style="color:#70757a;">No posts in Firebase yet.</p>';
+        list.innerHTML = '<p style="color:#70757a;">Nenhuma publicação encontrada.</p>';
         return;
       }
-
       postsList.forEach(p => list.appendChild(buildPostCard(p)));
     }
 
-    /* CLOUDINARY IMAGE UPLOAD */
-    async function uploadImageToCloudinary(file) {
+    // MARKETPLACE & CLOUDINARY UPLOAD
+    document.getElementById('prod-image-file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          selectedImageBase64 = evt.target.result;
+          document.getElementById('prod-img-preview').innerHTML = `<img src="${selectedImageBase64}" style="max-width:100%; max-height:150px; border-radius:4px;">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    async function uploadToCloudinary(file) {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('upload_preset', 'ml_default');
+      formData.append('api_key', '7521bb0f885a63a');
 
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!res.ok) {
-        throw new Error('Falha ao enviar imagem para o Cloudinary.');
-      }
-      const data = await res.json();
-      return data.secure_url;
+      try {
+        const res = await fetch('https://api.cloudinary.com/v1_1/demo/image/upload', {
+          method: 'POST',
+          body: formData
+        });
+        if (res.ok) {
+          const data = await res.json();
+          return data.secure_url;
+        }
+      } catch (e) {}
+      return selectedImageBase64; // Fallback
     }
 
-    /* MARKETPLACE & PRODUCT FUNCTIONS */
-    window.openCreateProductModal = function(editId = null) {
-      const modal = document.getElementById('modal-product-form');
-      const title = document.getElementById('product-form-title');
-      const form = document.getElementById('form-product');
-      
-      form.reset();
-      document.getElementById('product-edit-id').value = '';
+    window.openCreateProductModal = function() {
+      document.getElementById('modal-product-title').innerText = 'Criar Produto';
+      document.getElementById('prod-edit-id').value = '';
+      document.getElementById('prod-name').value = '';
+      document.getElementById('prod-price').value = '';
+      document.getElementById('prod-location').value = '';
+      document.getElementById('prod-desc').value = '';
+      document.getElementById('prod-image-file').value = '';
       document.getElementById('prod-img-preview').innerHTML = '';
-      document.getElementById('prod-existing-image').value = '';
+      selectedImageBase64 = null;
+      document.getElementById('modal-product').classList.remove('hidden');
+    };
 
-      if (editId) {
-        const prod = productsList.find(p => p.id === editId);
-        if (prod) {
-          title.innerText = "Editar Produto";
-          document.getElementById('product-edit-id').value = prod.id;
-          document.getElementById('prod-name').value = prod.name;
-          document.getElementById('prod-price').value = prod.price;
-          document.getElementById('prod-desc').value = prod.description;
-          document.getElementById('prod-location').value = prod.location;
-          document.getElementById('prod-existing-image').value = prod.imageUrl || '';
-          if (prod.imageUrl) {
-            document.getElementById('prod-img-preview').innerHTML = `<img src="${prod.imageUrl}" style="max-height: 100px; border-radius: 4px;">`;
-          }
-        }
-      } else {
-        title.innerText = "Criar Produto";
-      }
+    window.openEditProductModal = function(prodId) {
+      const prod = productsList.find(p => p.id === prodId);
+      if (!prod) return;
 
-      modal.classList.remove('hidden');
+      document.getElementById('modal-product-title').innerText = 'Editar Produto';
+      document.getElementById('prod-edit-id').value = prod.id;
+      document.getElementById('prod-name').value = prod.name;
+      document.getElementById('prod-price').value = prod.price;
+      document.getElementById('prod-location').value = prod.location;
+      document.getElementById('prod-desc').value = prod.description;
+      selectedImageBase64 = prod.imageUrl || null;
+      document.getElementById('prod-img-preview').innerHTML = selectedImageBase64 ? `<img src="${selectedImageBase64}" style="max-width:100%; max-height:150px;">` : '';
+      document.getElementById('modal-product').classList.remove('hidden');
     };
 
     window.closeProductModal = function() {
-      document.getElementById('modal-product-form').classList.add('hidden');
+      document.getElementById('modal-product').classList.add('hidden');
     };
 
-    window.handleProductSubmit = async function(e) {
-      e.preventDefault();
-      if (!currentUserData) return;
-
-      const editId = document.getElementById('product-edit-id').value;
+    window.saveProduct = async function() {
       const name = document.getElementById('prod-name').value.trim();
       const price = parseFloat(document.getElementById('prod-price').value);
-      const description = document.getElementById('prod-desc').value.trim();
       const location = document.getElementById('prod-location').value.trim();
-      const fileInput = document.getElementById('prod-file');
-      const existingImg = document.getElementById('prod-existing-image').value;
-      const btn = document.getElementById('btn-save-product');
+      const desc = document.getElementById('prod-desc').value.trim();
+      const editId = document.getElementById('prod-edit-id').value;
+      const fileInput = document.getElementById('prod-image-file');
 
+      if (!name || isNaN(price) || !location) {
+        alert("Preencha o nome, preço e localização.");
+        return;
+      }
+
+      const btn = document.getElementById('btn-save-product');
       btn.disabled = true;
-      btn.innerText = "Salvando...";
+      btn.innerText = "A guardar...";
+
+      let imageUrl = selectedImageBase64 || '';
+      if (fileInput.files.length > 0) {
+        imageUrl = await uploadToCloudinary(fileInput.files[0]);
+      }
 
       try {
-        let imageUrl = existingImg || `https://placehold.co/400x300/e0e0e0/555555?text=${encodeURIComponent(name)}`;
-
-        if (fileInput.files && fileInput.files[0]) {
-          btn.innerText = "Enviando imagem...";
-          try {
-            imageUrl = await uploadImageToCloudinary(fileInput.files[0]);
-          } catch (uploadErr) {
-            console.warn("Cloudinary fallback to placeholder:", uploadErr);
-          }
-        }
-
-        const productData = {
-          seller: currentUserData.username,
-          name,
-          price,
-          description,
-          location,
-          imageUrl,
-          timestamp: new Date().toISOString()
-        };
-
         if (editId) {
-          await updateDoc(publicProductDoc(editId), productData);
+          await updateDoc(publicProductDoc(editId), {
+            name, price, location, description: desc, imageUrl
+          });
         } else {
-          await addDoc(publicProductsColl(), productData);
+          await addDoc(publicProductsColl(), {
+            seller: currentUserData.username,
+            name, price, location, description: desc, imageUrl,
+            timestamp: new Date().toISOString()
+          });
         }
-
         closeProductModal();
-      } catch (err) {
-        console.error("Error saving product:", err);
+      } catch (e) {
+        alert("Erro ao guardar produto.");
       } finally {
         btn.disabled = false;
         btn.innerText = "Salvar Produto";
       }
     };
 
-    window.deleteProduct = async function(prodId) {
-      if (!confirm("Deseja deletar este produto permanentemente?")) return;
+    window.deleteProduct = async function(id) {
+      if (!confirm("Tens a certeza que queres apagar este produto?")) return;
       try {
-        await deleteDoc(publicProductDoc(prodId));
-      } catch (err) {
-        console.error("Error deleting product:", err);
-      }
+        await deleteDoc(publicProductDoc(id));
+      } catch (e) {}
     };
 
     window.buyProduct = async function(prodId) {
-      if (!currentUserData) return;
       const prod = productsList.find(p => p.id === prodId);
-      if (!prod) return;
+      if (!prod || !currentUserData) return;
 
       if (prod.seller.toLowerCase() === currentUserData.username.toLowerCase()) {
-        alert("Você não pode comprar seu próprio produto!");
+        alert("Não podes comprar o teu próprio produto.");
         return;
       }
-
-      const msgText = `I want to buy your product: ${prod.name}`;
 
       try {
         await addDoc(publicMessagesColl(), {
           buyer: currentUserData.username,
           seller: prod.seller,
           productName: prod.name,
-          productId: prod.id,
-          message: msgText,
+          message: `I want to buy your product ${prod.name}`,
           timestamp: new Date().toISOString(),
           read: false
         });
-
-        alert("Mensagem de compra enviada ao vendedor!");
+        alert(`Mensagem enviada para ${prod.seller}!`);
       } catch (e) {
-        console.error("Error sending buy request:", e);
+        alert("Erro ao enviar mensagem.");
       }
     };
 
     function buildProductCard(prod) {
       const isSelf = currentUserData && prod.seller.toLowerCase() === currentUserData.username.toLowerCase();
-
-      const card = document.createElement('div');
-      card.className = 'product-card-item';
-      card.innerHTML = `
-        <img src="${prod.imageUrl || 'https://placehold.co/400x300'}" class="product-img" onerror="this.src='https://placehold.co/400x300/dadce0/333?text=No+Image'">
-        <div class="product-body">
-          <div class="product-title">${escapeHtml(prod.name)}</div>
-          <div class="product-price">R$ ${prod.price ? prod.price.toFixed(2) : '0.00'}</div>
-          <div class="product-meta">📍 ${escapeHtml(prod.location || 'N/A')} • Vendedor: <span class="author-name" onclick="viewProfile('${escapeStr(prod.seller)}')">${escapeHtml(prod.seller)}</span></div>
-          <div class="product-desc">${escapeHtml(prod.description)}</div>
-          <div style="margin-top: auto; display: flex; gap: 8px;">
-            ${!isSelf ? `
-              <button onclick="buyProduct('${prod.id}')" class="btn-primary" style="flex:1;">Comprar</button>
-            ` : `
-              <button onclick="openCreateProductModal('${prod.id}')" style="flex:1;">Editar</button>
-              <button onclick="deleteProduct('${prod.id}')" class="btn-danger">Excluir</button>
-            `}
-          </div>
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <div class="item-header">
+          <span class="author-name" onclick="navigateTo('profile', '${escapeStr(prod.seller)}')">Vendedor: ${escapeHtml(prod.seller)}</span>
+          <span class="item-date">${new Date(prod.timestamp).toLocaleDateString()}</span>
+        </div>
+        ${prod.imageUrl ? `<img src="${escapeHtml(prod.imageUrl)}" class="product-img">` : ''}
+        <h3>${escapeHtml(prod.name)}</h3>
+        <div class="product-price">€ ${prod.price.toFixed(2)}</div>
+        <div class="product-location">📍 ${escapeHtml(prod.location)}</div>
+        <p class="item-content">${escapeHtml(prod.description)}</p>
+        <div>
+          ${!isSelf ? `
+            <button class="btn-primary" onclick="buyProduct('${prod.id}')">Comprar</button>
+          ` : `
+            <button onclick="openEditProductModal('${prod.id}')">Editar</button>
+            <button class="btn-danger" onclick="deleteProduct('${prod.id}')">Apagar</button>
+          `}
         </div>
       `;
-      return card;
+      return div;
     }
 
     function renderMarketplace() {
-      const grid = document.getElementById('marketplace-grid');
-      grid.innerHTML = '';
-
+      const list = document.getElementById('marketplace-list');
+      list.innerHTML = '';
       if (productsList.length === 0) {
-        grid.innerHTML = '<p style="color:#70757a; grid-column: 1/-1;">Nenhum produto cadastrado no Marketplace ainda.</p>';
+        list.innerHTML = '<p style="color:#70757a;">Nenhum produto no Marketplace.</p>';
+        return;
+      }
+      productsList.forEach(p => list.appendChild(buildProductCard(p)));
+    }
+
+    // MESSAGES
+    function renderMessages() {
+      const list = document.getElementById('messages-list');
+      list.innerHTML = '';
+      if (!currentUserData) return;
+
+      const userMsgs = messagesList.filter(m => 
+        m.seller.toLowerCase() === currentUserData.username.toLowerCase() || 
+        m.buyer.toLowerCase() === currentUserData.username.toLowerCase()
+      );
+
+      if (userMsgs.length === 0) {
+        list.innerHTML = '<p style="color:#70757a;">Nenhuma mensagem recebida ou enviada.</p>';
         return;
       }
 
-      productsList.forEach(p => grid.appendChild(buildProductCard(p)));
+      userMsgs.forEach(m => {
+        const isSeller = m.seller.toLowerCase() === currentUserData.username.toLowerCase();
+        if (isSeller && !m.read) {
+          updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
+        }
+
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <div class="item-header">
+            <strong>${isSeller ? `De: ${escapeHtml(m.buyer)}` : `Para: ${escapeHtml(m.seller)}`}</strong>
+            <span class="item-date">${new Date(m.timestamp).toLocaleString()}</span>
+          </div>
+          <p style="margin: 8px 0; font-size: 14px;"><strong>Produto:</strong> ${escapeHtml(m.productName)}</p>
+          <p style="background: #f1f3f4; padding: 10px; border-radius: 4px; font-style: italic;">"${escapeHtml(m.message)}"</p>
+        `;
+        list.appendChild(div);
+      });
     }
 
-    /* MESSAGES MODAL */
-    window.openMessagesModal = async function() {
-      const modal = document.getElementById('modal-messages');
-      const body = document.getElementById('messages-list-body');
-      body.innerHTML = '';
+    // SEARCH
+    window.switchSearchTab = function(tab) {
+      activeSearchTab = tab;
+      document.getElementById('search-results-profiles').classList.toggle('hidden', tab !== 'profiles');
+      document.getElementById('search-results-posts').classList.toggle('hidden', tab !== 'posts');
+      document.getElementById('search-results-products').classList.toggle('hidden', tab !== 'products');
 
-      if (!currentUserData) return;
-
-      const myName = currentUserData.username.toLowerCase();
-      const userMessages = messagesList.filter(
-        m => m.seller.toLowerCase() === myName || m.buyer.toLowerCase() === myName
-      );
-
-      if (userMessages.length === 0) {
-        body.innerHTML = '<p style="color:#70757a; text-align:center;">Nenhuma mensagem de Marketplace encontrada.</p>';
-      } else {
-        userMessages.forEach(msg => {
-          const isIncoming = msg.seller.toLowerCase() === myName;
-          const item = document.createElement('div');
-          item.className = `message-item ${isIncoming && !msg.read ? 'unread' : ''}`;
-          item.innerHTML = `
-            <div style="font-weight: bold; font-size: 13px; color: #1a73e8;">
-              ${isIncoming ? `De: ${escapeHtml(msg.buyer)}` : `Para: ${escapeHtml(msg.seller)}`}
-            </div>
-            <div style="font-size: 14px; margin: 4px 0;">"${escapeHtml(msg.message)}"</div>
-            <div style="font-size: 11px; color: #70757a;">${formatTime(msg.timestamp)}</div>
-          `;
-          body.appendChild(item);
-
-          // Mark as read if receiving
-          if (isIncoming && !msg.read) {
-            updateDoc(publicMessageDoc(msg.id), { read: true });
-          }
-        });
-      }
-
-      modal.classList.remove('hidden');
+      document.getElementById('tab-btn-profiles').classList.toggle('active', tab === 'profiles');
+      document.getElementById('tab-btn-posts').classList.toggle('active', tab === 'posts');
+      document.getElementById('tab-btn-products').classList.toggle('active', tab === 'products');
     };
 
-    window.closeMessagesModal = function() {
-      document.getElementById('modal-messages').classList.add('hidden');
-    };
+    function renderSearch(query) {
+      document.getElementById('search-query-text').innerText = query;
+      const q = query.toLowerCase();
 
-    /* PROFILE VIEW & SWITCHING */
-    window.viewProfile = function(name) {
-      navigateTo('profile', name);
-    };
+      // Profiles
+      const matchedUsers = Object.keys(usersMap).filter(k => k.includes(q));
+      document.getElementById('count-profiles').innerText = matchedUsers.length;
+      const profDiv = document.getElementById('search-results-profiles');
+      profDiv.innerHTML = matchedUsers.length === 0 ? '<p style="color:#70757a;">Nenhum perfil encontrado.</p>' : '';
+      matchedUsers.forEach(k => {
+        const u = usersMap[k];
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `<span class="author-name" onclick="navigateTo('profile', '${escapeStr(u.username)}')">${escapeHtml(u.username)}</span>`;
+        profDiv.appendChild(div);
+      });
 
+      // Posts
+      const matchedPosts = postsList.filter(p => p.content.toLowerCase().includes(q) || p.author.toLowerCase().includes(q));
+      document.getElementById('count-posts').innerText = matchedPosts.length;
+      const postsDiv = document.getElementById('search-results-posts');
+      postsDiv.innerHTML = matchedPosts.length === 0 ? '<p style="color:#70757a;">Nenhum post encontrado.</p>' : '';
+      matchedPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
+
+      // Products
+      const matchedProds = productsList.filter(p => p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.seller.toLowerCase().includes(q));
+      document.getElementById('count-products').innerText = matchedProds.length;
+      const prodsDiv = document.getElementById('search-results-products');
+      prodsDiv.innerHTML = matchedProds.length === 0 ? '<p style="color:#70757a;">Nenhum produto encontrado.</p>' : '';
+      matchedProds.forEach(p => prodsDiv.appendChild(buildProductCard(p)));
+    }
+
+    // PROFILE
     window.switchProfileTab = function(tab) {
-      activeProfileTab = tab;
-      const postsListEl = document.getElementById('profile-posts-list');
-      const vitrineGridEl = document.getElementById('profile-vitrine-grid');
-      const btnPosts = document.getElementById('profile-tab-posts');
-      const btnVitrine = document.getElementById('profile-tab-vitrine');
-
-      if (tab === 'posts') {
-        postsListEl.classList.remove('hidden');
-        vitrineGridEl.classList.add('hidden');
-        btnPosts.classList.add('active');
-        btnVitrine.classList.remove('active');
-      } else {
-        postsListEl.classList.add('hidden');
-        vitrineGridEl.classList.remove('hidden');
-        btnVitrine.classList.add('active');
-        btnPosts.classList.remove('active');
-      }
+      document.getElementById('profile-posts-list').classList.toggle('hidden', tab !== 'posts');
+      document.getElementById('profile-vitrine-list').classList.toggle('hidden', tab !== 'vitrine');
+      document.getElementById('profile-tab-posts').classList.toggle('active', tab === 'posts');
+      document.getElementById('profile-tab-vitrine').classList.toggle('active', tab === 'vitrine');
     };
 
     function renderProfile(name) {
       const userKey = name.toLowerCase();
       const user = usersMap[userKey];
-      
+
       if (!user) {
         document.getElementById('profile-name-display').innerText = name;
-        document.getElementById('profile-dob-display').innerText = "User not found";
-        document.getElementById('profile-posts-list').innerHTML = '';
+        document.getElementById('profile-dob-display').innerText = "Utilizador não encontrado.";
         return;
       }
 
-      const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
-      const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(user.username);
-
       document.getElementById('profile-name-display').innerText = user.username;
-      const botTag = document.getElementById('profile-bot-tag');
-      if (user.isBot) botTag.classList.remove('hidden');
-      else botTag.classList.add('hidden');
+      document.getElementById('profile-dob-display').innerText = "Nascimento: " + (user.dob || 'N/A');
 
-      document.getElementById('profile-dob-display').innerText = "Born: " + (user.dob || 'N/A');
-
-      const userPosts = postsList.filter(p => p.author && p.author.toLowerCase() === userKey);
-      const userProducts = productsList.filter(p => p.seller && p.seller.toLowerCase() === userKey);
+      const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
+      const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
 
       document.getElementById('stat-posts').innerText = userPosts.length;
-      document.getElementById('stat-products').innerText = userProducts.length;
       document.getElementById('stat-followers').innerText = user.followers ? user.followers.length : 0;
       document.getElementById('stat-following').innerText = user.following ? user.following.length : 0;
 
-      const actionArea = document.getElementById('profile-action-btn-area');
-      actionArea.innerHTML = '';
-      
-      if (!isSelf) {
-        const btn = document.createElement('button');
-        btn.innerText = isFollowing ? 'Unfollow' : 'Follow';
-        btn.onclick = () => toggleFollow(user.username);
-        if (!isFollowing) btn.className = 'btn-primary';
-        actionArea.appendChild(btn);
-      } else {
-        const btn = document.createElement('button');
-        btn.innerText = "Criar produto";
-        btn.className = "btn-primary";
-        btn.onclick = () => openCreateProductModal();
-        actionArea.appendChild(btn);
-      }
-
       // Render Posts
-      const postsEl = document.getElementById('profile-posts-list');
-      postsEl.innerHTML = '';
-      if (userPosts.length === 0) {
-        postsEl.innerHTML = '<p style="color:#70757a;">Nenhum post publicado.</p>';
-      } else {
-        userPosts.forEach(p => postsEl.appendChild(buildPostCard(p)));
-      }
+      const postsDiv = document.getElementById('profile-posts-list');
+      postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Sem publicações.</p>' : '';
+      userPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
 
       // Render Vitrine
-      const vitrineEl = document.getElementById('profile-vitrine-grid');
-      vitrineEl.innerHTML = '';
-      if (userProducts.length === 0) {
-        vitrineEl.innerHTML = '<p style="color:#70757a; grid-column: 1/-1;">Nenhum produto à venda na vitrine.</p>';
-      } else {
-        userProducts.forEach(p => vitrineEl.appendChild(buildProductCard(p)));
-      }
+      const vitrineDiv = document.getElementById('profile-vitrine-list');
+      vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Este utilizador não tem produtos à venda.</p>' : '';
+      userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
     }
 
-    /* FOLLOWERS / FOLLOWING MODAL */
-    window.openUserListModal = function(type) {
-      if (!currentProfileUsername) return;
-      const userKey = currentProfileUsername.toLowerCase();
-      const user = usersMap[userKey];
-      if (!user) return;
-
-      const listNames = type === 'followers' ? (user.followers || []) : (user.following || []);
-      const titleEl = document.getElementById('modal-user-list-title');
-      const bodyEl = document.getElementById('modal-user-list-body');
-
-      titleEl.innerText = type === 'followers' ? `Followers of ${user.username}` : `Accounts ${user.username} Follows`;
-      bodyEl.innerHTML = '';
-
-      if (listNames.length === 0) {
-        bodyEl.innerHTML = `<p style="color:#70757a; text-align:center; padding: 12px;">No ${type} found.</p>`;
-      } else {
-        listNames.forEach(name => {
-          const uKey = name.toLowerCase();
-          const uObj = usersMap[uKey] || { username: name, isBot: false };
-          const isSelf = currentUserData && uObj.username.toLowerCase() === currentUserData.username.toLowerCase();
-          const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(uObj.username);
-
-          const div = document.createElement('div');
-          div.className = 'user-list-item';
-          div.innerHTML = `
-            <div>
-              <span class="author-name" onclick="closeUserListModal(); viewProfile('${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
-              ${uObj.isBot ? `<span class="bot-badge">[BOT]</span>` : ''}
-            </div>
-            ${!isSelf ? `
-              <button onclick="toggleFollow('${escapeStr(uObj.username)}')" style="font-size: 12px;">
-                ${isFollowing ? 'Unfollow' : 'Follow'}
-              </button>
-            ` : ''}
-          `;
-          bodyEl.appendChild(div);
-        });
-      }
-
-      document.getElementById('modal-user-list').classList.remove('hidden');
-    };
-
-    window.closeUserListModal = function() {
-      document.getElementById('modal-user-list').classList.add('hidden');
-    };
-
-    /* SEARCH FUNCTIONALITY */
-    window.switchSearchTab = function(tab) {
-      activeSearchTab = tab;
-      const profDiv = document.getElementById('search-results-profiles');
-      const postsDiv = document.getElementById('search-results-posts');
-      const prodDiv = document.getElementById('search-results-products');
-
-      document.getElementById('tab-btn-profiles').classList.toggle('active', tab === 'profiles');
-      document.getElementById('tab-btn-posts').classList.toggle('active', tab === 'posts');
-      document.getElementById('tab-btn-products').classList.toggle('active', tab === 'products');
-
-      profDiv.classList.toggle('hidden', tab !== 'profiles');
-      postsDiv.classList.toggle('hidden', tab !== 'posts');
-      prodDiv.classList.toggle('hidden', tab !== 'products');
-    };
-
-    function renderSearch(query) {
-      document.getElementById('search-query-text').innerText = query;
-      const q = query.toLowerCase().trim();
-
-      // Search Profiles
-      const matchedUserKeys = Object.keys(usersMap).filter(k => k.includes(q));
-      document.getElementById('count-profiles').innerText = matchedUserKeys.length;
-
-      const profContainer = document.getElementById('search-results-profiles');
-      profContainer.innerHTML = '';
-
-      if (matchedUserKeys.length === 0) {
-        profContainer.innerHTML = '<p style="color:#70757a;">No profiles found.</p>';
-      } else {
-        matchedUserKeys.forEach(uKey => {
-          const uObj = usersMap[uKey];
-          const isSelf = currentUserData && uObj.username.toLowerCase() === currentUserData.username.toLowerCase();
-          const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(uObj.username);
-
-          const div = document.createElement('div');
-          div.style.cssText = 'border: 1px solid #dadce0; padding: 12px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; background-color:#fff;';
-          div.innerHTML = `
-            <div>
-              <span class="author-name" onclick="viewProfile('${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
-              ${uObj.isBot ? `<span class="bot-badge">[BOT]</span>` : ''}
-            </div>
-            ${!isSelf ? `
-              <button onclick="toggleFollow('${escapeStr(uObj.username)}')" style="font-size: 12px;">
-                ${isFollowing ? 'Unfollow' : 'Follow'}
-              </button>
-            ` : ''}
-          `;
-          profContainer.appendChild(div);
-        });
-      }
-
-      // Search Posts
-      const matchedPosts = postsList.filter(p => p.content.toLowerCase().includes(q) || (p.author && p.author.toLowerCase().includes(q)));
-      document.getElementById('count-posts').innerText = matchedPosts.length;
-
-      const postsContainer = document.getElementById('search-results-posts');
-      postsContainer.innerHTML = '';
-
-      if (matchedPosts.length === 0) {
-        postsContainer.innerHTML = '<p style="color:#70757a;">No posts found.</p>';
-      } else {
-        matchedPosts.forEach(p => postsContainer.appendChild(buildPostCard(p)));
-      }
-
-      // Search Products
-      const matchedProducts = productsList.filter(p => 
-        (p.name && p.name.toLowerCase().includes(q)) || 
-        (p.description && p.description.toLowerCase().includes(q)) ||
-        (p.seller && p.seller.toLowerCase().includes(q))
-      );
-      document.getElementById('count-products').innerText = matchedProducts.length;
-
-      const prodContainer = document.getElementById('search-results-products');
-      prodContainer.innerHTML = '';
-
-      if (matchedProducts.length === 0) {
-        prodContainer.innerHTML = '<p style="color:#70757a; grid-column: 1/-1;">No marketplace items found.</p>';
-      } else {
-        matchedProducts.forEach(p => prodContainer.appendChild(buildProductCard(p)));
-      }
-    }
-
-    /* UTILITIES */
+    // UTILS
     function escapeHtml(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
-
     function escapeStr(str) {
       return String(str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
 
-    // Attach Event Listeners
+    // EVENT LISTENERS
     window.onload = function() {
       const searchInput = document.getElementById('search-input');
-
-      // Standard uninterrupted typing listener
       searchInput.addEventListener('input', function(e) {
-        const value = e.target.value;
-        if (value.trim().length > 0) {
+        const val = e.target.value;
+        if (val.length > 0) {
           if (document.getElementById('view-search').classList.contains('hidden')) {
-            document.getElementById('view-feed').classList.add('hidden');
-            document.getElementById('view-marketplace').classList.add('hidden');
-            document.getElementById('view-profile').classList.add('hidden');
-            document.getElementById('view-search').classList.remove('hidden');
+            navigateTo('search', val);
+          } else {
+            renderSearch(val);
           }
-          renderSearch(value);
         } else {
-          if (!document.getElementById('view-search').classList.contains('hidden')) {
-            navigateTo('feed');
-          }
+          navigateTo('feed');
         }
       });
 
@@ -1647,4 +1132,3 @@
   </script>
 </body>
 </html>
-```
