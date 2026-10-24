@@ -279,7 +279,7 @@
       </div>
       <div class="modal-body">
         <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">
-          Escolha uma das opções abaixo para abrir um pedido direto com o <strong>Lourenço</strong>:
+          Escolha uma das opções abaixo para abrir um pedido direto com a conta <strong>Arnos</strong>:
         </p>
 
         <div class="credit-option-card">
@@ -556,7 +556,6 @@
         usersMap = {};
         snapshot.forEach(docSnap => usersMap[docSnap.data().username.toLowerCase()] = docSnap.data());
         ensureArnosBotExists();
-        ensureLourencoExists();
         if (currentUserData && usersMap[currentUserData.username.toLowerCase()]) {
           currentUserData = usersMap[currentUserData.username.toLowerCase()];
           window.currentUserData = currentUserData;
@@ -602,18 +601,6 @@
         try {
           await setDoc(publicUserDoc(botName), {
             username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: []
-          });
-        } catch(e) {}
-      }
-    }
-
-    async function ensureLourencoExists() {
-      const name = "Lourenço";
-      const key = name.toLowerCase();
-      if (!usersMap[key]) {
-        try {
-          await setDoc(publicUserDoc(name), {
-            username: name, password: "system_protected_password", dob: "2000-01-01", isBot: false, credits: 0, followers: [], following: []
           });
         } catch(e) {}
       }
@@ -777,12 +764,12 @@
         currentProfileUsername = arg || (currentUserData ? currentUserData.username : '');
         renderProfile(currentProfileUsername);
       } else if (view === 'search') {
-        document.getElementById('view-search').classList.remove('hidden');
+        document.getElementById('view-search').classList.add('hidden');
         renderSearch(arg || document.getElementById('search-input').value);
       }
     };
 
-    // MODAL DE OBTER CRÉDITOS E COMPRA
+    // MODAL DE OBTER CRÉDITOS E COMPRA (DIRETO PARA ARNOS)
     window.openGetCreditsModal = function() {
       document.getElementById('modal-get-credits').classList.remove('hidden');
     };
@@ -792,8 +779,8 @@
 
     window.requestCreditsPurchase = async function(amount) {
       if (!currentUserData) return;
-      if (currentUserData.username.toLowerCase() === 'lourenço') {
-        return alert("Você já é o Lourenço!");
+      if (currentUserData.username.toLowerCase() === 'arnos') {
+        return alert("Você já é a conta Arnos!");
       }
 
       const prodTitle = `Créditos R$ ${amount}`;
@@ -801,7 +788,7 @@
         await addDoc(publicMessagesColl(), {
           sender: currentUserData.username,
           buyer: currentUserData.username,
-          seller: "Lourenço",
+          seller: "Arnos",
           productName: prodTitle,
           message: `Olá, quero comprar ${amount} de crédito.`,
           timestamp: new Date().toISOString(),
@@ -811,13 +798,13 @@
         });
         closeGetCreditsModal();
         navigateTo('messages');
-        alert(`Pedido de ${amount} créditos enviado ao Lourenço! Acompanhe na aba Mensagens.`);
+        alert(`Pedido de ${amount} créditos enviado ao Arnos! Acompanhe na aba Mensagens.`);
       } catch (e) { alert("Erro ao solicitar créditos."); }
     };
 
-    // APROVAÇÃO DE PEDIDO DE CRÉDITOS PELO LOURENÇO
+    // APROVAÇÃO DE PEDIDO DE CRÉDITOS PELA CONTA ARNOS
     window.approveCreditsOrder = async function(msgId, buyerUser, amount) {
-      if (!currentUserData || currentUserData.username.toLowerCase() !== 'lourenço') return;
+      if (!currentUserData || currentUserData.username.toLowerCase() !== 'arnos') return;
 
       try {
         const buyerSnap = await getDoc(publicUserDoc(buyerUser));
@@ -827,11 +814,11 @@
         }
 
         const myCredits = currentUserData.credits || 0;
-        await updateDoc(publicUserDoc("Lourenço"), { credits: myCredits + amount });
+        await updateDoc(publicUserDoc("Arnos"), { credits: myCredits + amount });
 
         await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
 
-        alert(`Pedido de ${amount} créditos concluído! Créditos creditados para ${buyerUser} e Lourenço.`);
+        alert(`Pedido de ${amount} créditos concluído! Créditos creditados para ${buyerUser} e Arnos.`);
       } catch (e) { alert("Erro ao processar o pedido."); }
     };
 
@@ -1017,7 +1004,7 @@
       } catch (e) {}
     };
 
-    // REACTION SYSTEM (SISTEMA DE REAÇÕES COM EMOJIS COMPARTILHADO)
+    // REACTION SYSTEM
     const EMOJI_OPTIONS = ['❤️', '😂', '😮', '😢', '😡', '👍', '🔥', '🎉'];
 
     window.startReactPress = function(e, itemId, type) {
@@ -1526,7 +1513,8 @@
       if (lastMsgWithAction) {
         const myName = currentUserData.username.toLowerCase();
 
-        if (lastMsgWithAction.status === 'pending_credits' && myName === 'lourenço') {
+        // APENAS A CONTA "ARNOS" PODE APROVAR PEDIDOS DE CRÉDITOS AGORA
+        if (lastMsgWithAction.status === 'pending_credits' && myName === 'arnos') {
           banner.classList.remove('hidden');
           banner.innerHTML = `
             <span><strong>Pedido de Créditos:</strong> ${lastMsgWithAction.buyer} quer comprar ${lastMsgWithAction.creditAmount} créditos.</span>
