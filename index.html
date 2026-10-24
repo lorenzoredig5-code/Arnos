@@ -44,6 +44,18 @@
     nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
 
+    /* AVATAR SYSTEM */
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+      background-color: #bdc1c6; display: inline-flex; align-items: center; justify-content: center;
+      color: #ffffff; font-weight: bold; font-size: 14px; flex-shrink: 0; border: 1px solid #dadce0;
+    }
+    .user-avatar.small { width: 28px; height: 28px; font-size: 11px; }
+    .user-avatar.large { width: 80px; height: 80px; font-size: 28px; }
+
+    .author-container { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .author-container:hover .author-name { text-decoration: underline; }
+
     /* BADGE & CREDITS */
     .badge-container { position: relative; display: inline-block; }
     .badge {
@@ -64,10 +76,10 @@
     }
 
     .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .author-name { font-weight: bold; color: #1a73e8; cursor: pointer; }
-    .author-name:hover { text-decoration: underline; }
+    .author-name { font-weight: bold; color: #1a73e8; }
     .item-date { font-size: 12px; color: #70757a; }
     .item-content { font-size: 14px; margin-bottom: 12px; white-space: pre-wrap; }
+    .post-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
     .product-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
     .product-price { font-size: 18px; font-weight: bold; color: #188038; margin-bottom: 4px; }
     
@@ -193,6 +205,11 @@
       <div class="card">
         <h3 style="font-size: 15px; margin-bottom: 8px;">Criar uma publicação</h3>
         <textarea id="post-input" rows="3" placeholder="No que estás a pensar?" dir="ltr"></textarea>
+        
+        <label style="font-size: 12px; font-weight: bold; display: block; margin-top: 6px;">Adicionar Foto ao Post (Opcional)</label>
+        <input type="file" id="post-image-file" accept="image/*" style="margin-bottom: 8px;">
+        <div id="post-img-preview" style="margin-bottom: 12px;"></div>
+
         <button id="btn-publish-post" onclick="submitPost()" class="btn-primary">Publicar</button>
       </div>
       <div id="feed-list"></div>
@@ -249,14 +266,23 @@
     <!-- PROFILE VIEW -->
     <div id="view-profile" class="hidden">
       <div class="card profile-header">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div>
-            <h2 id="profile-name-display" style="display: inline-block;"></h2>
-            <span id="profile-verified-badge" style="font-size: 18px; margin-left: 4px;" title="Conta Verificada">✅</span>
-            <span id="profile-bot-badge" class="bot-badge hidden">BOT</span>
-            <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div id="profile-avatar-container"></div>
+            <div>
+              <h2 id="profile-name-display" style="display: inline-block;"></h2>
+              <span id="profile-verified-badge" style="font-size: 18px; margin-left: 4px;" title="Conta Verificada">✅</span>
+              <span id="profile-bot-badge" class="bot-badge hidden">BOT</span>
+              <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
+            </div>
           </div>
           <div id="profile-action-btn-area" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+        </div>
+
+        <div id="profile-edit-avatar-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
+          <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Alterar Foto de Perfil</label>
+          <input type="file" id="profile-avatar-file" accept="image/*" style="margin-bottom: 6px;">
+          <button class="btn-primary" onclick="saveProfileAvatar()">Guardar Foto de Perfil</button>
         </div>
 
         <div class="profile-stats" style="display:flex; gap:16px; margin-top:12px; font-size:13px; color:#5f6368;">
@@ -475,19 +501,6 @@
         <div id="prod-img-preview" style="margin-bottom: 12px;"></div>
 
         <button id="btn-save-product" onclick="saveProduct()" class="btn-primary" style="width: 100%;">Salvar e Publicar Produto</button>
-
-        <div class="rules-box">
-          <strong style="display:block; margin-bottom:4px; font-size:13px;">⚠️ Marketplace Listing Policies & Prohibited Items:</strong>
-          <p style="margin-bottom:4px;">To protect our community, items listed on this Marketplace must comply with our safety guidelines.</p>
-          <ul style="margin-left: 18px; line-height: 1.4;">
-            <li><strong>Pets & Animals:</strong> Sales or adoption of animals are strictly prohibited.</li>
-            <li><strong>Weapons & Ammunition:</strong> Firearms, explosives, knives, or tactical gear are strictly banned.</li>
-            <li><strong>Alcohol, Drugs & Medications:</strong> Prescription drugs, illegal substances, alcohol, and medical devices are not allowed.</li>
-            <li><strong>Services:</strong> Only physical products can be listed. Services or jobs are prohibited.</li>
-            <li><strong>Replicas & Counterfeits:</strong> Counterfeit, fake, or knockoff brand products are illegal and prohibited.</li>
-          </ul>
-        </div>
-
       </div>
     </div>
   </div>
@@ -529,7 +542,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, addDoc, setDoc as firestoreSetDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'arnos-app';
     const firebaseConfig = typeof __firebase_config !== 'undefined' 
@@ -556,6 +569,8 @@
     let reportsList = [];
     let currentProfileUsername = null;
     let selectedImageBase64 = null;
+    let selectedPostImageBase64 = null;
+    let selectedAvatarBase64 = null;
     let activeChatKey = null;
     let activeMsgSubTab = 'profile';
 
@@ -688,7 +703,7 @@
       if (!usersMap[botKey]) {
         try {
           await setDoc(publicUserDoc(botName), {
-            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: [], banned: false, verified: true
+            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: [], banned: false, verified: true, avatarUrl: ''
           });
         } catch(e) {}
       }
@@ -722,7 +737,7 @@
         ];
         try {
           await addDoc(publicPostsColl(), {
-            author: botName, content: msgs[Math.floor(Math.random() * msgs.length)], timestamp: now.toISOString(), reactions: {}, comments: []
+            author: botName, content: msgs[Math.floor(Math.random() * msgs.length)], imageUrl: '', timestamp: now.toISOString(), reactions: {}, comments: []
           });
         } catch (e) {}
       }
@@ -760,6 +775,16 @@
       }
     }
 
+    // AVATAR RENDER HELPER
+    function renderAvatar(userObj, sizeClass = '') {
+      const name = userObj ? userObj.username : 'U';
+      const initial = name.charAt(0).toUpperCase();
+      if (userObj && userObj.avatarUrl) {
+        return `<img src="${escapeHtml(userObj.avatarUrl)}" class="user-avatar ${sizeClass}">`;
+      }
+      return `<div class="user-avatar ${sizeClass}">${initial}</div>`;
+    }
+
     // AUTH
     window.toggleAuth = function(mode) {
       document.getElementById('auth-error').classList.add('hidden');
@@ -783,7 +808,7 @@
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [], banned: false, verified: false, banReason: '', banUntil: '' };
+        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [], banned: false, verified: false, avatarUrl: '', banReason: '', banUntil: '' };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
@@ -853,7 +878,31 @@
       navigateTo('feed');
     }
 
-    // ADMIN PANEL - COM CRIAÇÃO AUTOMÁTICA DE CAMPOS FALTANTES (BOOLEANOS/STRINGS)
+    // PROFILE AVATAR UPLOAD
+    document.getElementById('profile-avatar-file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          selectedAvatarBase64 = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    window.saveProfileAvatar = async function() {
+      if (!selectedAvatarBase64 || !currentUserData) return alert("Selecione uma imagem para o avatar.");
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { avatarUrl: selectedAvatarBase64 });
+        currentUserData.avatarUrl = selectedAvatarBase64;
+        selectedAvatarBase64 = null;
+        document.getElementById('profile-avatar-file').value = '';
+        alert("Foto de perfil atualizada com sucesso!");
+        renderProfile(currentUserData.username);
+      } catch (e) { alert("Erro ao atualizar foto de perfil."); }
+    };
+
+    // ADMIN PANEL
     window.openAdminBanModal = function() {
       document.getElementById('admin-search-user').value = '';
       document.getElementById('admin-user-result').innerHTML = '<p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir a conta.</p>';
@@ -876,7 +925,6 @@
         return;
       }
 
-      // VERIFICA SE OS CAMPOS BOOLEANOS/STRINGS EXISTEM. SE NÃO, CRIA AUTOMATICAMENTE NO FIREBASE
       let needsUpdate = false;
       let updatePayload = {};
 
@@ -886,16 +934,17 @@
       if (user.banUntil === undefined) { user.banUntil = ''; updatePayload.banUntil = ''; needsUpdate = true; }
 
       if (needsUpdate) {
-        try {
-          await updateDoc(publicUserDoc(user.username), updatePayload);
-        } catch(e) {}
+        try { await updateDoc(publicUserDoc(user.username), updatePayload); } catch(e) {}
       }
 
       const isBanned = user.banned;
       const isVerified = user.verified;
 
       resultDiv.innerHTML = `
-        <h4 style="margin-bottom: 6px;">Utilizador: ${escapeHtml(user.username)} ${isVerified ? '✅' : ''}</h4>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom: 6px;">
+          ${renderAvatar(user, 'small')}
+          <h4 style="margin:0;">${escapeHtml(user.username)} ${isVerified ? '✅' : ''}</h4>
+        </div>
         <p style="font-size:12px; margin-bottom:8px;">
           <strong>Status Verificado:</strong> ${isVerified ? '<span style="color:green; font-weight:bold;">Verificado (True)</span>' : '<span style="color:gray;">Não Verificado (False)</span>'}
           <button onclick="toggleVerifyUser('${escapeStr(user.username)}', ${!isVerified})" style="font-size:11px; padding:2px 6px; margin-left:8px;" class="btn-primary">
@@ -963,7 +1012,6 @@
       if (!reason) return alert("Por favor insira o motivo do banimento.");
 
       try {
-        // Garante que todos os campos de banimento e verificação existam antes de atualizar
         await setDoc(publicUserDoc(username), {
           banned: true,
           banReason: reason,
@@ -1371,19 +1419,44 @@
       return { top3, totalCount, myEmoji };
     }
 
+    // POST IMAGE PREVIEW & SUBMIT
+    document.getElementById('post-image-file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          selectedPostImageBase64 = evt.target.result;
+          document.getElementById('post-img-preview').innerHTML = `<img src="${selectedPostImageBase64}" style="max-width:100%; max-height:180px; border-radius:4px;">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
     window.submitPost = async function() {
       if (!currentUserData) return;
       const textEl = document.getElementById('post-input');
       const content = textEl.value.trim();
-      if (!content) return;
+      const imageUrl = selectedPostImageBase64 || '';
+
+      if (!content && !imageUrl) return alert("Escreva um texto ou adicione uma foto para publicar.");
 
       if (containsProfanity(content)) {
         return alert("Erro: O seu post contém palavrões ou termos impróprios e não pode ser publicado publicamente.");
       }
 
       try {
-        await addDoc(publicPostsColl(), { author: currentUserData.username, content, timestamp: new Date().toISOString(), reactions: {}, comments: [] });
+        await addDoc(publicPostsColl(), { 
+          author: currentUserData.username, 
+          content, 
+          imageUrl, 
+          timestamp: new Date().toISOString(), 
+          reactions: {}, 
+          comments: [] 
+        });
         textEl.value = '';
+        selectedPostImageBase64 = null;
+        document.getElementById('post-image-file').value = '';
+        document.getElementById('post-img-preview').innerHTML = '';
       } catch (e) {}
     };
 
@@ -1447,22 +1520,21 @@
       div.className = isVerified ? 'card verified-post' : 'card';
       div.innerHTML = `
         <div class="item-header">
-          <div>
-            <span class="author-name" onclick="navigateTo('profile', '${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
-            ${isVerified ? '<span style="font-size:14px; margin-left:2px;" title="Verificado">✅</span>' : ''}
-            ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
-            ${!isSelf && !isBot ? `
-              <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size:11px; padding:2px 8px; margin-left:6px;">
-                ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
-              </button>
-            ` : ''}
+          <div class="author-container" onclick="navigateTo('profile', '${escapeStr(post.author)}')">
+            ${renderAvatar(authorObj, 'small')}
+            <div>
+              <span class="author-name">${escapeHtml(post.author)}</span>
+              ${isVerified ? '<span style="font-size:14px; margin-left:2px;" title="Verificado">✅</span>' : ''}
+              ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
+            </div>
           </div>
           <div>
             <span class="item-date">${new Date(post.timestamp).toLocaleString()}</span>
             ${isSelf ? `<button onclick="deletePost('${post.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
           </div>
         </div>
-        <div class="item-content">${escapeHtml(post.content)}</div>
+        ${post.content ? `<div class="item-content">${escapeHtml(post.content)}</div>` : ''}
+        ${post.imageUrl ? `<img src="${escapeHtml(post.imageUrl)}" class="post-img">` : ''}
         
         <div style="display:flex; gap:12px; margin-bottom:8px; align-items:center; position:relative;">
           <div id="react-picker-area-post-${post.id}" style="position:relative;"></div>
@@ -1484,6 +1556,12 @@
           <button onclick="toggleCommentBox('${post.id}')">
             💬 Comentários (${comments.length})
           </button>
+
+          ${!isSelf && !isBot ? `
+            <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size:11px; padding:2px 8px; margin-left:auto;">
+              ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
+            </button>
+          ` : ''}
         </div>
 
         <div id="comments-box-${post.id}" class="comments-section hidden">
@@ -1499,7 +1577,8 @@
               return `
               <div class="comment-item">
                 <div class="comment-header">
-                  <div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    ${renderAvatar(cAuthorObj, 'small')}
                     <strong>${escapeHtml(c.author)}</strong>
                     ${cVerified ? '<span style="font-size:12px; margin-left:2px;">✅</span>' : ''}
                   </div>
@@ -1510,7 +1589,7 @@
                     ` : ''}
                   </div>
                 </div>
-                <div>${escapeHtml(c.text)}</div>
+                <div style="margin-top:4px;">${escapeHtml(c.text)}</div>
               </div>
             `;
             }).join('')}
@@ -1537,18 +1616,6 @@
         reader.readAsDataURL(file);
       }
     });
-
-    async function uploadToCloudinary(file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'ml_default');
-      formData.append('api_key', '752794814119293');
-      try {
-        const res = await fetch('https://api.cloudinary.com/v1_1/ml_default/image/upload', { method: 'POST', body: formData });
-        if (res.ok) { const data = await res.json(); return data.secure_url; }
-      } catch (e) {}
-      return selectedImageBase64;
-    }
 
     window.openCreateProductModal = function() {
       document.getElementById('modal-product-title').innerText = 'Criar Produto';
@@ -1590,7 +1657,6 @@
       }
 
       let imageUrl = selectedImageBase64 || '';
-      if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]);
 
       const productPayload = {
         seller: currentUserData.username,
@@ -1661,7 +1727,10 @@
       div.className = 'card';
       div.innerHTML = `
         <div class="item-header">
-          <span class="author-name" onclick="navigateTo('profile', '${escapeStr(prod.seller)}')">Vendedor: ${escapeHtml(prod.seller)} ${sellerVerified ? '✅' : ''}</span>
+          <div class="author-container" onclick="navigateTo('profile', '${escapeStr(prod.seller)}')">
+            ${renderAvatar(sellerObj, 'small')}
+            <span class="author-name">Vendedor: ${escapeHtml(prod.seller)} ${sellerVerified ? '✅' : ''}</span>
+          </div>
           <span class="item-date">${new Date(prod.timestamp).toLocaleDateString()}</span>
         </div>
         ${prod.imageUrl ? `<img src="${escapeHtml(prod.imageUrl)}" class="product-img">` : ''}
@@ -1762,6 +1831,7 @@
       keys.forEach(k => {
         const g = groups[k];
         const myUser = currentUserData.username.toLowerCase();
+        const otherObj = usersMap[g.otherUser.toLowerCase()];
         
         const hasUnread = g.msgs.some(m => {
           const sender = (m.sender || m.buyer || '').toLowerCase();
@@ -1777,8 +1847,11 @@
             <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : (g.productName.startsWith('Créditos') ? `💳 ${escapeHtml(g.productName)}` : `📦 Produto: ${escapeHtml(g.productName)}`)}</h3>
             <span class="item-date">${new Date(g.lastMsg.timestamp).toLocaleTimeString()}</span>
           </div>
-          <p style="font-size: 13px; color: #5f6368;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
-          <p style="font-size: 13px; margin-top: 4px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message)}"</p>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+            ${renderAvatar(otherObj, 'small')}
+            <p style="font-size: 13px; color: #5f6368; margin:0;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
+          </div>
+          <p style="font-size: 13px; margin-top: 6px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message)}"</p>
         `;
         convListDiv.appendChild(div);
       });
@@ -1909,7 +1982,8 @@
           const div = document.createElement('div');
           div.style.cssText = 'border:1px solid #dadce0; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;';
           div.innerHTML = `
-            <div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${renderAvatar(uObj, 'small')}
               <span class="author-name" onclick="closeUserListModal(); navigateTo('profile', '${escapeStr(name)}')">${escapeHtml(name)}</span>
               ${uVerified ? '✅' : ''}
             </div>
@@ -1955,10 +2029,13 @@
         div.className = 'card';
         div.style.cssText = 'display:flex; justify-content:space-between; align-items:center;';
         div.innerHTML = `
-          <div>
-            <span class="author-name" onclick="navigateTo('profile', '${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
-            ${isVerified ? '✅' : ''}
-            ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
+          <div style="display:flex; align-items:center; gap:8px;">
+            ${renderAvatar(uObj, 'small')}
+            <div>
+              <span class="author-name" onclick="navigateTo('profile', '${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
+              ${isVerified ? '✅' : ''}
+              ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
+            </div>
           </div>
           ${!isSelf && !isBot ? `
             <button onclick="toggleFollow('${escapeStr(uObj.username)}')" style="font-size:12px;">
@@ -1998,6 +2075,7 @@
       if (!user) return;
 
       document.getElementById('profile-name-display').innerText = user.username;
+      document.getElementById('profile-avatar-container').innerHTML = renderAvatar(user, 'large');
       
       const verifiedBadge = document.getElementById('profile-verified-badge');
       if (user.verified) verifiedBadge.classList.remove('hidden');
@@ -2011,6 +2089,13 @@
 
       const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
       const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(user.username);
+
+      const editAvatarSection = document.getElementById('profile-edit-avatar-section');
+      if (isSelf) {
+        editAvatarSection.classList.remove('hidden');
+      } else {
+        editAvatarSection.classList.add('hidden');
+      }
 
       const actionArea = document.getElementById('profile-action-btn-area');
       actionArea.innerHTML = '';
