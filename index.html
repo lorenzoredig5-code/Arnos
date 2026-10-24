@@ -55,6 +55,13 @@
     /* CONTAINER & CARDS */
     .container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
     .card { background-color: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 16px; position: relative; }
+    
+    /* POST VERIFICADO - BORDA AZUL NEON */
+    .card.verified-post {
+      border: 2px solid #00f0ff;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+      background: linear-gradient(135deg, #ffffff 0%, #f4fbff 100%);
+    }
 
     .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .author-name { font-weight: bold; color: #1a73e8; cursor: pointer; }
@@ -135,11 +142,9 @@
         <span id="msg-badge" class="badge hidden">0</span>
       </div>
 
-      <!-- BOTÃO OBTER CRÉDITOS E SALDO -->
       <span class="credits-display">💳 <span id="user-credits-val">0.00</span></span>
       <button class="btn-success" onclick="openGetCreditsModal()">💰 Obter Créditos</button>
 
-      <!-- BOTÃO PAINEL DE BANIMENTO (APARECE APENAS PARA ARNOS) -->
       <button id="nav-btn-admin" class="btn-danger hidden" onclick="openAdminBanModal()">🛡️ Painel Admin</button>
 
       <button onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')">Meu Perfil</button>
@@ -274,7 +279,7 @@
 
   </div>
 
-  <!-- MODAL: PAINEL DE ADMINISTRAÇÃO E BANIMENTO (EXCLUSIVO ARNOS) -->
+  <!-- MODAL: PAINEL DE ADMINISTRAÇÃO E BANIMENTO -->
   <div id="modal-admin-ban" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -848,7 +853,7 @@
       navigateTo('feed');
     }
 
-    // ADMIN PANEL (GERIR BANIMENTO E VERIFICAÇÃO)
+    // ADMIN PANEL CORRIGIDO E ESTABILIZADO
     window.openAdminBanModal = function() {
       document.getElementById('admin-search-user').value = '';
       document.getElementById('admin-user-result').innerHTML = '<p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir a conta.</p>';
@@ -859,13 +864,15 @@
     };
 
     window.searchUserForAdmin = function() {
-      const query = document.getElementById('admin-search-user').value.trim().toLowerCase();
+      const queryInput = document.getElementById('admin-search-user').value.trim();
       const resultDiv = document.getElementById('admin-user-result');
-      if (!query) return;
+      if (!queryInput) return;
 
-      const user = usersMap[query];
+      const queryKey = queryInput.toLowerCase();
+      const user = usersMap[queryKey];
+
       if (!user) {
-        resultDiv.innerHTML = `<p style="color: #d93025; font-size: 13px;">Utilizador não encontrado.</p>`;
+        resultDiv.innerHTML = `<p style="color: #d93025; font-size: 13px;">Utilizador "${escapeHtml(queryInput)}" não encontrado.</p>`;
         return;
       }
 
@@ -883,8 +890,8 @@
         <hr style="margin:8px 0; border:0; border-top:1px solid #ddd;">
         ${isBanned ? `
           <p style="font-size:12px; color:red; margin-bottom:6px;"><strong>CONTA BANIDA</strong></p>
-          <p style="font-size:12px; margin-bottom:6px;"><strong>Motivo:</strong> ${escapeHtml(user.banReason)}</p>
-          <p style="font-size:12px; margin-bottom:10px;"><strong>Expira em:</strong> ${escapeHtml(user.banUntil)}</p>
+          <p style="font-size:12px; margin-bottom:6px;"><strong>Motivo:</strong> ${escapeHtml(user.banReason || 'Não especificado')}</p>
+          <p style="font-size:12px; margin-bottom:10px;"><strong>Expira em:</strong> ${escapeHtml(user.banUntil || 'Para sempre')}</p>
           <button class="btn-success" onclick="unbanUser('${escapeStr(user.username)}')">Desbanir Utilizador</button>
         ` : `
           <div style="margin-top: 8px;">
@@ -917,13 +924,19 @@
     };
 
     window.toggleBanDateInput = function() {
-      const type = document.getElementById('ban-type-select').value;
-      document.getElementById('ban-date-container').classList.toggle('hidden', type !== 'temporary');
+      const selectEl = document.getElementById('ban-type-select');
+      const containerEl = document.getElementById('ban-date-container');
+      if (selectEl && containerEl) {
+        containerEl.classList.toggle('hidden', selectEl.value !== 'temporary');
+      }
     };
 
     window.executeBanUser = async function(username) {
-      const type = document.getElementById('ban-type-select').value;
-      const reason = document.getElementById('ban-reason-input').value.trim();
+      const typeEl = document.getElementById('ban-type-select');
+      const reasonEl = document.getElementById('ban-reason-input');
+      
+      const type = typeEl ? typeEl.value : 'permanent';
+      const reason = reasonEl ? reasonEl.value.trim() : '';
       let banUntil = 'Para sempre';
 
       if (type === 'temporary') {
@@ -1413,7 +1426,8 @@
       const { top3, totalCount, myEmoji } = calculateTopReactions(post.reactions);
 
       const div = document.createElement('div');
-      div.className = 'card';
+      // SE FOR VERIFICADO, ADICIONA A CLASSE COM BORDAS AZUL NEON
+      div.className = isVerified ? 'card verified-post' : 'card';
       div.innerHTML = `
         <div class="item-header">
           <div>
