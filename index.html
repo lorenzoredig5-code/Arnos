@@ -16,7 +16,7 @@
       position: sticky; top: 0; z-index: 100;
     }
     .logo { font-size: 22px; font-weight: bold; color: #1a73e8; cursor: pointer; }
-    .search-bar-container { flex: 1 1 200px; max-width: 400px; display: flex; align-items: center; }
+    .search-bar-container { flex: 1 1 200px; max-width: 350px; display: flex; align-items: center; }
 
     /* INPUTS */
     input[type="text"], input[type="password"], input[type="date"], input[type="number"], select, textarea {
@@ -36,18 +36,21 @@
     button:hover { background-color: #f1f3f4; color: #202124; }
     button.btn-primary { background-color: #1a73e8; border-color: #1a73e8; color: #ffffff; font-weight: bold; }
     button.btn-primary:hover { background-color: #1557b0; }
+    button.btn-success { background-color: #188038; border-color: #188038; color: #ffffff; font-weight: bold; }
+    button.btn-success:hover { background-color: #13652b; }
     button.btn-danger { background-color: #d93025; border-color: #d93025; color: #ffffff; }
     button.btn-warning { background-color: #f2994a; border-color: #f2994a; color: #ffffff; }
 
     nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
 
-    /* BADGE */
+    /* BADGE & CREDITS */
     .badge-container { position: relative; display: inline-block; }
     .badge {
       position: absolute; top: -6px; right: -6px; background-color: #d93025; color: #ffffff;
       border: 2px solid #ffffff; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold;
     }
+    .credits-display { background-color: #e6f4ea; color: #137333; padding: 4px 10px; border-radius: 16px; font-weight: bold; font-size: 13px; border: 1px solid #ceedd6; }
 
     /* CONTAINER & CARDS */
     .container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
@@ -72,9 +75,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 24px; padding: 6px 10px;
       display: flex; gap: 8px; z-index: 200; transform: translateY(-45px); animation: fadeIn 0.15s ease-in-out;
     }
-    .reaction-picker span {
-      font-size: 20px; cursor: pointer; transition: transform 0.1s; display: inline-block;
-    }
+    .reaction-picker span { font-size: 20px; cursor: pointer; transition: transform 0.1s; display: inline-block; }
     .reaction-picker span:hover { transform: scale(1.3); }
 
     @keyframes fadeIn {
@@ -98,12 +99,16 @@
     .chat-bubble.mine { background-color: #e8f0fe; align-self: flex-end; color: #1a73e8; border-bottom-right-radius: 2px; }
     .chat-bubble.other { background-color: #ffffff; align-self: flex-start; color: #202124; border: 1px solid #dadce0; border-bottom-left-radius: 2px; }
     .chat-sender-tag { font-size: 10px; font-weight: bold; margin-bottom: 2px; color: #5f6368; display: block; }
+    .chat-action-banner { background-color: #fff8e1; border: 1px solid #ffe082; padding: 10px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
 
     /* MODAL */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .modal-card { background: #fff; border-radius: 8px; border: 1px solid #dadce0; width: 90%; max-width: 520px; max-height: 90vh; display: flex; flex-direction: column; }
     .modal-header { padding: 12px 16px; border-bottom: 1px solid #dadce0; display: flex; justify-content: space-between; align-items: center; }
     .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
+
+    .credit-option-card { border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
+    .credit-option-card:hover { border-color: #1a73e8; background: #f4f8fe; }
 
     .auth-box { max-width: 360px; margin: 40px auto; padding: 24px; background-color: #fff; border: 1px solid #dadce0; border-radius: 8px; }
     .error-msg { color: #d93025; font-size: 13px; margin-bottom: 12px; }
@@ -124,10 +129,16 @@
     <nav>
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('marketplace')">Marketplace</button>
+      
       <div class="badge-container">
         <button onclick="navigateTo('messages')">Mensagens</button>
         <span id="msg-badge" class="badge hidden">0</span>
       </div>
+
+      <!-- BOTÃO OBTER CRÉDITOS E SALDO -->
+      <span class="credits-display">💳 <span id="user-credits-val">0.00</span></span>
+      <button class="btn-success" onclick="openGetCreditsModal()">💰 Obter Créditos</button>
+
       <button onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')">Meu Perfil</button>
       <span id="nav-user-link" class="nav-user" onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')"></span>
       <button onclick="logout()">Log out</button>
@@ -190,7 +201,7 @@
 
     <!-- MESSAGES VIEW -->
     <div id="view-messages" class="hidden">
-      <h2 style="margin-bottom: 12px;">Mensagens / Marketplace</h2>
+      <h2 style="margin-bottom: 12px;">Mensagens / Marketplace / Créditos</h2>
       
       <div class="tabs">
         <button id="msg-tab-profile" class="tab-btn active" onclick="switchMsgTab('profile')">Mensagens de Perfis</button>
@@ -202,6 +213,10 @@
       <div id="messages-chat-view" class="hidden">
         <button onclick="closeChatView()" style="margin-bottom: 12px;">← Voltar para Conversas</button>
         <h3 id="chat-title" style="margin-bottom: 8px;"></h3>
+
+        <!-- BANNER DE AÇÕES ESPECIAIS NO CHAT (CRÉDITOS / APROVAÇÃO DE VENDAS) -->
+        <div id="chat-action-banner" class="chat-action-banner hidden"></div>
+
         <div id="chat-bubbles" class="chat-container"></div>
         <div style="display: flex; gap: 8px;">
           <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." dir="ltr" style="margin-bottom:0;">
@@ -254,6 +269,66 @@
       <div id="profile-reports-list" class="hidden"></div>
     </div>
 
+  </div>
+
+  <!-- MODAL: OBTER CRÉDITOS -->
+  <div id="modal-get-credits" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>💰 Obter Créditos para sua Conta</h3>
+        <button onclick="closeGetCreditsModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">
+          Escolha uma das opções abaixo para abrir um pedido direto com o <strong>Lourenço</strong>:
+        </p>
+
+        <div class="credit-option-card">
+          <div>
+            <h4 style="font-size: 16px; color: #188038;">Pacote Básico</h4>
+            <span style="font-size: 13px; color: #5f6368;">Comprar 10 Créditos</span>
+          </div>
+          <button class="btn-primary" onclick="requestCreditsPurchase(10)">Comprar 10 Créditos</button>
+        </div>
+
+        <div class="credit-option-card">
+          <div>
+            <h4 style="font-size: 16px; color: #188038;">Pacote Médio</h4>
+            <span style="font-size: 13px; color: #5f6368;">Comprar 100 Créditos</span>
+          </div>
+          <button class="btn-primary" onclick="requestCreditsPurchase(100)">Comprar 100 Créditos</button>
+        </div>
+
+        <div class="credit-option-card">
+          <div>
+            <h4 style="font-size: 16px; color: #188038;">Pacote Avançado</h4>
+            <span style="font-size: 13px; color: #5f6368;">Comprar 1000 Créditos</span>
+          </div>
+          <button class="btn-primary" onclick="requestCreditsPurchase(1000)">Comprar 1000 Créditos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ESCOLHER TIPO DE PAGAMENTO NO MARKETPLACE -->
+  <div id="modal-buy-type" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3>Escolha a Forma de Pagamento</h3>
+        <button onclick="closeBuyTypeModal()">✕</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <input type="hidden" id="buy-prod-id">
+        <p style="margin-bottom: 16px; font-size: 14px;">Como deseja negociar este produto?</p>
+
+        <button class="btn-primary" style="width: 100%; padding: 10px; margin-bottom: 10px;" onclick="processProductPurchase('pix')">
+          📱 Comprar com PIX
+        </button>
+        <button class="btn-success" style="width: 100%; padding: 10px;" onclick="processProductPurchase('credit')">
+          💳 Comprar com Crédito
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL: ENVIAR MENSAGEM DIRETA DE PERFIL -->
@@ -482,9 +557,11 @@
         usersMap = {};
         snapshot.forEach(docSnap => usersMap[docSnap.data().username.toLowerCase()] = docSnap.data());
         ensureArnosBotExists();
+        ensureLourencoExists();
         if (currentUserData && usersMap[currentUserData.username.toLowerCase()]) {
           currentUserData = usersMap[currentUserData.username.toLowerCase()];
           window.currentUserData = currentUserData;
+          updateCreditsUI();
         }
         refreshCurrentView();
       });
@@ -525,9 +602,28 @@
       if (!usersMap[botKey]) {
         try {
           await setDoc(publicUserDoc(botName), {
-            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, followers: [], following: []
+            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: []
           });
         } catch(e) {}
+      }
+    }
+
+    async function ensureLourencoExists() {
+      const name = "Lourenço";
+      const key = name.toLowerCase();
+      if (!usersMap[key]) {
+        try {
+          await setDoc(publicUserDoc(name), {
+            username: name, password: "system_protected_password", dob: "2000-01-01", isBot: false, credits: 0, followers: [], following: []
+          });
+        } catch(e) {}
+      }
+    }
+
+    function updateCreditsUI() {
+      if (currentUserData) {
+        const val = currentUserData.credits || 0;
+        document.getElementById('user-credits-val').innerText = val.toFixed(2);
       }
     }
 
@@ -610,7 +706,7 @@
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, followers: [], following: [] };
+        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [] };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
@@ -629,6 +725,7 @@
         const userSnap = await getDoc(publicUserDoc(name));
         if (!userSnap.exists() || userSnap.data().password !== pwd) return showAuthErr("Credenciais incorretas.");
         currentUserData = userSnap.data();
+        if (currentUserData.credits === undefined) currentUserData.credits = 0;
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', currentUserData.username);
         showMainInterface();
@@ -660,6 +757,7 @@
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('view-auth').classList.add('hidden');
       document.getElementById('nav-user-link').innerText = currentUserData.username;
+      updateCreditsUI();
       setupListeners();
       navigateTo('feed');
     }
@@ -683,6 +781,189 @@
         document.getElementById('view-search').classList.remove('hidden');
         renderSearch(arg || document.getElementById('search-input').value);
       }
+    };
+
+    // MODAL DE OBTER CRÉDITOS E COMPRA
+    window.openGetCreditsModal = function() {
+      document.getElementById('modal-get-credits').classList.remove('hidden');
+    };
+    window.closeGetCreditsModal = function() {
+      document.getElementById('modal-get-credits').classList.add('hidden');
+    };
+
+    window.requestCreditsPurchase = async function(amount) {
+      if (!currentUserData) return;
+      if (currentUserData.username.toLowerCase() === 'lourenço') {
+        return alert("Você já é o Lourenço!");
+      }
+
+      const prodTitle = `Créditos R$ ${amount}`;
+      try {
+        await addDoc(publicMessagesColl(), {
+          sender: currentUserData.username,
+          buyer: currentUserData.username,
+          seller: "Lourenço",
+          productName: prodTitle,
+          message: `Olá, quero comprar ${amount} de crédito.`,
+          timestamp: new Date().toISOString(),
+          read: false,
+          creditAmount: amount,
+          status: 'pending_credits'
+        });
+        closeGetCreditsModal();
+        navigateTo('messages');
+        alert(`Pedido de ${amount} créditos enviado ao Lourenço! Acompanhe na aba Mensagens.`);
+      } catch (e) { alert("Erro ao solicitar créditos."); }
+    };
+
+    // APROVAÇÃO DE PEDIDO DE CRÉDITOS PELO LOURENÇO
+    window.approveCreditsOrder = async function(msgId, buyerUser, amount) {
+      if (!currentUserData || currentUserData.username.toLowerCase() !== 'lourenço') return;
+
+      try {
+        // Atualiza créditos do Comprador
+        const buyerSnap = await getDoc(publicUserDoc(buyerUser));
+        if (buyerSnap.exists()) {
+          const currentB = buyerSnap.data().credits || 0;
+          await updateDoc(publicUserDoc(buyerUser), { credits: currentB + amount });
+        }
+
+        // Atualiza créditos do Lourenço
+        const myCredits = currentUserData.credits || 0;
+        await updateDoc(publicUserDoc("Lourenço"), { credits: myCredits + amount });
+
+        // Atualiza status da mensagem
+        await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
+
+        alert(`Pedido de ${amount} créditos concluído! Créditos creditados para ${buyerUser} e Lourenço.`);
+      } catch (e) { alert("Erro ao processar o pedido."); }
+    };
+
+    // COMPRA COM CRÉDITO OU PIX NO MARKETPLACE
+    window.openBuyTypeModal = function(prodId) {
+      const prod = productsList.find(p => p.id === prodId);
+      if (!prod) return;
+      if (prod.seller.toLowerCase() === currentUserData.username.toLowerCase()) return alert("Você não pode comprar seu próprio produto.");
+
+      document.getElementById('buy-prod-id').value = prodId;
+      document.getElementById('modal-buy-type').classList.remove('hidden');
+    };
+
+    window.closeBuyTypeModal = function() {
+      document.getElementById('modal-buy-type').classList.add('hidden');
+    };
+
+    window.processProductPurchase = async function(type) {
+      const prodId = document.getElementById('buy-prod-id').value;
+      const prod = productsList.find(p => p.id === prodId);
+      if (!prod || !currentUserData) return;
+
+      closeBuyTypeModal();
+
+      if (type === 'credit') {
+        const myCredits = currentUserData.credits || 0;
+        if (myCredits < prod.price) {
+          return alert(`Erro: Você não tem créditos suficientes! Seu saldo é R$ ${myCredits.toFixed(2)} e o produto custa R$ ${prod.price.toFixed(2)}.`);
+        }
+
+        if (!confirm(`Confirmar a compra de "${prod.name}" por R$ ${prod.price.toFixed(2)} usando seus créditos?`)) return;
+
+        try {
+          await addDoc(publicMessagesColl(), {
+            sender: currentUserData.username,
+            buyer: currentUserData.username,
+            seller: prod.seller,
+            productName: prod.name,
+            productId: prod.id,
+            price: prod.price,
+            message: `Olá! Quero comprar o seu produto ${prod.name} com meus créditos.`,
+            timestamp: new Date().toISOString(),
+            read: false,
+            type: 'credit_purchase',
+            status: 'pending_vendor_approval'
+          });
+          navigateTo('messages');
+          alert("Sua proposta com Créditos foi enviada ao vendedor!");
+        } catch (e) { alert("Erro ao processar compra."); }
+
+      } else if (type === 'pix') {
+        try {
+          await addDoc(publicMessagesColl(), {
+            sender: currentUserData.username,
+            buyer: currentUserData.username,
+            seller: prod.seller,
+            productName: prod.name,
+            productId: prod.id,
+            price: prod.price,
+            message: `Olá! Quero comprar o seu produto ${prod.name} via PIX.`,
+            timestamp: new Date().toISOString(),
+            read: false,
+            type: 'pix_purchase',
+            status: 'pending_pix_approval'
+          });
+          navigateTo('messages');
+          alert("Sua mensagem para negociação via PIX foi enviada!");
+        } catch (e) { alert("Erro ao processar compra."); }
+      }
+    };
+
+    // APROVAÇÕES E RECUSAS DE COMPRAS PELO VENDEDOR
+    window.acceptCreditSale = async function(msgId, buyerUser, price, prodId) {
+      if (!currentUserData) return;
+
+      try {
+        const buyerSnap = await getDoc(publicUserDoc(buyerUser));
+        if (!buyerSnap.exists()) return alert("Comprador não encontrado.");
+
+        const buyerCredits = buyerSnap.data().credits || 0;
+        if (buyerCredits < price) return alert("O comprador não tem mais créditos suficientes!");
+
+        // Deduz créditos do comprador
+        await updateDoc(publicUserDoc(buyerUser), { credits: buyerCredits - price });
+
+        // Deposita créditos para o vendedor
+        const sellerCredits = currentUserData.credits || 0;
+        await updateDoc(publicUserDoc(currentUserData.username), { credits: sellerCredits + price });
+
+        // Exclui o produto do Marketplace automaticamente
+        if (prodId) {
+          await deleteDoc(publicProductDoc(prodId)).catch(() => {});
+        }
+
+        // Atualiza status da negociação
+        await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
+
+        alert(`Venda aceita! R$ ${price.toFixed(2)} depositados na sua conta. O produto foi removido do Marketplace.`);
+      } catch (e) { alert("Erro ao aceitar venda."); }
+    };
+
+    window.refuseCreditSale = async function(msgId) {
+      if (!confirm("Recusar venda com créditos? O chat será excluído.")) return;
+      try {
+        await deleteDoc(publicMessageDoc(msgId));
+        activeChatKey = null;
+        renderMessages();
+        alert("Pedido recusado e chat apagado.");
+      } catch (e) { alert("Erro ao recusar."); }
+    };
+
+    window.acceptPixSale = async function(msgId, prodId) {
+      if (!confirm("Confirmar que a venda por PIX foi realizada? O produto será removido do Marketplace.")) return;
+      try {
+        if (prodId) {
+          await deleteDoc(publicProductDoc(prodId)).catch(() => {});
+        }
+        await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
+        alert("Venda PIX confirmada! O produto foi excluído do Marketplace.");
+      } catch (e) { alert("Erro ao confirmar venda PIX."); }
+    };
+
+    window.cancelPixOrder = async function(msgId) {
+      if (!confirm("Cancelar pedido PIX?")) return;
+      try {
+        await updateDoc(publicMessageDoc(msgId), { status: 'cancelled' });
+        alert("Pedido PIX cancelado.");
+      } catch (e) { alert("Erro ao cancelar."); }
     };
 
     // MENSAGEM DIRETA DE PERFIL
@@ -744,7 +1025,7 @@
       } catch (e) {}
     };
 
-    // REACTION SYSTEM (SISTEMA DE REAÇÕES COM EMOJIS COMPARTILHADO COM POSTS E MARKETPLACE)
+    // REACTION SYSTEM (SISTEMA DE REAÇÕES COM EMOJIS COMPARTILHADO)
     const EMOJI_OPTIONS = ['❤️', '😂', '😮', '😢', '😡', '👍', '🔥', '🎉'];
 
     window.startReactPress = function(e, itemId, type) {
@@ -753,7 +1034,7 @@
       pressTimer = setTimeout(() => {
         isLongPress = true;
         showReactionPicker(itemId, type);
-      }, 500); // 500ms para considerar segurar
+      }, 500);
     };
 
     window.cancelReactPress = function() {
@@ -762,7 +1043,7 @@
 
     window.handleReactClick = function(e, itemId, type) {
       e.stopPropagation();
-      if (isLongPress) return; // Se foi clique longo, não executa clique rápido
+      if (isLongPress) return;
       toggleReaction(itemId, '❤️', type);
     };
 
@@ -803,21 +1084,12 @@
 
       if (!item) return;
 
-      // Reactions é um Objeto: { "username": "❤️" }
       let reactions = item.reactions ? { ...item.reactions } : {};
-
-      // Se já suportar o array "likes" antigo, converte
-      if (!item.reactions && item.likes) {
-        item.likes.forEach(u => reactions[u] = '❤️');
-      }
-
       const myUser = currentUserData.username;
 
-      // Se já reagiu com esse exato emoji, remove a reação (descurtir)
       if (reactions[myUser] === emoji) {
         delete reactions[myUser];
       } else {
-        // Altera ou adiciona apenas 1 emoji por usuário
         reactions[myUser] = emoji;
       }
 
@@ -839,7 +1111,6 @@
         totalCount++;
       });
 
-      // Ordena emojis por popularidade
       const sortedEmojis = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
       const top3 = sortedEmojis.slice(0, 3);
 
@@ -942,7 +1213,6 @@
             ${myEmoji ? `${myEmoji} Curtido` : '♡ Curtir'}
           </button>
           
-          <!-- TOP 3 EMOJIS E TOTAL -->
           <span style="font-size:13px; color:#5f6368; cursor:default;">
             ${top3.join('')} <strong>${totalCount}</strong>
           </span>
@@ -1069,25 +1339,6 @@
       try { await deleteDoc(publicProductDoc(id)); } catch (e) {}
     };
 
-    window.buyProduct = async function(prodId) {
-      const prod = productsList.find(p => p.id === prodId);
-      if (!prod || !currentUserData) return;
-      if (prod.seller.toLowerCase() === currentUserData.username.toLowerCase()) return alert("Não podes comprar o teu produto.");
-
-      try {
-        await addDoc(publicMessagesColl(), {
-          sender: currentUserData.username,
-          buyer: currentUserData.username,
-          seller: prod.seller,
-          productName: prod.name,
-          message: `I want to buy your product ${prod.name}`,
-          timestamp: new Date().toISOString(),
-          read: false
-        });
-        alert(`Mensagem enviada para ${prod.seller}!`);
-      } catch (e) { alert("Erro ao enviar mensagem."); }
-    };
-
     // REPORT MODAL
     window.openReportModal = function(prodId, prodName, sellerName) {
       document.getElementById('report-prod-id').value = prodId;
@@ -1140,18 +1391,17 @@
         </div>
         ${prod.imageUrl ? `<img src="${escapeHtml(prod.imageUrl)}" class="product-img">` : ''}
         <h3>${escapeHtml(prod.name)}</h3>
-        <div class="product-price">€ ${prod.price.toFixed(2)}</div>
+        <div class="product-price">€ / R$ ${prod.price.toFixed(2)}</div>
         <div style="font-size: 12px; color: #5f6368; margin-bottom: 6px;">
           🏷️ <strong>Category:</strong> ${escapeHtml(prod.category || 'General')} | <strong>Condition:</strong> ${escapeHtml(prod.condition || 'New')}
         </div>
         <div class="product-location">📍 ${escapeHtml(prod.location)} (${escapeHtml(prod.delivery || 'Local Pickup')})</div>
         <p class="item-content" style="margin-top:6px;">${escapeHtml(prod.description)}</p>
         
-        <!-- BOTOES E REACOES COM EMOJIS NO MARKETPLACE -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
           <div style="display:flex; gap:8px; align-items:center;">
             ${!isSelf ? `
-              <button class="btn-primary" onclick="buyProduct('${prod.id}')">Comprar</button>
+              <button class="btn-primary" onclick="openBuyTypeModal('${prod.id}')">Comprar</button>
             ` : `
               <button class="btn-danger" onclick="deleteProduct('${prod.id}')">Apagar</button>
             `}
@@ -1250,7 +1500,7 @@
         div.onclick = () => openChatView(k);
         div.innerHTML = `
           <div class="item-header">
-            <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : `📦 Produto: ${escapeHtml(g.productName)}`}</h3>
+            <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : (g.productName.startsWith('Créditos') ? `💳 ${escapeHtml(g.productName)}` : `📦 Produto: ${escapeHtml(g.productName)}`)}</h3>
             <span class="item-date">${new Date(g.lastMsg.timestamp).toLocaleTimeString()}</span>
           </div>
           <p style="font-size: 13px; color: #5f6368;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
@@ -1268,13 +1518,54 @@
       const prodName = parts[0];
       const otherUser = parts[1];
 
-      document.getElementById('chat-title').innerText = prodName === '[Perfil]' ? `Conversa Direta com ${otherUser}` : `Produto: ${prodName} (com ${otherUser})`;
+      document.getElementById('chat-title').innerText = prodName === '[Perfil]' ? `Conversa Direta com ${otherUser}` : `${prodName} (com ${otherUser})`;
 
       const chatMsgs = messagesList.filter(m => {
         const isUserMatch = (m.seller.toLowerCase() === currentUserData.username.toLowerCase() && m.buyer.toLowerCase() === otherUser) ||
                             (m.buyer.toLowerCase() === currentUserData.username.toLowerCase() && m.seller.toLowerCase() === otherUser);
         return m.productName === prodName && isUserMatch;
       });
+
+      const banner = document.getElementById('chat-action-banner');
+      banner.innerHTML = '';
+      banner.classList.add('hidden');
+
+      // VERIFICA SE HÁ BANNERS DE AÇÃO PARA LOURENÇO OU VENDEDOR
+      const lastMsgWithAction = chatMsgs.find(m => m.status && m.status.startsWith('pending'));
+      if (lastMsgWithAction) {
+        const myName = currentUserData.username.toLowerCase();
+
+        // 1. Pedido de Créditos para o Lourenço
+        if (lastMsgWithAction.status === 'pending_credits' && myName === 'lourenço') {
+          banner.classList.remove('hidden');
+          banner.innerHTML = `
+            <span><strong>Pedido de Créditos:</strong> ${lastMsgWithAction.buyer} quer comprar ${lastMsgWithAction.creditAmount} créditos.</span>
+            <button class="btn-success" onclick="approveCreditsOrder('${lastMsgWithAction.id}', '${lastMsgWithAction.buyer}', ${lastMsgWithAction.creditAmount})">Pedido Feito</button>
+          `;
+        } 
+        // 2. Compra com Crédito para o Vendedor
+        else if (lastMsgWithAction.status === 'pending_vendor_approval' && lastMsgWithAction.seller.toLowerCase() === myName) {
+          banner.classList.remove('hidden');
+          banner.innerHTML = `
+            <span><strong>Proposta com Créditos:</strong> Valor R$ ${lastMsgWithAction.price.toFixed(2)}</span>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-success" onclick="acceptCreditSale('${lastMsgWithAction.id}', '${lastMsgWithAction.buyer}', ${lastMsgWithAction.price}, '${lastMsgWithAction.productId}')">Aceitar Crédito</button>
+              <button class="btn-danger" onclick="refuseCreditSale('${lastMsgWithAction.id}')">Recusar</button>
+            </div>
+          `;
+        }
+        // 3. Compra por PIX para o Vendedor
+        else if (lastMsgWithAction.status === 'pending_pix_approval' && lastMsgWithAction.seller.toLowerCase() === myName) {
+          banner.classList.remove('hidden');
+          banner.innerHTML = `
+            <span><strong>Proposta via PIX:</strong> Confirmar venda por PIX?</span>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-success" onclick="acceptPixSale('${lastMsgWithAction.id}', '${lastMsgWithAction.productId}')">Aceitar Venda PIX</button>
+              <button class="btn-danger" onclick="cancelPixOrder('${lastMsgWithAction.id}')">Cancelar Pedido</button>
+            </div>
+          `;
+        }
+      }
 
       const container = document.getElementById('chat-bubbles');
       container.innerHTML = '';
