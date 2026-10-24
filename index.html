@@ -247,6 +247,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div>
             <h2 id="profile-name-display" style="display: inline-block;"></h2>
+            <span id="profile-verified-badge" style="font-size: 18px; margin-left: 4px;" title="Conta Verificada">✅</span>
             <span id="profile-bot-badge" class="bot-badge hidden">BOT</span>
             <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
           </div>
@@ -277,18 +278,18 @@
   <div id="modal-admin-ban" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>🛡️ Painel de Banimento (Arnos Admin)</h3>
+        <h3>🛡️ Painel de Administração (Arnos Admin)</h3>
         <button onclick="closeAdminBanModal()">✕</button>
       </div>
       <div class="modal-body">
-        <label style="font-size: 12px; font-weight: bold;">Pesquisar Utilizador para Banir</label>
+        <label style="font-size: 12px; font-weight: bold;">Pesquisar Utilizador (Gerir Banimento / Verificação)</label>
         <div style="display: flex; gap: 6px; margin-bottom: 12px;">
           <input type="text" id="admin-search-user" placeholder="Nome do utilizador..." dir="ltr" style="margin-bottom:0;">
           <button class="btn-primary" onclick="searchUserForAdmin()">Pesquisar</button>
         </div>
 
         <div id="admin-user-result" style="border: 1px solid #dadce0; padding: 12px; border-radius: 6px; background: #fafafa;">
-          <p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir o banimento.</p>
+          <p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir a conta.</p>
         </div>
       </div>
     </div>
@@ -606,7 +607,6 @@
           const userSnap = await getDoc(publicUserDoc(savedUsername));
           if (userSnap.exists()) {
             const uData = userSnap.data();
-            // VERIFICA SE ESTÁ BANIDO
             if (uData.banned) {
               localStorage.removeItem('arnos_logged_username');
               alert(`Sua conta foi banida.\nMotivo: ${uData.banReason || 'Não especificado'}\nExpira em: ${uData.banUntil || 'Para sempre'}`);
@@ -683,7 +683,7 @@
       if (!usersMap[botKey]) {
         try {
           await setDoc(publicUserDoc(botName), {
-            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: [], banned: false
+            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: [], banned: false, verified: true
           });
         } catch(e) {}
       }
@@ -778,7 +778,7 @@
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [], banned: false };
+        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [], banned: false, verified: false };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
@@ -836,7 +836,6 @@
       document.getElementById('view-auth').classList.add('hidden');
       document.getElementById('nav-user-link').innerText = currentUserData.username;
 
-      // MOSTRA BOTÃO ADMIN APENAS SE FOR A CONTA ARNOS
       const adminBtn = document.getElementById('nav-btn-admin');
       if (currentUserData.username.toLowerCase() === 'arnos') {
         adminBtn.classList.remove('hidden');
@@ -849,10 +848,10 @@
       navigateTo('feed');
     }
 
-    // ADMIN BAN SYSTEM (EXCLUSIVO ARNOS)
+    // ADMIN PANEL (GERIR BANIMENTO E VERIFICAÇÃO)
     window.openAdminBanModal = function() {
       document.getElementById('admin-search-user').value = '';
-      document.getElementById('admin-user-result').innerHTML = '<p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir o banimento.</p>';
+      document.getElementById('admin-user-result').innerHTML = '<p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir a conta.</p>';
       document.getElementById('modal-admin-ban').classList.remove('hidden');
     };
     window.closeAdminBanModal = function() {
@@ -871,9 +870,19 @@
       }
 
       const isBanned = user.banned;
+      const isVerified = user.verified;
+
       resultDiv.innerHTML = `
-        <h4 style="margin-bottom: 6px;">Utilizador: ${escapeHtml(user.username)} ${isBanned ? '<span style="color:red;">(BANIDO)</span>' : '<span style="color:green;">(Ativo)</span>'}</h4>
+        <h4 style="margin-bottom: 6px;">Utilizador: ${escapeHtml(user.username)} ${isVerified ? '✅' : ''}</h4>
+        <p style="font-size:12px; margin-bottom:8px;">
+          <strong>Status Verificado:</strong> ${isVerified ? '<span style="color:green; font-weight:bold;">Verificado (True)</span>' : '<span style="color:gray;">Não Verificado (False)</span>'}
+          <button onclick="toggleVerifyUser('${escapeStr(user.username)}', ${!isVerified})" style="font-size:11px; padding:2px 6px; margin-left:8px;" class="btn-primary">
+            ${isVerified ? 'Remover Verificação' : 'Tornar Verificado'}
+          </button>
+        </p>
+        <hr style="margin:8px 0; border:0; border-top:1px solid #ddd;">
         ${isBanned ? `
+          <p style="font-size:12px; color:red; margin-bottom:6px;"><strong>CONTA BANIDA</strong></p>
           <p style="font-size:12px; margin-bottom:6px;"><strong>Motivo:</strong> ${escapeHtml(user.banReason)}</p>
           <p style="font-size:12px; margin-bottom:10px;"><strong>Expira em:</strong> ${escapeHtml(user.banUntil)}</p>
           <button class="btn-success" onclick="unbanUser('${escapeStr(user.username)}')">Desbanir Utilizador</button>
@@ -897,6 +906,14 @@
           </div>
         `}
       `;
+    };
+
+    window.toggleVerifyUser = async function(username, newStatus) {
+      try {
+        await updateDoc(publicUserDoc(username), { verified: newStatus });
+        alert(`Utilizador ${username} atualizado para verificado: ${newStatus}`);
+        searchUserForAdmin();
+      } catch (e) { alert("Erro ao atualizar verificação."); }
     };
 
     window.toggleBanDateInput = function() {
@@ -1388,6 +1405,7 @@
     function buildPostCard(post) {
       const authorObj = usersMap[post.author.toLowerCase()];
       const isBot = authorObj && authorObj.isBot;
+      const isVerified = authorObj && authorObj.verified;
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
       const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(post.author);
       const comments = post.comments || [];
@@ -1400,6 +1418,7 @@
         <div class="item-header">
           <div>
             <span class="author-name" onclick="navigateTo('profile', '${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
+            ${isVerified ? '<span style="font-size:14px; margin-left:2px;" title="Verificado">✅</span>' : ''}
             ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
             ${!isSelf && !isBot ? `
               <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size:11px; padding:2px 8px; margin-left:6px;">
@@ -1443,10 +1462,16 @@
           </div>
           <div id="comments-list-${post.id}">
             ${comments.length === 0 ? '<p style="color:#70757a; font-size:12px;">Sem comentários ainda.</p>' : ''}
-            ${comments.map(c => `
+            ${comments.map(c => {
+              const cAuthorObj = usersMap[c.author.toLowerCase()];
+              const cVerified = cAuthorObj && cAuthorObj.verified;
+              return `
               <div class="comment-item">
                 <div class="comment-header">
-                  <strong>${escapeHtml(c.author)}</strong>
+                  <div>
+                    <strong>${escapeHtml(c.author)}</strong>
+                    ${cVerified ? '<span style="font-size:12px; margin-left:2px;">✅</span>' : ''}
+                  </div>
                   <div>
                     <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
                     ${currentUserData && c.author.toLowerCase() === currentUserData.username.toLowerCase() ? `
@@ -1456,7 +1481,8 @@
                 </div>
                 <div>${escapeHtml(c.text)}</div>
               </div>
-            `).join('')}
+            `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -1595,6 +1621,8 @@
     };
 
     function buildProductCard(prod) {
+      const sellerObj = usersMap[prod.seller.toLowerCase()];
+      const sellerVerified = sellerObj && sellerObj.verified;
       const isSelf = currentUserData && prod.seller.toLowerCase() === currentUserData.username.toLowerCase();
       const { top3, totalCount, myEmoji } = calculateTopReactions(prod.reactions);
 
@@ -1602,7 +1630,7 @@
       div.className = 'card';
       div.innerHTML = `
         <div class="item-header">
-          <span class="author-name" onclick="navigateTo('profile', '${escapeStr(prod.seller)}')">Vendedor: ${escapeHtml(prod.seller)}</span>
+          <span class="author-name" onclick="navigateTo('profile', '${escapeStr(prod.seller)}')">Vendedor: ${escapeHtml(prod.seller)} ${sellerVerified ? '✅' : ''}</span>
           <span class="item-date">${new Date(prod.timestamp).toLocaleDateString()}</span>
         </div>
         ${prod.imageUrl ? `<img src="${escapeHtml(prod.imageUrl)}" class="product-img">` : ''}
@@ -1844,11 +1872,16 @@
         listNames.forEach(name => {
           const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
           const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(name);
+          const uObj = usersMap[name.toLowerCase()];
+          const uVerified = uObj && uObj.verified;
 
           const div = document.createElement('div');
           div.style.cssText = 'border:1px solid #dadce0; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;';
           div.innerHTML = `
-            <span class="author-name" onclick="closeUserListModal(); navigateTo('profile', '${escapeStr(name)}')">${escapeHtml(name)}</span>
+            <div>
+              <span class="author-name" onclick="closeUserListModal(); navigateTo('profile', '${escapeStr(name)}')">${escapeHtml(name)}</span>
+              ${uVerified ? '✅' : ''}
+            </div>
             ${!isSelf ? `
               <button onclick="toggleFollow('${escapeStr(name)}')" style="font-size:12px;">
                 ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
@@ -1884,6 +1917,7 @@
         const uObj = usersMap[k];
         const isSelf = currentUserData && uObj.username.toLowerCase() === currentUserData.username.toLowerCase();
         const isBot = uObj.isBot;
+        const isVerified = uObj.verified;
         const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(uObj.username);
 
         const div = document.createElement('div');
@@ -1892,6 +1926,7 @@
         div.innerHTML = `
           <div>
             <span class="author-name" onclick="navigateTo('profile', '${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
+            ${isVerified ? '✅' : ''}
             ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
           </div>
           ${!isSelf && !isBot ? `
@@ -1932,6 +1967,11 @@
       if (!user) return;
 
       document.getElementById('profile-name-display').innerText = user.username;
+      
+      const verifiedBadge = document.getElementById('profile-verified-badge');
+      if (user.verified) verifiedBadge.classList.remove('hidden');
+      else verifiedBadge.classList.add('hidden');
+
       document.getElementById('profile-dob-display').innerText = "Nascimento: " + (user.dob || 'N/A');
       
       const botBadge = document.getElementById('profile-bot-badge');
