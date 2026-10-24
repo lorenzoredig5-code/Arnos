@@ -139,6 +139,9 @@
       <span class="credits-display">💳 <span id="user-credits-val">0.00</span></span>
       <button class="btn-success" onclick="openGetCreditsModal()">💰 Obter Créditos</button>
 
+      <!-- BOTÃO PAINEL DE BANIMENTO (APARECE APENAS PARA ARNOS) -->
+      <button id="nav-btn-admin" class="btn-danger hidden" onclick="openAdminBanModal()">🛡️ Painel Admin</button>
+
       <button onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')">Meu Perfil</button>
       <span id="nav-user-link" class="nav-user" onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')"></span>
       <button onclick="logout()">Log out</button>
@@ -247,7 +250,7 @@
             <span id="profile-bot-badge" class="bot-badge hidden">BOT</span>
             <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
           </div>
-          <div id="profile-action-btn-area" style="display:flex; gap:6px;"></div>
+          <div id="profile-action-btn-area" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
         </div>
 
         <div class="profile-stats" style="display:flex; gap:16px; margin-top:12px; font-size:13px; color:#5f6368;">
@@ -268,6 +271,54 @@
       <div id="profile-reports-list" class="hidden"></div>
     </div>
 
+  </div>
+
+  <!-- MODAL: PAINEL DE ADMINISTRAÇÃO E BANIMENTO (EXCLUSIVO ARNOS) -->
+  <div id="modal-admin-ban" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🛡️ Painel de Banimento (Arnos Admin)</h3>
+        <button onclick="closeAdminBanModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label style="font-size: 12px; font-weight: bold;">Pesquisar Utilizador para Banir</label>
+        <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+          <input type="text" id="admin-search-user" placeholder="Nome do utilizador..." dir="ltr" style="margin-bottom:0;">
+          <button class="btn-primary" onclick="searchUserForAdmin()">Pesquisar</button>
+        </div>
+
+        <div id="admin-user-result" style="border: 1px solid #dadce0; padding: 12px; border-radius: 6px; background: #fafafa;">
+          <p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir o banimento.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DENUNCIAR PERFIL -->
+  <div id="modal-report-profile" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-report-prof-title">Denunciar Perfil</h3>
+        <button onclick="closeReportProfileModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="report-prof-target">
+        <label style="font-size: 12px; font-weight: bold;">Motivo da Denúncia do Perfil</label>
+        <select id="report-prof-category" onchange="toggleReportProfOther()">
+          <option value="Comportamento Ofensivo / Assédio">Comportamento Ofensivo / Assédio</option>
+          <option value="Conta Falsa / Golpe">Conta Falsa / Golpe</option>
+          <option value="Spam">Spam</option>
+          <option value="Outros">Outros</option>
+        </select>
+
+        <div id="report-prof-other-container" class="hidden">
+          <label style="font-size: 12px; font-weight: bold;">Descreva o motivo</label>
+          <textarea id="report-prof-other-text" rows="3" placeholder="Explique detalhadamente..." dir="ltr"></textarea>
+        </div>
+
+        <button onclick="submitProfileReport()" class="btn-danger" style="width: 100%; margin-top: 10px;">Enviar Denúncia de Perfil</button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL: OBTER CRÉDITOS -->
@@ -505,6 +556,21 @@
     let pressTimer = null;
     let isLongPress = false;
 
+    const BAD_WORDS = [
+      'pinto', 'cabeludo', 'caralho', 'puta', 'puto', 'merda', 'porra', 'cu', 'bosta', 
+      'foder', 'fodido', 'corno', 'cacete', 'buceta', 'piroca', 'viado', 'retardado', 
+      'desgraça', 'arrombado', 'fdp', 'krl', 'pnc', 'tomar no cu'
+    ];
+
+    function containsProfanity(text) {
+      if (!text) return false;
+      const lower = text.toLowerCase();
+      return BAD_WORDS.some(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'i');
+        return regex.test(lower) || lower.includes(word);
+      });
+    }
+
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
     const publicPostsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'posts');
@@ -539,7 +605,16 @@
         try {
           const userSnap = await getDoc(publicUserDoc(savedUsername));
           if (userSnap.exists()) {
-            currentUserData = userSnap.data();
+            const uData = userSnap.data();
+            // VERIFICA SE ESTÁ BANIDO
+            if (uData.banned) {
+              localStorage.removeItem('arnos_logged_username');
+              alert(`Sua conta foi banida.\nMotivo: ${uData.banReason || 'Não especificado'}\nExpira em: ${uData.banUntil || 'Para sempre'}`);
+              showAuthInterface();
+              return;
+            }
+
+            currentUserData = uData;
             window.currentUserData = currentUserData;
             showMainInterface();
             return;
@@ -557,7 +632,15 @@
         snapshot.forEach(docSnap => usersMap[docSnap.data().username.toLowerCase()] = docSnap.data());
         ensureArnosBotExists();
         if (currentUserData && usersMap[currentUserData.username.toLowerCase()]) {
-          currentUserData = usersMap[currentUserData.username.toLowerCase()];
+          const freshData = usersMap[currentUserData.username.toLowerCase()];
+          if (freshData.banned) {
+            localStorage.removeItem('arnos_logged_username');
+            currentUserData = null; window.currentUserData = null;
+            alert(`Sua conta foi banida!\nMotivo: ${freshData.banReason || 'Não especificado'}\nExpira em: ${freshData.banUntil || 'Para sempre'}`);
+            showAuthInterface();
+            return;
+          }
+          currentUserData = freshData;
           window.currentUserData = currentUserData;
           updateCreditsUI();
         }
@@ -600,7 +683,7 @@
       if (!usersMap[botKey]) {
         try {
           await setDoc(publicUserDoc(botName), {
-            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: []
+            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: [], banned: false
           });
         } catch(e) {}
       }
@@ -667,9 +750,8 @@
       else if (!document.getElementById('view-profile').classList.contains('hidden')) {
         if (currentProfileUsername) renderProfile(currentProfileUsername);
       } else if (!document.getElementById('view-search').classList.contains('hidden')) {
-        if (document.activeElement !== document.getElementById('search-input')) {
-          renderSearch(document.getElementById('search-input').value);
-        }
+        const q = document.getElementById('search-input').value;
+        if (q.length > 0) renderSearch(q);
       }
     }
 
@@ -689,10 +771,14 @@
       const dob = document.getElementById('signup-dob').value;
       if (!name || !pwd || !dob) return showAuthErr("Preencha todos os campos.");
 
+      if (containsProfanity(name)) {
+        return showAuthErr("Erro: O nome de utilizador contém termos impróprios ou palavrões. Escolha um nome normal.");
+      }
+
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [] };
+        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [], banned: false };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
@@ -710,7 +796,13 @@
       try {
         const userSnap = await getDoc(publicUserDoc(name));
         if (!userSnap.exists() || userSnap.data().password !== pwd) return showAuthErr("Credenciais incorretas.");
-        currentUserData = userSnap.data();
+        const uData = userSnap.data();
+
+        if (uData.banned) {
+          return showAuthErr(`Sua conta foi banida.\nMotivo: ${uData.banReason || 'Não especificado'}\nExpira em: ${uData.banUntil || 'Para sempre'}`);
+        }
+
+        currentUserData = uData;
         if (currentUserData.credits === undefined) currentUserData.credits = 0;
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', currentUserData.username);
@@ -743,10 +835,152 @@
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('view-auth').classList.add('hidden');
       document.getElementById('nav-user-link').innerText = currentUserData.username;
+
+      // MOSTRA BOTÃO ADMIN APENAS SE FOR A CONTA ARNOS
+      const adminBtn = document.getElementById('nav-btn-admin');
+      if (currentUserData.username.toLowerCase() === 'arnos') {
+        adminBtn.classList.remove('hidden');
+      } else {
+        adminBtn.classList.add('hidden');
+      }
+
       updateCreditsUI();
       setupListeners();
       navigateTo('feed');
     }
+
+    // ADMIN BAN SYSTEM (EXCLUSIVO ARNOS)
+    window.openAdminBanModal = function() {
+      document.getElementById('admin-search-user').value = '';
+      document.getElementById('admin-user-result').innerHTML = '<p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir o banimento.</p>';
+      document.getElementById('modal-admin-ban').classList.remove('hidden');
+    };
+    window.closeAdminBanModal = function() {
+      document.getElementById('modal-admin-ban').classList.add('hidden');
+    };
+
+    window.searchUserForAdmin = function() {
+      const query = document.getElementById('admin-search-user').value.trim().toLowerCase();
+      const resultDiv = document.getElementById('admin-user-result');
+      if (!query) return;
+
+      const user = usersMap[query];
+      if (!user) {
+        resultDiv.innerHTML = `<p style="color: #d93025; font-size: 13px;">Utilizador não encontrado.</p>`;
+        return;
+      }
+
+      const isBanned = user.banned;
+      resultDiv.innerHTML = `
+        <h4 style="margin-bottom: 6px;">Utilizador: ${escapeHtml(user.username)} ${isBanned ? '<span style="color:red;">(BANIDO)</span>' : '<span style="color:green;">(Ativo)</span>'}</h4>
+        ${isBanned ? `
+          <p style="font-size:12px; margin-bottom:6px;"><strong>Motivo:</strong> ${escapeHtml(user.banReason)}</p>
+          <p style="font-size:12px; margin-bottom:10px;"><strong>Expira em:</strong> ${escapeHtml(user.banUntil)}</p>
+          <button class="btn-success" onclick="unbanUser('${escapeStr(user.username)}')">Desbanir Utilizador</button>
+        ` : `
+          <div style="margin-top: 8px;">
+            <label style="font-size: 12px; font-weight: bold;">Tipo de Banimento</label>
+            <select id="ban-type-select" onchange="toggleBanDateInput()" style="margin-bottom:6px;">
+              <option value="permanent">Para sempre (Permanente)</option>
+              <option value="temporary">Temporário (Definir data)</option>
+            </select>
+
+            <div id="ban-date-container" class="hidden" style="margin-bottom:6px;">
+              <label style="font-size: 12px; font-weight: bold;">Data para ser desbanido</label>
+              <input type="date" id="ban-expiry-date">
+            </div>
+
+            <label style="font-size: 12px; font-weight: bold;">Motivo do Banimento</label>
+            <textarea id="ban-reason-input" rows="2" placeholder="Explique o motivo..." dir="ltr" style="margin-bottom:8px;"></textarea>
+
+            <button class="btn-danger" onclick="executeBanUser('${escapeStr(user.username)}')">Confirmar Banimento</button>
+          </div>
+        `}
+      `;
+    };
+
+    window.toggleBanDateInput = function() {
+      const type = document.getElementById('ban-type-select').value;
+      document.getElementById('ban-date-container').classList.toggle('hidden', type !== 'temporary');
+    };
+
+    window.executeBanUser = async function(username) {
+      const type = document.getElementById('ban-type-select').value;
+      const reason = document.getElementById('ban-reason-input').value.trim();
+      let banUntil = 'Para sempre';
+
+      if (type === 'temporary') {
+        const dateVal = document.getElementById('ban-expiry-date').value;
+        if (!dateVal) return alert("Por favor selecione a data em que será desbanido.");
+        banUntil = dateVal;
+      }
+
+      if (!reason) return alert("Por favor insira o motivo do banimento.");
+
+      try {
+        await updateDoc(publicUserDoc(username), {
+          banned: true,
+          banReason: reason,
+          banUntil: banUntil
+        });
+        alert(`Utilizador ${username} banido com sucesso!`);
+        searchUserForAdmin();
+      } catch (e) { alert("Erro ao banir utilizador."); }
+    };
+
+    window.unbanUser = async function(username) {
+      try {
+        await updateDoc(publicUserDoc(username), {
+          banned: false,
+          banReason: '',
+          banUntil: ''
+        });
+        alert(`Utilizador ${username} desbanido com sucesso!`);
+        searchUserForAdmin();
+      } catch (e) { alert("Erro ao desbanir."); }
+    };
+
+    // DENUNCIAR PERFIL
+    window.openReportProfileModal = function(targetName) {
+      document.getElementById('modal-report-prof-title').innerText = `Denunciar Perfil de ${targetName}`;
+      document.getElementById('report-prof-target').value = targetName;
+      document.getElementById('report-prof-category').value = 'Comportamento Ofensivo / Assédio';
+      document.getElementById('report-prof-other-text').value = '';
+      toggleReportProfOther();
+      document.getElementById('modal-report-profile').classList.remove('hidden');
+    };
+
+    window.closeReportProfileModal = function() {
+      document.getElementById('modal-report-profile').classList.add('hidden');
+    };
+
+    window.toggleReportProfOther = function() {
+      const cat = document.getElementById('report-prof-category').value;
+      document.getElementById('report-prof-other-container').classList.toggle('hidden', cat !== 'Outros');
+    };
+
+    window.submitProfileReport = async function() {
+      const target = document.getElementById('report-prof-target').value;
+      const cat = document.getElementById('report-prof-category').value;
+      const otherTxt = document.getElementById('report-prof-other-text').value.trim();
+      const reason = cat === 'Outros' ? otherTxt : cat;
+
+      if (!reason) return alert("Por favor preencha o motivo.");
+
+      try {
+        await addDoc(publicReportsColl(), {
+          productId: 'PERFIL_' + target,
+          productName: `Perfil: ${target}`,
+          seller: target,
+          reporter: currentUserData.username,
+          reason: `[Denúncia de Perfil] ${reason}`,
+          timestamp: new Date().toISOString(),
+          banned: false
+        });
+        closeReportProfileModal();
+        alert("Denúncia de perfil enviada com sucesso! A administração irá analisar.");
+      } catch (e) { alert("Erro ao enviar denúncia."); }
+    };
 
     // NAVIGATION
     window.navigateTo = function(view, arg = null) {
@@ -764,12 +998,11 @@
         currentProfileUsername = arg || (currentUserData ? currentUserData.username : '');
         renderProfile(currentProfileUsername);
       } else if (view === 'search') {
-        document.getElementById('view-search').classList.add('hidden');
-        renderSearch(arg || document.getElementById('search-input').value);
+        document.getElementById('view-search').classList.remove('hidden');
+        renderSearch(arg || '');
       }
     };
 
-    // MODAL DE OBTER CRÉDITOS E COMPRA (DIRETO PARA ARNOS)
     window.openGetCreditsModal = function() {
       document.getElementById('modal-get-credits').classList.remove('hidden');
     };
@@ -802,7 +1035,6 @@
       } catch (e) { alert("Erro ao solicitar créditos."); }
     };
 
-    // APROVAÇÃO DE PEDIDO DE CRÉDITOS PELA CONTA ARNOS
     window.approveCreditsOrder = async function(msgId, buyerUser, amount) {
       if (!currentUserData || currentUserData.username.toLowerCase() !== 'arnos') return;
 
@@ -822,7 +1054,6 @@
       } catch (e) { alert("Erro ao processar o pedido."); }
     };
 
-    // COMPRA COM CRÉDITO OU PIX NO MARKETPLACE
     window.openBuyTypeModal = function(prodId) {
       const prod = productsList.find(p => p.id === prodId);
       if (!prod) return;
@@ -890,7 +1121,6 @@
       }
     };
 
-    // APROVAÇÕES E RECUSAS DE COMPRAS PELO VENDEDOR
     window.acceptCreditSale = async function(msgId, buyerUser, price, prodId) {
       if (!currentUserData) return;
 
@@ -945,7 +1175,6 @@
       } catch (e) { alert("Erro ao cancelar."); }
     };
 
-    // MENSAGEM DIRETA DE PERFIL
     window.openDirectMsgModal = function(targetName) {
       document.getElementById('modal-msg-target-name').innerText = `Mensagem para ${targetName}`;
       document.getElementById('direct-msg-target-username').value = targetName;
@@ -977,7 +1206,6 @@
       } catch (e) { alert("Erro ao enviar mensagem."); }
     };
 
-    // FOLLOW / UNFOLLOW SYSTEM
     window.toggleFollow = async function(targetUsername) {
       if (!currentUserData || targetUsername.toLowerCase() === currentUserData.username.toLowerCase()) return;
 
@@ -1004,7 +1232,6 @@
       } catch (e) {}
     };
 
-    // REACTION SYSTEM
     const EMOJI_OPTIONS = ['❤️', '😂', '😮', '😢', '😡', '👍', '🔥', '🎉'];
 
     window.startReactPress = function(e, itemId, type) {
@@ -1096,12 +1323,16 @@
       return { top3, totalCount, myEmoji };
     }
 
-    // POSTS
     window.submitPost = async function() {
       if (!currentUserData) return;
       const textEl = document.getElementById('post-input');
       const content = textEl.value.trim();
       if (!content) return;
+
+      if (containsProfanity(content)) {
+        return alert("Erro: O seu post contém palavrões ou termos impróprios e não pode ser publicado publicamente.");
+      }
+
       try {
         await addDoc(publicPostsColl(), { author: currentUserData.username, content, timestamp: new Date().toISOString(), reactions: {}, comments: [] });
         textEl.value = '';
@@ -1123,6 +1354,10 @@
       const input = document.getElementById(`comment-input-${postId}`);
       const text = input.value.trim();
       if (!text) return;
+
+      if (containsProfanity(text)) {
+        return alert("Erro: O seu comentário contém palavrões e não pode ser publicado.");
+      }
 
       const post = postsList.find(p => p.id === postId);
       if (!post) return;
@@ -1234,7 +1469,6 @@
       postsList.forEach(p => list.appendChild(buildPostCard(p)));
     }
 
-    // MARKETPLACE & CLOUDINARY
     document.getElementById('prod-image-file').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -1294,6 +1528,10 @@
 
       if (!name || isNaN(price) || !location) return alert("Please fill Title, Price and Location.");
 
+      if (containsProfanity(name) || containsProfanity(desc)) {
+        return alert("Erro: O título ou a descrição do produto contêm palavrões ou termos impróprios. Por favor, corrija.");
+      }
+
       let imageUrl = selectedImageBase64 || '';
       if (fileInput.files.length > 0) imageUrl = await uploadToCloudinary(fileInput.files[0]);
 
@@ -1318,7 +1556,6 @@
       try { await deleteDoc(publicProductDoc(id)); } catch (e) {}
     };
 
-    // REPORT MODAL
     window.openReportModal = function(prodId, prodName, sellerName) {
       document.getElementById('report-prod-id').value = prodId;
       document.getElementById('report-prod-name').value = prodName;
@@ -1414,7 +1651,6 @@
       productsList.forEach(p => list.appendChild(buildProductCard(p)));
     }
 
-    // MESSAGES CONVERSATIONS
     window.switchMsgTab = function(tab) {
       activeMsgSubTab = tab;
       document.getElementById('msg-tab-profile').classList.toggle('active', tab === 'profile');
@@ -1513,7 +1749,6 @@
       if (lastMsgWithAction) {
         const myName = currentUserData.username.toLowerCase();
 
-        // APENAS A CONTA "ARNOS" PODE APROVAR PEDIDOS DE CRÉDITOS AGORA
         if (lastMsgWithAction.status === 'pending_credits' && myName === 'arnos') {
           banner.classList.remove('hidden');
           banner.innerHTML = `
@@ -1590,7 +1825,6 @@
       } catch (e) {}
     };
 
-    // USER LIST MODAL (FOLLOWERS / FOLLOWING)
     window.openUserListModal = function(type) {
       if (!currentProfileUsername) return;
       const userKey = currentProfileUsername.toLowerCase();
@@ -1632,7 +1866,6 @@
       document.getElementById('modal-user-list').classList.add('hidden');
     };
 
-    // SEARCH & PROFILE
     window.switchSearchTab = function(tab) {
       document.getElementById('search-results-profiles').classList.toggle('hidden', tab !== 'profiles');
       document.getElementById('search-results-posts').classList.toggle('hidden', tab !== 'posts');
@@ -1721,6 +1954,12 @@
         btnMsg.innerText = '💬 Enviar Mensagem';
         btnMsg.onclick = () => openDirectMsgModal(user.username);
         actionArea.appendChild(btnMsg);
+
+        const btnReportProf = document.createElement('button');
+        btnReportProf.className = 'btn-warning';
+        btnReportProf.innerText = '⚠️ Denunciar Perfil';
+        btnReportProf.onclick = () => openReportProfileModal(user.username);
+        actionArea.appendChild(btnReportProf);
       }
 
       const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
@@ -1747,14 +1986,14 @@
         div.className = 'card';
         div.innerHTML = `
           <div class="item-header">
-            <strong>Produto: ${escapeHtml(r.productName)}</strong>
+            <strong>${escapeHtml(r.productName)}</strong>
             <span class="item-date">${new Date(r.timestamp).toLocaleDateString()}</span>
           </div>
           <p style="font-size:13px;"><strong>Motivo:</strong> ${escapeHtml(r.reason)}</p>
           <p style="font-size:13px; margin-top:6px;">
             <strong>Status:</strong> 
             ${r.banned 
-              ? `<span style="color:#d93025; font-weight:bold;">Denúncia feita, esse produto foi banido.</span>` 
+              ? `<span style="color:#d93025; font-weight:bold;">Denúncia tratada.</span>` 
               : `<span style="color:#f2994a; font-weight:bold;">Em análise (Aguarde de 2 a 7 dias)</span>`}
           </p>
         `;
@@ -1767,8 +2006,12 @@
 
     window.onload = function() {
       document.getElementById('search-input').addEventListener('input', function(e) {
-        if (e.target.value.length > 0) navigateTo('search', e.target.value);
-        else navigateTo('feed');
+        const val = e.target.value.trim();
+        if (val.length > 0) {
+          navigateTo('search', val);
+        } else {
+          navigateTo('feed');
+        }
       });
       initAuth();
     };
