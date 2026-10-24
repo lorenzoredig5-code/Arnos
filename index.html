@@ -214,7 +214,6 @@
         <button onclick="closeChatView()" style="margin-bottom: 12px;">← Voltar para Conversas</button>
         <h3 id="chat-title" style="margin-bottom: 8px;"></h3>
 
-        <!-- BANNER DE AÇÕES ESPECIAIS NO CHAT (CRÉDITOS / APROVAÇÃO DE VENDAS) -->
         <div id="chat-action-banner" class="chat-action-banner hidden"></div>
 
         <div id="chat-bubbles" class="chat-container"></div>
@@ -821,18 +820,15 @@
       if (!currentUserData || currentUserData.username.toLowerCase() !== 'lourenço') return;
 
       try {
-        // Atualiza créditos do Comprador
         const buyerSnap = await getDoc(publicUserDoc(buyerUser));
         if (buyerSnap.exists()) {
           const currentB = buyerSnap.data().credits || 0;
           await updateDoc(publicUserDoc(buyerUser), { credits: currentB + amount });
         }
 
-        // Atualiza créditos do Lourenço
         const myCredits = currentUserData.credits || 0;
         await updateDoc(publicUserDoc("Lourenço"), { credits: myCredits + amount });
 
-        // Atualiza status da mensagem
         await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
 
         alert(`Pedido de ${amount} créditos concluído! Créditos creditados para ${buyerUser} e Lourenço.`);
@@ -918,19 +914,15 @@
         const buyerCredits = buyerSnap.data().credits || 0;
         if (buyerCredits < price) return alert("O comprador não tem mais créditos suficientes!");
 
-        // Deduz créditos do comprador
         await updateDoc(publicUserDoc(buyerUser), { credits: buyerCredits - price });
 
-        // Deposita créditos para o vendedor
         const sellerCredits = currentUserData.credits || 0;
         await updateDoc(publicUserDoc(currentUserData.username), { credits: sellerCredits + price });
 
-        // Exclui o produto do Marketplace automaticamente
         if (prodId) {
           await deleteDoc(publicProductDoc(prodId)).catch(() => {});
         }
 
-        // Atualiza status da negociação
         await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
 
         alert(`Venda aceita! R$ ${price.toFixed(2)} depositados na sua conta. O produto foi removido do Marketplace.`);
@@ -1530,12 +1522,10 @@
       banner.innerHTML = '';
       banner.classList.add('hidden');
 
-      // VERIFICA SE HÁ BANNERS DE AÇÃO PARA LOURENÇO OU VENDEDOR
       const lastMsgWithAction = chatMsgs.find(m => m.status && m.status.startsWith('pending'));
       if (lastMsgWithAction) {
         const myName = currentUserData.username.toLowerCase();
 
-        // 1. Pedido de Créditos para o Lourenço
         if (lastMsgWithAction.status === 'pending_credits' && myName === 'lourenço') {
           banner.classList.remove('hidden');
           banner.innerHTML = `
@@ -1543,7 +1533,6 @@
             <button class="btn-success" onclick="approveCreditsOrder('${lastMsgWithAction.id}', '${lastMsgWithAction.buyer}', ${lastMsgWithAction.creditAmount})">Pedido Feito</button>
           `;
         } 
-        // 2. Compra com Crédito para o Vendedor
         else if (lastMsgWithAction.status === 'pending_vendor_approval' && lastMsgWithAction.seller.toLowerCase() === myName) {
           banner.classList.remove('hidden');
           banner.innerHTML = `
@@ -1554,7 +1543,6 @@
             </div>
           `;
         }
-        // 3. Compra por PIX para o Vendedor
         else if (lastMsgWithAction.status === 'pending_pix_approval' && lastMsgWithAction.seller.toLowerCase() === myName) {
           banner.classList.remove('hidden');
           banner.innerHTML = `
