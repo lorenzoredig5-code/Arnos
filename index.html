@@ -529,7 +529,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, addDoc, setDoc as firestoreSetDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'arnos-app';
     const firebaseConfig = typeof __firebase_config !== 'undefined' 
@@ -783,7 +783,7 @@
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [], banned: false, verified: false };
+        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [], banned: false, verified: false, banReason: '', banUntil: '' };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
@@ -853,7 +853,7 @@
       navigateTo('feed');
     }
 
-    // ADMIN PANEL CORRIGIDO E ESTABILIZADO
+    // ADMIN PANEL - COM CRIAÇÃO AUTOMÁTICA DE CAMPOS FALTANTES (BOOLEANOS/STRINGS)
     window.openAdminBanModal = function() {
       document.getElementById('admin-search-user').value = '';
       document.getElementById('admin-user-result').innerHTML = '<p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir a conta.</p>';
@@ -863,17 +863,32 @@
       document.getElementById('modal-admin-ban').classList.add('hidden');
     };
 
-    window.searchUserForAdmin = function() {
+    window.searchUserForAdmin = async function() {
       const queryInput = document.getElementById('admin-search-user').value.trim();
       const resultDiv = document.getElementById('admin-user-result');
       if (!queryInput) return;
 
       const queryKey = queryInput.toLowerCase();
-      const user = usersMap[queryKey];
+      let user = usersMap[queryKey];
 
       if (!user) {
         resultDiv.innerHTML = `<p style="color: #d93025; font-size: 13px;">Utilizador "${escapeHtml(queryInput)}" não encontrado.</p>`;
         return;
+      }
+
+      // VERIFICA SE OS CAMPOS BOOLEANOS/STRINGS EXISTEM. SE NÃO, CRIA AUTOMATICAMENTE NO FIREBASE
+      let needsUpdate = false;
+      let updatePayload = {};
+
+      if (user.banned === undefined) { user.banned = false; updatePayload.banned = false; needsUpdate = true; }
+      if (user.verified === undefined) { user.verified = false; updatePayload.verified = false; needsUpdate = true; }
+      if (user.banReason === undefined) { user.banReason = ''; updatePayload.banReason = ''; needsUpdate = true; }
+      if (user.banUntil === undefined) { user.banUntil = ''; updatePayload.banUntil = ''; needsUpdate = true; }
+
+      if (needsUpdate) {
+        try {
+          await updateDoc(publicUserDoc(user.username), updatePayload);
+        } catch(e) {}
       }
 
       const isBanned = user.banned;
@@ -948,11 +963,14 @@
       if (!reason) return alert("Por favor insira o motivo do banimento.");
 
       try {
-        await updateDoc(publicUserDoc(username), {
+        // Garante que todos os campos de banimento e verificação existam antes de atualizar
+        await setDoc(publicUserDoc(username), {
           banned: true,
           banReason: reason,
-          banUntil: banUntil
-        });
+          banUntil: banUntil,
+          verified: usersMap[username.toLowerCase()]?.verified ?? false
+        }, { merge: true });
+
         alert(`Utilizador ${username} banido com sucesso!`);
         searchUserForAdmin();
       } catch (e) { alert("Erro ao banir utilizador."); }
@@ -960,11 +978,11 @@
 
     window.unbanUser = async function(username) {
       try {
-        await updateDoc(publicUserDoc(username), {
+        await setDoc(publicUserDoc(username), {
           banned: false,
           banReason: '',
           banUntil: ''
-        });
+        }, { merge: true });
         alert(`Utilizador ${username} desbanido com sucesso!`);
         searchUserForAdmin();
       } catch (e) { alert("Erro ao desbanir."); }
@@ -1426,7 +1444,6 @@
       const { top3, totalCount, myEmoji } = calculateTopReactions(post.reactions);
 
       const div = document.createElement('div');
-      // SE FOR VERIFICADO, ADICIONA A CLASSE COM BORDAS AZUL NEON
       div.className = isVerified ? 'card verified-post' : 'card';
       div.innerHTML = `
         <div class="item-header">
