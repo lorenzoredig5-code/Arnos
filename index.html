@@ -1,548 +1,617 @@
+```html
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos</title>
+  <title>Arnos - Social & Marketplace</title>
   <style>
-    /* RESET & BASE STYLES */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, Helvetica, sans-serif; background-color: #f8f9fa; color: #222222; line-height: 1.5; }
+    /* CLASSIC CLEAN GOOGLE-LIKE STYLING */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f8f9fa;
+      color: #222222;
+      line-height: 1.5;
+    }
 
-    /* HEADER & NAVIGATION */
+    button, input[type="submit"] {
+      background-color: #f8f9fa;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      color: #3c4043;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      padding: 8px 16px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-align: center;
+      text-decoration: none;
+    }
+    button:hover, input[type="submit"]:hover {
+      box-shadow: 0 1px 2px rgba(60,64,67,0.15);
+      background-color: #f1f3f4;
+      border-color: #dadce0;
+      color: #202124;
+    }
+    button:active {
+      background-color: #e8eaed;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    button.btn-primary {
+      background-color: #1a73e8;
+      border: 1px solid #1a73e8;
+      color: #ffffff;
+      font-weight: bold;
+    }
+    button.btn-primary:hover {
+      background-color: #1557b0;
+      border-color: #1557b0;
+      color: #ffffff;
+    }
+
+    button.btn-danger {
+      background-color: #d93025;
+      border: 1px solid #d93025;
+      color: #ffffff;
+    }
+    button.btn-danger:hover {
+      background-color: #b31412;
+      border-color: #b31412;
+    }
+
+    /* Standard LTR Form Inputs */
+    input[type="text"], input[type="number"], input[type="password"], input[type="date"], textarea, select {
+      width: 100%;
+      padding: 8px 12px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      background-color: #ffffff;
+      color: #222222;
+      direction: ltr !important;
+      text-align: left !important;
+      unicode-bidi: normal !important;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus, input[type="date"]:focus, textarea:focus {
+      outline: none;
+      border-color: #1a73e8;
+    }
+
     header {
-      border-bottom: 1px solid #dadce0; padding: 10px 16px; display: flex; flex-wrap: wrap;
-      align-items: center; justify-content: space-between; background-color: #ffffff; gap: 10px;
-      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    .logo { font-size: 22px; font-weight: bold; color: #1a73e8; cursor: pointer; }
-    .search-bar-container { flex: 1 1 200px; max-width: 350px; display: flex; align-items: center; }
-
-    /* INPUTS */
-    input[type="text"], input[type="password"], input[type="date"], input[type="number"], select, textarea {
-      width: 100%; padding: 8px 12px; border: 1px solid #dadce0; border-radius: 4px;
-      font-family: Arial, sans-serif; font-size: 14px; background-color: #ffffff; color: #222222;
-      direction: ltr !important; text-align: left !important; box-sizing: border-box; margin-bottom: 8px;
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1a73e8;
+      text-decoration: none;
+      cursor: pointer;
     }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
-
-    /* BUTTONS */
-    button {
-      background-color: #f8f9fa; border: 1px solid #dadce0; border-radius: 4px; color: #3c4043;
-      font-family: Arial, sans-serif; font-size: 13px; padding: 6px 12px; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap;
-      user-select: none; -webkit-user-select: none;
+    .search-bar-container {
+      flex: 1;
+      max-width: 450px;
+      margin: 0 15px;
     }
-    button:hover { background-color: #f1f3f4; color: #202124; }
-    button.btn-primary { background-color: #1a73e8; border-color: #1a73e8; color: #ffffff; font-weight: bold; }
-    button.btn-primary:hover { background-color: #1557b0; }
-    button.btn-success { background-color: #188038; border-color: #188038; color: #ffffff; font-weight: bold; }
-    button.btn-success:hover { background-color: #13652b; }
-    button.btn-danger { background-color: #d93025; border-color: #d93025; color: #ffffff; }
-    button.btn-warning { background-color: #f2994a; border-color: #f2994a; color: #ffffff; }
-
-    nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
-
-    /* AVATAR SYSTEM */
-    .user-avatar {
-      width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
-      background-color: #bdc1c6; display: inline-flex; align-items: center; justify-content: center;
-      color: #ffffff; font-weight: bold; font-size: 14px; flex-shrink: 0; border: 1px solid #dadce0;
+    .search-bar-container input {
+      margin: 0;
     }
-    .user-avatar.small { width: 28px; height: 28px; font-size: 11px; }
-    .user-avatar.large { width: 80px; height: 80px; font-size: 28px; }
 
-    .author-container { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .author-container:hover .author-name { text-decoration: underline; }
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-user {
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      color: #1a73e8;
+      text-decoration: underline;
+    }
 
-    /* BADGE & CREDITS */
-    .badge-container { position: relative; display: inline-block; }
+    .nav-msg-btn {
+      position: relative;
+    }
     .badge {
-      position: absolute; top: -6px; right: -6px; background-color: #d93025; color: #ffffff;
-      border: 2px solid #ffffff; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold;
+      position: absolute;
+      top: -5px;
+      right: -6px;
+      background-color: #d93025;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      min-width: 18px;
+      height: 18px;
+      font-size: 10px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 3px;
     }
-    .credits-display { background-color: #e6f4ea; color: #137333; padding: 4px 10px; border-radius: 16px; font-weight: bold; font-size: 13px; border: 1px solid #ceedd6; }
 
-    /* CONTAINER & CARDS */
-    .container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
-    .card { background-color: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 16px; position: relative; }
-    
-    /* POST VERIFICADO - BORDA AZUL NEON */
-    .card.verified-post {
-      border: 2px solid #00f0ff;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
-      background: linear-gradient(135deg, #ffffff 0%, #f4fbff 100%);
+    .container {
+      max-width: 850px;
+      margin: 20px auto;
+      padding: 0 16px;
     }
 
-    .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .author-name { font-weight: bold; color: #1a73e8; }
-    .item-date { font-size: 12px; color: #70757a; }
-    .item-content { font-size: 14px; margin-bottom: 12px; white-space: pre-wrap; }
-    .post-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
-    .product-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
-    .product-price { font-size: 18px; font-weight: bold; color: #188038; margin-bottom: 4px; }
-    
+    .auth-box {
+      max-width: 380px;
+      margin: 60px auto;
+      padding: 24px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      background-color: #ffffff;
+    }
+    .auth-box h2 {
+      margin-bottom: 16px;
+      font-size: 22px;
+      text-align: center;
+    }
+    .auth-box label {
+      font-size: 13px;
+      font-weight: bold;
+      color: #5f6368;
+    }
+    .error-msg {
+      color: #d93025;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .create-post-card, .section-card {
+      border: 1px solid #dadce0;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      background-color: #ffffff;
+    }
+    .post-card {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      background-color: #ffffff;
+    }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .author-name {
+      font-weight: bold;
+      color: #1a73e8;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .author-name:hover {
+      text-decoration: underline;
+    }
+    .post-date {
+      font-size: 12px;
+      color: #70757a;
+    }
+    .post-content {
+      font-size: 15px;
+      margin-bottom: 12px;
+      white-space: pre-wrap;
+    }
+    .post-footer {
+      border-top: 1px solid #f1f3f4;
+      padding-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .product-card-item {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      background-color: #ffffff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background-color: #f1f3f4;
+    }
+    .product-body {
+      padding: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #202124;
+      margin-bottom: 4px;
+    }
+    .product-price {
+      font-size: 18px;
+      color: #1e8e3e;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .product-meta {
+      font-size: 12px;
+      color: #70757a;
+      margin-bottom: 8px;
+    }
+    .product-desc {
+      font-size: 13px;
+      color: #3c4043;
+      margin-bottom: 12px;
+      flex: 1;
+    }
+
     .bot-badge {
-      background-color: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa;
-      font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: bold; margin-left: 4px;
+      background-color: #e8f0fe;
+      color: #1a73e8;
+      border: 1px solid #aecbfa;
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+      text-transform: uppercase;
     }
 
-    /* EMOJI REACTION POPUP */
-    .reaction-picker {
-      position: absolute; background: #ffffff; border: 1px solid #dadce0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 24px; padding: 6px 10px;
-      display: flex; gap: 8px; z-index: 200; transform: translateY(-45px); animation: fadeIn 0.15s ease-in-out;
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #dadce0;
+      margin-bottom: 16px;
+      gap: 4px;
     }
-    .reaction-picker span { font-size: 20px; cursor: pointer; transition: transform 0.1s; display: inline-block; }
-    .reaction-picker span:hover { transform: scale(1.3); }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-35px); }
-      to { opacity: 1; transform: translateY(-45px); }
+    .tab-btn {
+      border: none;
+      background: none;
+      border-radius: 0;
+      padding: 10px 16px;
+      border-bottom: 3px solid transparent;
+      color: #5f6368;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      border-bottom-color: #1a73e8;
+      color: #1a73e8;
+      background: none;
+      box-shadow: none;
     }
 
-    /* COMMENTS SECTION */
-    .comments-section { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
-    .comment-item { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; }
-    .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .profile-header {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #ffffff;
+    }
+    .profile-stats {
+      display: flex;
+      gap: 24px;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #5f6368;
+    }
+    .profile-stats-clickable {
+      cursor: pointer;
+      color: #1a73e8;
+      text-decoration: underline;
+    }
 
-    /* TABS */
-    .tabs { display: flex; border-bottom: 1px solid #dadce0; margin-bottom: 16px; overflow-x: auto; }
-    .tab-btn { border: none; background: none; border-radius: 0; padding: 8px 16px; border-bottom: 3px solid transparent; color: #5f6368; font-weight: bold; white-space: nowrap; }
-    .tab-btn.active { border-bottom-color: #1a73e8; color: #1a73e8; }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-card {
+      background-color: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #dadce0;
+      width: 90%;
+      max-width: 500px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      padding: 16px;
+      border-bottom: 1px solid #dadce0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      margin: 0;
+    }
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .message-item {
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background-color: #ffffff;
+    }
+    .message-item.unread {
+      background-color: #e8f0fe;
+      border-color: #aecbfa;
+    }
 
-    /* CHAT BOX */
-    .chat-container { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; border: 1px solid #dadce0; padding: 12px; border-radius: 8px; margin-bottom: 12px; background-color: #fcfcfc; }
-    .chat-bubble { padding: 8px 12px; border-radius: 12px; max-width: 75%; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
-    .chat-bubble.mine { background-color: #e8f0fe; align-self: flex-end; color: #1a73e8; border-bottom-right-radius: 2px; }
-    .chat-bubble.other { background-color: #ffffff; align-self: flex-start; color: #202124; border: 1px solid #dadce0; border-bottom-left-radius: 2px; }
-    .chat-sender-tag { font-size: 10px; font-weight: bold; margin-bottom: 2px; color: #5f6368; display: block; }
-    .chat-action-banner { background-color: #fff8e1; border: 1px solid #ffe082; padding: 10px; border-radius: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .loading-spinner {
+      text-align: center;
+      padding: 20px;
+      color: #70757a;
+    }
 
-    /* MODAL */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-card { background: #fff; border-radius: 8px; border: 1px solid #dadce0; width: 90%; max-width: 520px; max-height: 90vh; display: flex; flex-direction: column; }
-    .modal-header { padding: 12px 16px; border-bottom: 1px solid #dadce0; display: flex; justify-content: space-between; align-items: center; }
-    .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
-
-    .credit-option-card { border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
-    .credit-option-card:hover { border-color: #1a73e8; background: #f4f8fe; }
-
-    .auth-box { max-width: 360px; margin: 40px auto; padding: 24px; background-color: #fff; border: 1px solid #dadce0; border-radius: 8px; }
-    .error-msg { color: #d93025; font-size: 13px; margin-bottom: 12px; }
-    .rules-box { background-color: #fce8e6; border: 1px solid #f5c6cb; border-radius: 6px; padding: 12px; margin-top: 12px; font-size: 12px; color: #a50e0e; }
     .hidden { display: none !important; }
   </style>
 </head>
-<body onclick="hideAllReactionPickers()">
+<body>
 
   <!-- HEADER -->
   <header id="app-header" class="hidden">
     <div class="logo" onclick="navigateTo('feed')">Arnos</div>
     
     <div class="search-bar-container">
-      <input type="text" id="search-input" placeholder="Pesquisar perfil, post ou produto..." autocomplete="off" dir="ltr">
+      <input type="text" id="search-input" placeholder="Search profiles, posts or products..." autocomplete="off" spellcheck="false">
     </div>
 
     <nav>
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('marketplace')">Marketplace</button>
-      
-      <div class="badge-container">
-        <button onclick="navigateTo('messages')">Mensagens</button>
+      <button class="nav-msg-btn" onclick="openMessagesModal()">
+        Mensagens do Marketplace
         <span id="msg-badge" class="badge hidden">0</span>
-      </div>
-
-      <span class="credits-display">💳 <span id="user-credits-val">0.00</span></span>
-      <button class="btn-success" onclick="openGetCreditsModal()">💰 Obter Créditos</button>
-
-      <button id="nav-btn-admin" class="btn-danger hidden" onclick="openAdminBanModal()">🛡️ Painel Admin</button>
-
-      <button onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')">Meu Perfil</button>
-      <span id="nav-user-link" class="nav-user" onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')"></span>
+      </button>
+      <button onclick="navigateTo('profile')">Meu Perfil</button>
+      <span id="nav-user-link" class="nav-user" onclick="viewProfile(currentUserData ? currentUserData.username : '')"></span>
       <button onclick="logout()">Log out</button>
     </nav>
   </header>
 
-  <!-- CONTAINER PRINCIPAL -->
+  <!-- CONTAINER -->
   <div class="container">
 
-    <div id="view-loading" style="text-align: center; padding: 40px; color: #70757a;">Carregando Arnos...</div>
+    <div id="view-loading" class="loading-spinner">
+      Loading Arnos...
+    </div>
 
-    <!-- AUTH VIEW -->
+    <!-- AUTHENTICATION -->
     <div id="view-auth" class="auth-box hidden">
-      <h2 id="auth-title" style="margin-bottom: 16px; text-align: center;">Arnos Criar Conta</h2>
+      <h2 id="auth-title">Arnos Sign Up</h2>
       <div id="auth-error" class="error-msg hidden"></div>
 
       <form id="form-signup" onsubmit="handleSignup(event)">
-        <label style="font-size:12px; font-weight:bold;">Utilizador</label>
-        <input type="text" id="signup-username" required placeholder="Nome de utilizador" dir="ltr">
-        <label style="font-size:12px; font-weight:bold;">Palavra-passe</label>
-        <input type="password" id="signup-password" required placeholder="Mínimo 6 caracteres" dir="ltr">
-        <label style="font-size:12px; font-weight:bold;">Data de Nascimento</label>
-        <input type="date" id="signup-dob" required style="margin-bottom: 12px;">
-        <button type="submit" id="btn-signup" class="btn-primary" style="width: 100%;">Criar Conta</button>
+        <label>Username</label>
+        <input type="text" id="signup-username" required placeholder="Enter name">
+
+        <label>Password</label>
+        <input type="password" id="signup-password" required placeholder="Enter password (min 6 characters)">
+
+        <label>Date of Birth</label>
+        <input type="date" id="signup-dob" required>
+
+        <button type="submit" id="btn-signup" class="btn-primary" style="width: 100%; margin-top: 8px;">Create</button>
         <p style="text-align: center; font-size: 13px; margin-top: 16px;">
-          Já tens conta? <a href="#" onclick="toggleAuth('login')" style="color: #1a73e8;">Entrar</a>
+          Already have an account? <a href="#" onclick="toggleAuth('login')" style="color: #1a73e8;">Sign in</a>
         </p>
       </form>
 
       <form id="form-login" onsubmit="handleLogin(event)" class="hidden">
-        <label style="font-size:12px; font-weight:bold;">Utilizador</label>
-        <input type="text" id="login-username" required placeholder="Nome de utilizador" dir="ltr">
-        <label style="font-size:12px; font-weight:bold;">Palavra-passe</label>
-        <input type="password" id="login-password" required placeholder="Palavra-passe" dir="ltr">
-        <button type="submit" id="btn-login" class="btn-primary" style="width: 100%;">Entrar</button>
+        <label>Username</label>
+        <input type="text" id="login-username" required placeholder="Enter name">
+
+        <label>Password</label>
+        <input type="password" id="login-password" required placeholder="Enter password">
+
+        <button type="submit" id="btn-login" class="btn-primary" style="width: 100%; margin-top: 8px;">Sign In</button>
         <p style="text-align: center; font-size: 13px; margin-top: 16px;">
-          Não tens conta? <a href="#" onclick="toggleAuth('signup')" style="color: #1a73e8;">Criar uma</a>
+          Don't have an account? <a href="#" onclick="toggleAuth('signup')" style="color: #1a73e8;">Create one</a>
         </p>
       </form>
     </div>
 
-    <!-- FEED VIEW -->
+    <!-- HOME FEED -->
     <div id="view-feed" class="hidden">
-      <div class="card">
-        <h3 style="font-size: 15px; margin-bottom: 8px;">Criar uma publicação</h3>
-        <textarea id="post-input" rows="3" placeholder="No que estás a pensar?" dir="ltr"></textarea>
-        
-        <label style="font-size: 12px; font-weight: bold; display: block; margin-top: 6px;">Adicionar Foto ao Post (Opcional)</label>
-        <input type="file" id="post-image-file" accept="image/*" style="margin-bottom: 8px;">
-        <div id="post-img-preview" style="margin-bottom: 12px;"></div>
-
-        <button id="btn-publish-post" onclick="submitPost()" class="btn-primary">Publicar</button>
+      <div class="create-post-card">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">Create a post</h3>
+        <textarea id="post-input" rows="3" placeholder="What is on your mind?"></textarea>
+        <button id="btn-publish-post" onclick="submitPost()" class="btn-primary">Publish</button>
       </div>
       <div id="feed-list"></div>
     </div>
 
-    <!-- MARKETPLACE VIEW -->
+    <!-- MARKETPLACE -->
     <div id="view-marketplace" class="hidden">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h2>Marketplace</h2>
-        <button class="btn-primary" onclick="openCreateProductModal()">+ Criar Produto</button>
+        <button onclick="openCreateProductModal()" class="btn-primary">Criar produto</button>
       </div>
-      <div id="marketplace-list"></div>
+      <div id="marketplace-grid" class="product-grid"></div>
     </div>
 
-    <!-- MESSAGES VIEW -->
-    <div id="view-messages" class="hidden">
-      <h2 style="margin-bottom: 12px;">Mensagens / Marketplace / Créditos</h2>
-      
-      <div class="tabs">
-        <button id="msg-tab-profile" class="tab-btn active" onclick="switchMsgTab('profile')">Mensagens de Perfis</button>
-        <button id="msg-tab-marketplace" class="tab-btn" onclick="switchMsgTab('marketplace')">Mensagens do Marketplace</button>
-      </div>
-
-      <div id="messages-conversations-list"></div>
-      
-      <div id="messages-chat-view" class="hidden">
-        <button onclick="closeChatView()" style="margin-bottom: 12px;">← Voltar para Conversas</button>
-        <h3 id="chat-title" style="margin-bottom: 8px;"></h3>
-
-        <div id="chat-action-banner" class="chat-action-banner hidden"></div>
-
-        <div id="chat-bubbles" class="chat-container"></div>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." dir="ltr" style="margin-bottom:0;">
-          <button class="btn-primary" onclick="sendChatMessage()">Enviar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- SEARCH VIEW -->
+    <!-- SEARCH -->
     <div id="view-search" class="hidden">
-      <h3 style="margin-bottom: 12px;">Resultados para "<span id="search-query-text"></span>"</h3>
+      <h3 style="margin-bottom: 12px;">Search Results for "<span id="search-query-text"></span>"</h3>
       <div class="tabs">
-        <button id="tab-btn-profiles" class="tab-btn active" onclick="switchSearchTab('profiles')">Perfis (<span id="count-profiles">0</span>)</button>
-        <button id="tab-btn-posts" class="tab-btn" onclick="switchSearchTab('posts')">Posts (<span id="count-posts">0</span>)</button>
-        <button id="tab-btn-products" class="tab-btn" onclick="switchSearchTab('products')">Marketplace (<span id="count-products">0</span>)</button>
+        <button id="tab-btn-profiles" class="tab-btn active" onclick="switchSearchTab('profiles')">
+          Profiles (<span id="count-profiles">0</span>)
+        </button>
+        <button id="tab-btn-posts" class="tab-btn" onclick="switchSearchTab('posts')">
+          Posts (<span id="count-posts">0</span>)
+        </button>
+        <button id="tab-btn-products" class="tab-btn" onclick="switchSearchTab('products')">
+          Marketplace (<span id="count-products">0</span>)
+        </button>
       </div>
 
       <div id="search-results-profiles"></div>
       <div id="search-results-posts" class="hidden"></div>
-      <div id="search-results-products" class="hidden"></div>
+      <div id="search-results-products" class="product-grid hidden"></div>
     </div>
 
-    <!-- PROFILE VIEW -->
+    <!-- PROFILE -->
     <div id="view-profile" class="hidden">
-      <div class="card profile-header">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <div id="profile-avatar-container"></div>
-            <div>
-              <h2 id="profile-name-display" style="display: inline-block;"></h2>
-              <span id="profile-verified-badge" style="font-size: 18px; margin-left: 4px;" title="Conta Verificada">✅</span>
-              <span id="profile-bot-badge" class="bot-badge hidden">BOT</span>
-              <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
-            </div>
+      <div class="profile-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <h2 id="profile-name-display" style="display: inline-block;"></h2>
+            <span id="profile-bot-tag" class="bot-badge hidden" style="margin-left: 6px;">[BOT]</span>
+            <p id="profile-dob-display" style="font-size: 13px; color: #70757a; margin-top: 4px;"></p>
           </div>
-          <div id="profile-action-btn-area" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+          <div id="profile-action-btn-area"></div>
         </div>
 
-        <div id="profile-edit-avatar-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
-          <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Alterar Foto de Perfil</label>
-          <input type="file" id="profile-avatar-file" accept="image/*" style="margin-bottom: 6px;">
-          <button class="btn-primary" onclick="saveProfileAvatar()">Guardar Foto de Perfil</button>
-        </div>
-
-        <div class="profile-stats" style="display:flex; gap:16px; margin-top:12px; font-size:13px; color:#5f6368;">
+        <div class="profile-stats">
           <span><strong id="stat-posts">0</strong> Posts</span>
-          <span style="cursor:pointer; color:#1a73e8; text-decoration:underline;" onclick="openUserListModal('followers')"><strong id="stat-followers">0</strong> Seguidores</span>
-          <span style="cursor:pointer; color:#1a73e8; text-decoration:underline;" onclick="openUserListModal('following')"><strong id="stat-following">0</strong> Seguindo</span>
+          <span><strong id="stat-products">0</strong> Produtos</span>
+          <span class="profile-stats-clickable" onclick="openUserListModal('followers')"><strong id="stat-followers">0</strong> Followers</span>
+          <span class="profile-stats-clickable" onclick="openUserListModal('following')"><strong id="stat-following">0</strong> Following</span>
         </div>
       </div>
 
       <div class="tabs">
-        <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
-        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
-        <button id="profile-tab-reports" class="tab-btn" onclick="switchProfileTab('reports')">Histórico de Denúncias</button>
+        <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Posts</button>
+        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Marketplace / Vitrine</button>
       </div>
 
       <div id="profile-posts-list"></div>
-      <div id="profile-vitrine-list" class="hidden"></div>
-      <div id="profile-reports-list" class="hidden"></div>
+      <div id="profile-vitrine-grid" class="product-grid hidden"></div>
     </div>
 
   </div>
 
-  <!-- MODAL: PAINEL DE ADMINISTRAÇÃO E BANIMENTO -->
-  <div id="modal-admin-ban" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>🛡️ Painel de Administração (Arnos Admin)</h3>
-        <button onclick="closeAdminBanModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <label style="font-size: 12px; font-weight: bold;">Pesquisar Utilizador (Gerir Banimento / Verificação)</label>
-        <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-          <input type="text" id="admin-search-user" placeholder="Nome do utilizador..." dir="ltr" style="margin-bottom:0;">
-          <button class="btn-primary" onclick="searchUserForAdmin()">Pesquisar</button>
-        </div>
-
-        <div id="admin-user-result" style="border: 1px solid #dadce0; padding: 12px; border-radius: 6px; background: #fafafa;">
-          <p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir a conta.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: DENUNCIAR PERFIL -->
-  <div id="modal-report-profile" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="modal-report-prof-title">Denunciar Perfil</h3>
-        <button onclick="closeReportProfileModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="report-prof-target">
-        <label style="font-size: 12px; font-weight: bold;">Motivo da Denúncia do Perfil</label>
-        <select id="report-prof-category" onchange="toggleReportProfOther()">
-          <option value="Comportamento Ofensivo / Assédio">Comportamento Ofensivo / Assédio</option>
-          <option value="Conta Falsa / Golpe">Conta Falsa / Golpe</option>
-          <option value="Spam">Spam</option>
-          <option value="Outros">Outros</option>
-        </select>
-
-        <div id="report-prof-other-container" class="hidden">
-          <label style="font-size: 12px; font-weight: bold;">Descreva o motivo</label>
-          <textarea id="report-prof-other-text" rows="3" placeholder="Explique detalhadamente..." dir="ltr"></textarea>
-        </div>
-
-        <button onclick="submitProfileReport()" class="btn-danger" style="width: 100%; margin-top: 10px;">Enviar Denúncia de Perfil</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: OBTER CRÉDITOS -->
-  <div id="modal-get-credits" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>💰 Obter Créditos para sua Conta</h3>
-        <button onclick="closeGetCreditsModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">
-          Escolha uma das opções abaixo para abrir um pedido direto com a conta <strong>Arnos</strong>:
-        </p>
-
-        <div class="credit-option-card">
-          <div>
-            <h4 style="font-size: 16px; color: #188038;">Pacote Básico</h4>
-            <span style="font-size: 13px; color: #5f6368;">Comprar 10 Créditos</span>
-          </div>
-          <button class="btn-primary" onclick="requestCreditsPurchase(10)">Comprar 10 Créditos</button>
-        </div>
-
-        <div class="credit-option-card">
-          <div>
-            <h4 style="font-size: 16px; color: #188038;">Pacote Médio</h4>
-            <span style="font-size: 13px; color: #5f6368;">Comprar 100 Créditos</span>
-          </div>
-          <button class="btn-primary" onclick="requestCreditsPurchase(100)">Comprar 100 Créditos</button>
-        </div>
-
-        <div class="credit-option-card">
-          <div>
-            <h4 style="font-size: 16px; color: #188038;">Pacote Avançado</h4>
-            <span style="font-size: 13px; color: #5f6368;">Comprar 1000 Créditos</span>
-          </div>
-          <button class="btn-primary" onclick="requestCreditsPurchase(1000)">Comprar 1000 Créditos</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: ESCOLHER TIPO DE PAGAMENTO NO MARKETPLACE -->
-  <div id="modal-buy-type" class="modal-overlay hidden">
-    <div class="modal-card" style="max-width: 400px;">
-      <div class="modal-header">
-        <h3>Escolha a Forma de Pagamento</h3>
-        <button onclick="closeBuyTypeModal()">✕</button>
-      </div>
-      <div class="modal-body" style="text-align: center;">
-        <input type="hidden" id="buy-prod-id">
-        <p style="margin-bottom: 16px; font-size: 14px;">Como deseja negociar este produto?</p>
-
-        <button class="btn-primary" style="width: 100%; padding: 10px; margin-bottom: 10px;" onclick="processProductPurchase('pix')">
-          📱 Comprar com PIX
-        </button>
-        <button class="btn-success" style="width: 100%; padding: 10px;" onclick="processProductPurchase('credit')">
-          💳 Comprar com Crédito
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: ENVIAR MENSAGEM DIRETA DE PERFIL -->
-  <div id="modal-direct-msg" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="modal-msg-target-name">Enviar Mensagem</h3>
-        <button onclick="closeDirectMsgModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="direct-msg-target-username">
-        <label style="font-size: 12px; font-weight: bold;">Sua Mensagem</label>
-        <textarea id="direct-msg-text" rows="4" placeholder="Escreva a sua mensagem aqui..." dir="ltr"></textarea>
-        <button onclick="sendDirectMessageFromProfile()" class="btn-primary" style="width: 100%; margin-top: 8px;">Enviar Mensagem</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: LISTA DE SEGUIDORES / SEGUINDO -->
+  <!-- MODALS -->
   <div id="modal-user-list" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modal-user-list-title">Lista</h3>
-        <button onclick="closeUserListModal()">✕</button>
+        <h3 id="modal-user-list-title">Followers</h3>
+        <button onclick="closeUserListModal()" style="font-size: 12px; padding: 4px 8px;">✕ Close</button>
       </div>
       <div id="modal-user-list-body" class="modal-body"></div>
     </div>
   </div>
 
-  <!-- MODAL: CRIAR / EDITAR PRODUTO -->
-  <div id="modal-product" class="modal-overlay hidden">
+  <div id="modal-product-form" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modal-product-title">Criar Produto</h3>
-        <button onclick="closeProductModal()">✕</button>
+        <h3 id="product-form-title">Criar Produto</h3>
+        <button onclick="closeProductModal()" style="font-size: 12px; padding: 4px 8px;">✕ Close</button>
       </div>
       <div class="modal-body">
-        <input type="hidden" id="prod-edit-id">
+        <form id="form-product" onsubmit="handleProductSubmit(event)">
+          <input type="hidden" id="product-edit-id">
+          
+          <label style="font-size:12px; font-weight:bold;">Nome do Produto</label>
+          <input type="text" id="prod-name" required placeholder="Ex: iPhone 13">
 
-        <label style="font-size: 12px; font-weight: bold;">Title *</label>
-        <input type="text" id="prod-name" required placeholder="Ex: Tênis Nike Tam 40" dir="ltr">
+          <label style="font-size:12px; font-weight:bold;">Preço ($ ou R$)</label>
+          <input type="number" step="0.01" id="prod-price" required placeholder="Ex: 500">
 
-        <label style="font-size: 12px; font-weight: bold;">Price (€ / R$) *</label>
-        <input type="number" id="prod-price" step="0.01" required placeholder="0.00" dir="ltr">
+          <label style="font-size:12px; font-weight:bold;">Descrição</label>
+          <textarea id="prod-desc" rows="3" required placeholder="Detalhes do produto..."></textarea>
 
-        <label style="font-size: 12px; font-weight: bold;">Category *</label>
-        <select id="prod-category">
-          <option value="Electronics">Electronics & Appliances</option>
-          <option value="Clothing">Clothing & Accessories</option>
-          <option value="Home">Home & Garden</option>
-          <option value="Vehicles">Vehicles & Parts</option>
-          <option value="Hobbies">Hobbies, Books & Music</option>
-          <option value="Others">Others</option>
-        </select>
+          <label style="font-size:12px; font-weight:bold;">Local do Produto</label>
+          <input type="text" id="prod-location" required placeholder="Ex: São Paulo, SP">
 
-        <label style="font-size: 12px; font-weight: bold;">Condition *</label>
-        <select id="prod-condition">
-          <option value="New">New</option>
-          <option value="Used - Like New">Used - Like New</option>
-          <option value="Used - Good">Used - Good</option>
-          <option value="Used - Fair">Used - Fair</option>
-        </select>
+          <label style="font-size:12px; font-weight:bold;">Imagem do Produto</label>
+          <input type="file" id="prod-file" accept="image/*" style="margin-bottom: 12px;" onchange="previewSelectedImage(this)">
+          <input type="hidden" id="prod-existing-image">
 
-        <label style="font-size: 12px; font-weight: bold;">Location *</label>
-        <input type="text" id="prod-location" required placeholder="Ex: Lisboa, Portugal ou São Paulo, BR" dir="ltr">
+          <div id="prod-img-preview" style="margin-bottom: 12px; text-align: center;"></div>
 
-        <label style="font-size: 12px; font-weight: bold;">Availability</label>
-        <select id="prod-availability">
-          <option value="Single Item">List as Single Item</option>
-          <option value="In Stock">List as In Stock</option>
-        </select>
-
-        <label style="font-size: 12px; font-weight: bold;">Delivery Method</label>
-        <select id="prod-delivery">
-          <option value="Local Pickup">Public Meeting / Local Pickup Only</option>
-          <option value="Door Pickup">Door Pickup</option>
-          <option value="Shipping">Shipping Available</option>
-        </select>
-
-        <label style="font-size: 12px; font-weight: bold;">Product Tags / SKU (Optional)</label>
-        <input type="text" id="prod-tags" placeholder="Ex: nike, tenis, sapato, novo" dir="ltr">
-
-        <label style="font-size: 12px; font-weight: bold;">Description</label>
-        <textarea id="prod-desc" rows="3" placeholder="Describe brand, size, status, reason for selling..." dir="ltr"></textarea>
-
-        <label style="font-size: 12px; font-weight: bold;">Product Images (Up to 10 photos)</label>
-        <input type="file" id="prod-image-file" accept="image/*" style="margin-bottom: 8px;">
-        <div id="prod-img-preview" style="margin-bottom: 12px;"></div>
-
-        <button id="btn-save-product" onclick="saveProduct()" class="btn-primary" style="width: 100%;">Salvar e Publicar Produto</button>
+          <button type="submit" id="btn-save-product" class="btn-primary" style="width: 100%;">Salvar Produto</button>
+        </form>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: DENUNCIAR PRODUTO -->
-  <div id="modal-report" class="modal-overlay hidden">
+  <div id="modal-messages" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Denunciar Produto</h3>
-        <button onclick="closeReportModal()">✕</button>
+        <h3>Mensagens do Marketplace</h3>
+        <button onclick="closeMessagesModal()" style="font-size: 12px; padding: 4px 8px;">✕ Close</button>
       </div>
-      <div class="modal-body">
-        <input type="hidden" id="report-prod-id">
-        <input type="hidden" id="report-prod-name">
-        <input type="hidden" id="report-seller-name">
-
-        <label style="font-size: 12px; font-weight: bold;">Motivo da Denúncia</label>
-        <select id="report-category" onchange="toggleReportOtherText()">
-          <option value="Conteúdo Sexual">Conteúdo Sexual</option>
-          <option value="Drogas / Medicamentos">Drogas / Medicamentos</option>
-          <option value="Animais">Venda de Animais</option>
-          <option value="Armas / Munições">Armas / Munições</option>
-          <option value="Produtos Falsificados">Réplicas / Produtos Falsificados</option>
-          <option value="Fraude / Golpe">Fraude / Golpe</option>
-          <option value="Outros">Outros</option>
-        </select>
-
-        <div id="report-other-container" class="hidden">
-          <label style="font-size: 12px; font-weight: bold;">Descreva o motivo</label>
-          <textarea id="report-other-text" rows="3" placeholder="Explique detalhadamente o que aconteceu..." dir="ltr"></textarea>
-        </div>
-
-        <button onclick="submitReport()" class="btn-danger" style="width: 100%; margin-top: 10px;">Confirmar Denúncia</button>
-      </div>
+      <div id="messages-list-body" class="modal-body"></div>
     </div>
   </div>
 
-  <!-- FIREBASE SCRIPTS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { 
+      getAuth, 
+      signInWithCustomToken, 
+      signInAnonymously, 
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      updateDoc, 
+      deleteDoc,
+      collection, 
+      onSnapshot, 
+      addDoc 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'arnos-app';
     const firebaseConfig = typeof __firebase_config !== 'undefined' 
@@ -566,41 +635,22 @@
     let postsList = [];
     let productsList = [];
     let messagesList = [];
-    let reportsList = [];
+    let activeSearchTab = 'profiles';
+    let activeProfileTab = 'posts';
     let currentProfileUsername = null;
-    let selectedImageBase64 = null;
-    let selectedPostImageBase64 = null;
-    let selectedAvatarBase64 = null;
-    let activeChatKey = null;
-    let activeMsgSubTab = 'profile';
 
-    let pressTimer = null;
-    let isLongPress = false;
-
-    const BAD_WORDS = [
-      'pinto', 'cabeludo', 'caralho', 'puta', 'puto', 'merda', 'porra', 'cu', 'bosta', 
-      'foder', 'fodido', 'corno', 'cacete', 'buceta', 'piroca', 'viado', 'retardado', 
-      'desgraça', 'arrombado', 'fdp', 'krl', 'pnc', 'tomar no cu'
-    ];
-
-    function containsProfanity(text) {
-      if (!text) return false;
-      const lower = text.toLowerCase();
-      return BAD_WORDS.some(word => {
-        const regex = new RegExp(`\\b${word}\\b`, 'i');
-        return regex.test(lower) || lower.includes(word);
-      });
-    }
+    // Cloudinary Defaults
+    const CLOUDINARY_UPLOAD_PRESET = "ml_default";
+    const CLOUDINARY_CLOUD_NAME = "demo";
 
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
     const publicPostsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'posts');
-    const publicPostDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'posts', id);
+    const publicPostDoc = (postId) => doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId);
     const publicProductsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'products');
-    const publicProductDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
+    const publicProductDoc = (prodId) => doc(db, 'artifacts', appId, 'public', 'data', 'products', prodId);
     const publicMessagesColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-    const publicMessageDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'messages', id);
-    const publicReportsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'reports');
+    const publicMessageDoc = (msgId) => doc(db, 'artifacts', appId, 'public', 'data', 'messages', msgId);
 
     window.currentUserData = currentUserData;
 
@@ -612,35 +662,35 @@
           await signInAnonymously(auth);
         }
       } catch (err) {
-        try { await signInAnonymously(auth); } catch (e) {}
+        console.error("Auth init error:", err);
+        try { await signInAnonymously(auth); } catch (e) { console.error(e); }
       }
     }
 
     onAuthStateChanged(auth, async (user) => {
       authUser = user;
       document.getElementById('view-loading').classList.add('hidden');
-      if (!user) { showAuthInterface(); return; }
+
+      if (!user) {
+        showAuthInterface();
+        return;
+      }
 
       const savedUsername = localStorage.getItem('arnos_logged_username');
       if (savedUsername) {
         try {
           const userSnap = await getDoc(publicUserDoc(savedUsername));
           if (userSnap.exists()) {
-            const uData = userSnap.data();
-            if (uData.banned) {
-              localStorage.removeItem('arnos_logged_username');
-              alert(`Sua conta foi banida.\nMotivo: ${uData.banReason || 'Não especificado'}\nExpira em: ${uData.banUntil || 'Para sempre'}`);
-              showAuthInterface();
-              return;
-            }
-
-            currentUserData = uData;
+            currentUserData = userSnap.data();
             window.currentUserData = currentUserData;
             showMainInterface();
             return;
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error("Error fetching stored profile:", e);
+        }
       }
+
       showAuthInterface();
     });
 
@@ -649,206 +699,237 @@
 
       onSnapshot(publicUsersColl(), (snapshot) => {
         usersMap = {};
-        snapshot.forEach(docSnap => usersMap[docSnap.data().username.toLowerCase()] = docSnap.data());
-        ensureArnosBotExists();
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          usersMap[data.username.toLowerCase()] = data;
+        });
+
+        ensureBotAccountExists();
+
         if (currentUserData && usersMap[currentUserData.username.toLowerCase()]) {
-          const freshData = usersMap[currentUserData.username.toLowerCase()];
-          if (freshData.banned) {
-            localStorage.removeItem('arnos_logged_username');
-            currentUserData = null; window.currentUserData = null;
-            alert(`Sua conta foi banida!\nMotivo: ${freshData.banReason || 'Não especificado'}\nExpira em: ${freshData.banUntil || 'Para sempre'}`);
-            showAuthInterface();
-            return;
-          }
-          currentUserData = freshData;
+          currentUserData = usersMap[currentUserData.username.toLowerCase()];
           window.currentUserData = currentUserData;
-          updateCreditsUI();
         }
+
         refreshCurrentView();
-      });
+      }, (error) => console.error("Users listener error:", error));
 
       onSnapshot(publicPostsColl(), (snapshot) => {
         postsList = [];
-        snapshot.forEach(docSnap => postsList.push({ id: docSnap.id, ...docSnap.data() }));
+        snapshot.forEach(docSnap => {
+          postsList.push({ id: docSnap.id, ...docSnap.data() });
+        });
         postsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        checkAndPostArnosDaily();
         refreshCurrentView();
-      });
+      }, (error) => console.error("Posts listener error:", error));
 
       onSnapshot(publicProductsColl(), (snapshot) => {
         productsList = [];
-        snapshot.forEach(docSnap => productsList.push({ id: docSnap.id, ...docSnap.data() }));
+        snapshot.forEach(docSnap => {
+          productsList.push({ id: docSnap.id, ...docSnap.data() });
+        });
         productsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         refreshCurrentView();
-      });
+      }, (error) => console.error("Products listener error:", error));
 
       onSnapshot(publicMessagesColl(), (snapshot) => {
         messagesList = [];
-        snapshot.forEach(docSnap => messagesList.push({ id: docSnap.id, ...docSnap.data() }));
-        messagesList.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-        updateUnreadBadge();
+        snapshot.forEach(docSnap => {
+          messagesList.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        messagesList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        updateMessagesNotificationBadge();
         refreshCurrentView();
-      });
-
-      onSnapshot(publicReportsColl(), (snapshot) => {
-        reportsList = [];
-        snapshot.forEach(docSnap => reportsList.push({ id: docSnap.id, ...docSnap.data() }));
-        refreshCurrentView();
-      });
+      }, (error) => console.error("Messages listener error:", error));
     }
 
-    async function ensureArnosBotExists() {
-      const botName = "Arnos";
-      const botKey = botName.toLowerCase();
-      if (!usersMap[botKey]) {
-        try {
-          await setDoc(publicUserDoc(botName), {
-            username: botName, password: "system_protected_password", dob: "2026-01-01", isBot: true, credits: 0, followers: [], following: [], banned: false, verified: true, avatarUrl: ''
-          });
-        } catch(e) {}
-      }
-    }
-
-    function updateCreditsUI() {
-      if (currentUserData) {
-        const val = currentUserData.credits || 0;
-        document.getElementById('user-credits-val').innerText = val.toFixed(2);
-      }
-    }
-
-    async function checkAndPostArnosDaily() {
+    async function ensureBotAccountExists() {
       if (!authUser) return;
-      const botName = "Arnos";
-      const arnosPosts = postsList.filter(p => p.author.toLowerCase() === botName.toLowerCase());
-      const now = new Date();
-      let shouldPost = false;
+      const botUsername = "Arnos";
+      const botKey = botUsername.toLowerCase();
 
-      if (arnosPosts.length === 0) shouldPost = true;
-      else {
-        const lastPostDate = new Date(arnosPosts[0].timestamp);
-        if ((now - lastPostDate) / (1000 * 60 * 60) >= 24) shouldPost = true;
-      }
-
-      if (shouldPost) {
-        const msgs = [
-          "Olá comunidade Arnos! Não se esqueçam de conferir as novidades no Marketplace hoje. 🛒✨",
-          "Dica do Arnos: Mantenham os vossos perfis atualizados e explorem a vitrine de outros utilizadores! 🚀",
-          "Mais um dia espetacular na rede Arnos! Publique fotos e interaja com os teus amigos. 💡"
-        ];
+      if (!usersMap[botKey]) {
+        const botData = {
+          username: botUsername,
+          password: "system_protected_password_arnos",
+          dob: "2026-01-01",
+          isBot: true,
+          followers: [],
+          following: []
+        };
         try {
+          await setDoc(publicUserDoc(botUsername), botData);
           await addDoc(publicPostsColl(), {
-            author: botName, content: msgs[Math.floor(Math.random() * msgs.length)], imageUrl: '', timestamp: now.toISOString(), reactions: {}, comments: []
+            author: botUsername,
+            content: "Welcome to Arnos! You can post updates, list items on the Marketplace, and send buy requests directly!",
+            timestamp: new Date().toISOString(),
+            likes: []
           });
-        } catch (e) {}
+        } catch (err) {
+          console.error("Failed to initialize Bot in Firebase:", err);
+        }
       }
     }
 
-    function updateUnreadBadge() {
+    function updateMessagesNotificationBadge() {
       if (!currentUserData) return;
-      const myUser = currentUserData.username.toLowerCase();
-      const unreadCount = messagesList.filter(m => {
-        const sender = (m.sender || m.buyer || '').toLowerCase();
-        const isTargetUser = (m.seller.toLowerCase() === myUser || m.buyer.toLowerCase() === myUser);
-        const isNotMine = sender !== myUser;
-        return isTargetUser && isNotMine && !m.read;
-      }).length;
+      const unreadCount = messagesList.filter(
+        m => m.seller.toLowerCase() === currentUserData.username.toLowerCase() && !m.read
+      ).length;
 
       const badge = document.getElementById('msg-badge');
-      if (unreadCount > 0) { 
-        badge.innerText = unreadCount; 
-        badge.classList.remove('hidden'); 
-      } else { 
-        badge.classList.add('hidden'); 
+      if (unreadCount > 0) {
+        badge.innerText = unreadCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
       }
     }
 
     function refreshCurrentView() {
-      if (!document.getElementById('view-auth').classList.contains('hidden')) return;
-      if (!document.getElementById('view-feed').classList.contains('hidden')) renderFeed();
-      else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
-      else if (!document.getElementById('view-messages').classList.contains('hidden')) renderMessages();
-      else if (!document.getElementById('view-profile').classList.contains('hidden')) {
+      if (document.getElementById('view-auth').classList.contains('hidden') === false) return;
+
+      if (!document.getElementById('view-feed').classList.contains('hidden')) {
+        renderFeed();
+      } else if (!document.getElementById('view-marketplace').classList.contains('hidden')) {
+        renderMarketplace();
+      } else if (!document.getElementById('view-profile').classList.contains('hidden')) {
         if (currentProfileUsername) renderProfile(currentProfileUsername);
       } else if (!document.getElementById('view-search').classList.contains('hidden')) {
-        const q = document.getElementById('search-input').value;
-        if (q.length > 0) renderSearch(q);
+        if (document.activeElement !== document.getElementById('search-input')) {
+          const query = document.getElementById('search-input').value;
+          renderSearch(query);
+        }
       }
     }
 
-    // AVATAR RENDER HELPER
-    function renderAvatar(userObj, sizeClass = '') {
-      const name = userObj ? userObj.username : 'U';
-      const initial = name.charAt(0).toUpperCase();
-      if (userObj && userObj.avatarUrl) {
-        return `<img src="${escapeHtml(userObj.avatarUrl)}" class="user-avatar ${sizeClass}">`;
-      }
-      return `<div class="user-avatar ${sizeClass}">${initial}</div>`;
-    }
-
-    // AUTH
     window.toggleAuth = function(mode) {
       document.getElementById('auth-error').classList.add('hidden');
-      document.getElementById('auth-title').innerText = mode === 'login' ? "Arnos Entrar" : "Arnos Criar Conta";
-      document.getElementById('form-signup').classList.toggle('hidden', mode === 'login');
-      document.getElementById('form-login').classList.toggle('hidden', mode !== 'login');
+      if (mode === 'login') {
+        document.getElementById('auth-title').innerText = "Arnos Sign In";
+        document.getElementById('form-signup').classList.add('hidden');
+        document.getElementById('form-login').classList.remove('hidden');
+      } else {
+        document.getElementById('auth-title').innerText = "Arnos Sign Up";
+        document.getElementById('form-signup').classList.remove('hidden');
+        document.getElementById('form-login').classList.add('hidden');
+      }
     };
 
     window.handleSignup = async function(e) {
       e.preventDefault();
       if (!authUser) await initAuth();
+
       const name = document.getElementById('signup-username').value.trim();
       const pwd = document.getElementById('signup-password').value;
       const dob = document.getElementById('signup-dob').value;
-      if (!name || !pwd || !dob) return showAuthErr("Preencha todos os campos.");
+      const btn = document.getElementById('btn-signup');
 
-      if (containsProfanity(name)) {
-        return showAuthErr("Erro: O nome de utilizador contém termos impróprios ou palavrões. Escolha um nome normal.");
+      if (!name || !pwd || !dob) {
+        showAuthErr("Please fill in all fields.");
+        return;
       }
+
+      if (pwd.length < 6) {
+        showAuthErr("Password must be at least 6 characters.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Creating...";
 
       try {
         const docSnap = await getDoc(publicUserDoc(name));
-        if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, dob: dob, isBot: false, credits: 0, followers: [], following: [], banned: false, verified: false, avatarUrl: '', banReason: '', banUntil: '' };
+        if (docSnap.exists()) {
+          showAuthErr("Username already exists in Firebase. Please log in.");
+          btn.disabled = false;
+          btn.innerText = "Create";
+          return;
+        }
+
+        const newUserData = {
+          username: name,
+          password: pwd,
+          dob: dob,
+          isBot: false,
+          followers: [],
+          following: []
+        };
+
         await setDoc(publicUserDoc(name), newUserData);
+
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', name);
+
         showMainInterface();
-      } catch (err) { showAuthErr("Erro ao criar conta."); }
+      } catch (err) {
+        console.error("Signup Firebase Error:", err);
+        showAuthErr("Failed to create account in Firebase. " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Create";
+      }
     };
 
     window.handleLogin = async function(e) {
       e.preventDefault();
       if (!authUser) await initAuth();
+
       const name = document.getElementById('login-username').value.trim();
       const pwd = document.getElementById('login-password').value;
+      const btn = document.getElementById('btn-login');
+
+      if (!name || !pwd) {
+        showAuthErr("Please fill in all fields.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Signing in...";
 
       try {
         const userSnap = await getDoc(publicUserDoc(name));
-        if (!userSnap.exists() || userSnap.data().password !== pwd) return showAuthErr("Credenciais incorretas.");
-        const uData = userSnap.data();
-
-        if (uData.banned) {
-          return showAuthErr(`Sua conta foi banida.\nMotivo: ${uData.banReason || 'Não especificado'}\nExpira em: ${uData.banUntil || 'Para sempre'}`);
+        if (!userSnap.exists()) {
+          showAuthErr("User not found in Firebase.");
+          btn.disabled = false;
+          btn.innerText = "Sign In";
+          return;
         }
 
-        currentUserData = uData;
-        if (currentUserData.credits === undefined) currentUserData.credits = 0;
-        window.currentUserData = currentUserData;
-        localStorage.setItem('arnos_logged_username', currentUserData.username);
+        const userData = userSnap.data();
+        if (userData.password !== pwd) {
+          showAuthErr("Invalid password.");
+          btn.disabled = false;
+          btn.innerText = "Sign In";
+          return;
+        }
+
+        currentUserData = userData;
+        window.currentUserData = userData;
+        localStorage.setItem('arnos_logged_username', userData.username);
+
         showMainInterface();
-      } catch (err) { showAuthErr("Erro ao entrar."); }
+      } catch (err) {
+        console.error("Login Firebase Error:", err);
+        showAuthErr("Error checking account in Firebase.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Sign In";
+      }
     };
 
     window.logout = function() {
       localStorage.removeItem('arnos_logged_username');
-      currentUserData = null; window.currentUserData = null;
+      currentUserData = null;
+      window.currentUserData = null;
       showAuthInterface();
     };
 
     function showAuthErr(msg) {
       const err = document.getElementById('auth-error');
-      err.innerText = msg; err.classList.remove('hidden');
+      err.innerText = msg;
+      err.classList.remove('hidden');
     }
 
     function showAuthInterface() {
@@ -856,7 +937,6 @@
       document.getElementById('view-auth').classList.remove('hidden');
       document.getElementById('view-feed').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
-      document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-search').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
     }
@@ -865,447 +945,107 @@
       document.getElementById('app-header').classList.remove('hidden');
       document.getElementById('view-auth').classList.add('hidden');
       document.getElementById('nav-user-link').innerText = currentUserData.username;
-
-      const adminBtn = document.getElementById('nav-btn-admin');
-      if (currentUserData.username.toLowerCase() === 'arnos') {
-        adminBtn.classList.remove('hidden');
-      } else {
-        adminBtn.classList.add('hidden');
-      }
-
-      updateCreditsUI();
+      
       setupListeners();
       navigateTo('feed');
     }
 
-    // PROFILE AVATAR UPLOAD
-    document.getElementById('profile-avatar-file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          selectedAvatarBase64 = evt.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    window.saveProfileAvatar = async function() {
-      if (!selectedAvatarBase64 || !currentUserData) return alert("Selecione uma imagem para o avatar.");
-      try {
-        await updateDoc(publicUserDoc(currentUserData.username), { avatarUrl: selectedAvatarBase64 });
-        currentUserData.avatarUrl = selectedAvatarBase64;
-        selectedAvatarBase64 = null;
-        document.getElementById('profile-avatar-file').value = '';
-        alert("Foto de perfil atualizada com sucesso!");
-        renderProfile(currentUserData.username);
-      } catch (e) { alert("Erro ao atualizar foto de perfil."); }
-    };
-
-    // ADMIN PANEL
-    window.openAdminBanModal = function() {
-      document.getElementById('admin-search-user').value = '';
-      document.getElementById('admin-user-result').innerHTML = '<p style="color: #70757a; font-size: 13px;">Pesquise um utilizador acima para gerir a conta.</p>';
-      document.getElementById('modal-admin-ban').classList.remove('hidden');
-    };
-    window.closeAdminBanModal = function() {
-      document.getElementById('modal-admin-ban').classList.add('hidden');
-    };
-
-    window.searchUserForAdmin = async function() {
-      const queryInput = document.getElementById('admin-search-user').value.trim();
-      const resultDiv = document.getElementById('admin-user-result');
-      if (!queryInput) return;
-
-      const queryKey = queryInput.toLowerCase();
-      let user = usersMap[queryKey];
-
-      if (!user) {
-        resultDiv.innerHTML = `<p style="color: #d93025; font-size: 13px;">Utilizador "${escapeHtml(queryInput)}" não encontrado.</p>`;
-        return;
-      }
-
-      let needsUpdate = false;
-      let updatePayload = {};
-
-      if (user.banned === undefined) { user.banned = false; updatePayload.banned = false; needsUpdate = true; }
-      if (user.verified === undefined) { user.verified = false; updatePayload.verified = false; needsUpdate = true; }
-      if (user.banReason === undefined) { user.banReason = ''; updatePayload.banReason = ''; needsUpdate = true; }
-      if (user.banUntil === undefined) { user.banUntil = ''; updatePayload.banUntil = ''; needsUpdate = true; }
-
-      if (needsUpdate) {
-        try { await updateDoc(publicUserDoc(user.username), updatePayload); } catch(e) {}
-      }
-
-      const isBanned = user.banned;
-      const isVerified = user.verified;
-
-      resultDiv.innerHTML = `
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom: 6px;">
-          ${renderAvatar(user, 'small')}
-          <h4 style="margin:0;">${escapeHtml(user.username)} ${isVerified ? '✅' : ''}</h4>
-        </div>
-        <p style="font-size:12px; margin-bottom:8px;">
-          <strong>Status Verificado:</strong> ${isVerified ? '<span style="color:green; font-weight:bold;">Verificado (True)</span>' : '<span style="color:gray;">Não Verificado (False)</span>'}
-          <button onclick="toggleVerifyUser('${escapeStr(user.username)}', ${!isVerified})" style="font-size:11px; padding:2px 6px; margin-left:8px;" class="btn-primary">
-            ${isVerified ? 'Remover Verificação' : 'Tornar Verificado'}
-          </button>
-        </p>
-        <hr style="margin:8px 0; border:0; border-top:1px solid #ddd;">
-        ${isBanned ? `
-          <p style="font-size:12px; color:red; margin-bottom:6px;"><strong>CONTA BANIDA</strong></p>
-          <p style="font-size:12px; margin-bottom:6px;"><strong>Motivo:</strong> ${escapeHtml(user.banReason || 'Não especificado')}</p>
-          <p style="font-size:12px; margin-bottom:10px;"><strong>Expira em:</strong> ${escapeHtml(user.banUntil || 'Para sempre')}</p>
-          <button class="btn-success" onclick="unbanUser('${escapeStr(user.username)}')">Desbanir Utilizador</button>
-        ` : `
-          <div style="margin-top: 8px;">
-            <label style="font-size: 12px; font-weight: bold;">Tipo de Banimento</label>
-            <select id="ban-type-select" onchange="toggleBanDateInput()" style="margin-bottom:6px;">
-              <option value="permanent">Para sempre (Permanente)</option>
-              <option value="temporary">Temporário (Definir data)</option>
-            </select>
-
-            <div id="ban-date-container" class="hidden" style="margin-bottom:6px;">
-              <label style="font-size: 12px; font-weight: bold;">Data para ser desbanido</label>
-              <input type="date" id="ban-expiry-date">
-            </div>
-
-            <label style="font-size: 12px; font-weight: bold;">Motivo do Banimento</label>
-            <textarea id="ban-reason-input" rows="2" placeholder="Explique o motivo..." dir="ltr" style="margin-bottom:8px;"></textarea>
-
-            <button class="btn-danger" onclick="executeBanUser('${escapeStr(user.username)}')">Confirmar Banimento</button>
-          </div>
-        `}
-      `;
-    };
-
-    window.toggleVerifyUser = async function(username, newStatus) {
-      try {
-        await updateDoc(publicUserDoc(username), { verified: newStatus });
-        alert(`Utilizador ${username} atualizado para verificado: ${newStatus}`);
-        searchUserForAdmin();
-      } catch (e) { alert("Erro ao atualizar verificação."); }
-    };
-
-    window.toggleBanDateInput = function() {
-      const selectEl = document.getElementById('ban-type-select');
-      const containerEl = document.getElementById('ban-date-container');
-      if (selectEl && containerEl) {
-        containerEl.classList.toggle('hidden', selectEl.value !== 'temporary');
-      }
-    };
-
-    window.executeBanUser = async function(username) {
-      const typeEl = document.getElementById('ban-type-select');
-      const reasonEl = document.getElementById('ban-reason-input');
-      
-      const type = typeEl ? typeEl.value : 'permanent';
-      const reason = reasonEl ? reasonEl.value.trim() : '';
-      let banUntil = 'Para sempre';
-
-      if (type === 'temporary') {
-        const dateVal = document.getElementById('ban-expiry-date').value;
-        if (!dateVal) return alert("Por favor selecione a data em que será desbanido.");
-        banUntil = dateVal;
-      }
-
-      if (!reason) return alert("Por favor insira o motivo do banimento.");
-
-      try {
-        await setDoc(publicUserDoc(username), {
-          banned: true,
-          banReason: reason,
-          banUntil: banUntil,
-          verified: usersMap[username.toLowerCase()]?.verified ?? false
-        }, { merge: true });
-
-        alert(`Utilizador ${username} banido com sucesso!`);
-        searchUserForAdmin();
-      } catch (e) { alert("Erro ao banir utilizador."); }
-    };
-
-    window.unbanUser = async function(username) {
-      try {
-        await setDoc(publicUserDoc(username), {
-          banned: false,
-          banReason: '',
-          banUntil: ''
-        }, { merge: true });
-        alert(`Utilizador ${username} desbanido com sucesso!`);
-        searchUserForAdmin();
-      } catch (e) { alert("Erro ao desbanir."); }
-    };
-
-    // DENUNCIAR PERFIL
-    window.openReportProfileModal = function(targetName) {
-      document.getElementById('modal-report-prof-title').innerText = `Denunciar Perfil de ${targetName}`;
-      document.getElementById('report-prof-target').value = targetName;
-      document.getElementById('report-prof-category').value = 'Comportamento Ofensivo / Assédio';
-      document.getElementById('report-prof-other-text').value = '';
-      toggleReportProfOther();
-      document.getElementById('modal-report-profile').classList.remove('hidden');
-    };
-
-    window.closeReportProfileModal = function() {
-      document.getElementById('modal-report-profile').classList.add('hidden');
-    };
-
-    window.toggleReportProfOther = function() {
-      const cat = document.getElementById('report-prof-category').value;
-      document.getElementById('report-prof-other-container').classList.toggle('hidden', cat !== 'Outros');
-    };
-
-    window.submitProfileReport = async function() {
-      const target = document.getElementById('report-prof-target').value;
-      const cat = document.getElementById('report-prof-category').value;
-      const otherTxt = document.getElementById('report-prof-other-text').value.trim();
-      const reason = cat === 'Outros' ? otherTxt : cat;
-
-      if (!reason) return alert("Por favor preencha o motivo.");
-
-      try {
-        await addDoc(publicReportsColl(), {
-          productId: 'PERFIL_' + target,
-          productName: `Perfil: ${target}`,
-          seller: target,
-          reporter: currentUserData.username,
-          reason: `[Denúncia de Perfil] ${reason}`,
-          timestamp: new Date().toISOString(),
-          banned: false
-        });
-        closeReportProfileModal();
-        alert("Denúncia de perfil enviada com sucesso! A administração irá analisar.");
-      } catch (e) { alert("Erro ao enviar denúncia."); }
-    };
-
-    // NAVIGATION
     window.navigateTo = function(view, arg = null) {
       document.getElementById('view-feed').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
-      document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-search').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
 
-      if (view === 'feed') { document.getElementById('view-feed').classList.remove('hidden'); renderFeed(); }
-      else if (view === 'marketplace') { document.getElementById('view-marketplace').classList.remove('hidden'); renderMarketplace(); }
-      else if (view === 'messages') { document.getElementById('view-messages').classList.remove('hidden'); renderMessages(); }
-      else if (view === 'profile') {
+      if (view === 'feed') {
+        document.getElementById('view-feed').classList.remove('hidden');
+        document.getElementById('search-input').value = '';
+        renderFeed();
+      } else if (view === 'marketplace') {
+        document.getElementById('view-marketplace').classList.remove('hidden');
+        renderMarketplace();
+      } else if (view === 'profile') {
         document.getElementById('view-profile').classList.remove('hidden');
         currentProfileUsername = arg || (currentUserData ? currentUserData.username : '');
         renderProfile(currentProfileUsername);
       } else if (view === 'search') {
         document.getElementById('view-search').classList.remove('hidden');
-        renderSearch(arg || '');
+        renderSearch(arg || document.getElementById('search-input').value);
       }
     };
 
-    window.openGetCreditsModal = function() {
-      document.getElementById('modal-get-credits').classList.remove('hidden');
-    };
-    window.closeGetCreditsModal = function() {
-      document.getElementById('modal-get-credits').classList.add('hidden');
-    };
+    function formatTime(iso) {
+      const d = new Date(iso);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      const hrs = String(d.getHours()).padStart(2, '0');
+      const mins = String(d.getMinutes()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hrs}:${mins}`;
+    }
 
-    window.requestCreditsPurchase = async function(amount) {
-      if (!currentUserData) return;
-      if (currentUserData.username.toLowerCase() === 'arnos') {
-        return alert("Você já é a conta Arnos!");
-      }
+    window.submitPost = async function() {
+      if (!authUser || !currentUserData) return;
+      const textEl = document.getElementById('post-input');
+      const content = textEl.value.trim();
+      const btn = document.getElementById('btn-publish-post');
 
-      const prodTitle = `Créditos R$ ${amount}`;
+      if (!content) return;
+
+      btn.disabled = true;
+      btn.innerText = "Publishing...";
+
       try {
-        await addDoc(publicMessagesColl(), {
-          sender: currentUserData.username,
-          buyer: currentUserData.username,
-          seller: "Arnos",
-          productName: prodTitle,
-          message: `Olá, quero comprar ${amount} de crédito.`,
+        await addDoc(publicPostsColl(), {
+          author: currentUserData.username,
+          content: content,
           timestamp: new Date().toISOString(),
-          read: false,
-          creditAmount: amount,
-          status: 'pending_credits'
+          likes: []
         });
-        closeGetCreditsModal();
-        navigateTo('messages');
-        alert(`Pedido de ${amount} créditos enviado ao Arnos! Acompanhe na aba Mensagens.`);
-      } catch (e) { alert("Erro ao solicitar créditos."); }
-    };
 
-    window.approveCreditsOrder = async function(msgId, buyerUser, amount) {
-      if (!currentUserData || currentUserData.username.toLowerCase() !== 'arnos') return;
-
-      try {
-        const buyerSnap = await getDoc(publicUserDoc(buyerUser));
-        if (buyerSnap.exists()) {
-          const currentB = buyerSnap.data().credits || 0;
-          await updateDoc(publicUserDoc(buyerUser), { credits: currentB + amount });
-        }
-
-        const myCredits = currentUserData.credits || 0;
-        await updateDoc(publicUserDoc("Arnos"), { credits: myCredits + amount });
-
-        await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
-
-        alert(`Pedido de ${amount} créditos concluído! Créditos creditados para ${buyerUser} e Arnos.`);
-      } catch (e) { alert("Erro ao processar o pedido."); }
-    };
-
-    window.openBuyTypeModal = function(prodId) {
-      const prod = productsList.find(p => p.id === prodId);
-      if (!prod) return;
-      if (prod.seller.toLowerCase() === currentUserData.username.toLowerCase()) return alert("Você não pode comprar seu próprio produto.");
-
-      document.getElementById('buy-prod-id').value = prodId;
-      document.getElementById('modal-buy-type').classList.remove('hidden');
-    };
-
-    window.closeBuyTypeModal = function() {
-      document.getElementById('modal-buy-type').classList.add('hidden');
-    };
-
-    window.processProductPurchase = async function(type) {
-      const prodId = document.getElementById('buy-prod-id').value;
-      const prod = productsList.find(p => p.id === prodId);
-      if (!prod || !currentUserData) return;
-
-      closeBuyTypeModal();
-
-      if (type === 'credit') {
-        const myCredits = currentUserData.credits || 0;
-        if (myCredits < prod.price) {
-          return alert(`Erro: Você não tem créditos suficientes! Seu saldo é R$ ${myCredits.toFixed(2)} e o produto custa R$ ${prod.price.toFixed(2)}.`);
-        }
-
-        if (!confirm(`Confirmar a compra de "${prod.name}" por R$ ${prod.price.toFixed(2)} usando seus créditos?`)) return;
-
-        try {
-          await addDoc(publicMessagesColl(), {
-            sender: currentUserData.username,
-            buyer: currentUserData.username,
-            seller: prod.seller,
-            productName: prod.name,
-            productId: prod.id,
-            price: prod.price,
-            message: `Olá! Quero comprar o seu produto ${prod.name} com meus créditos.`,
-            timestamp: new Date().toISOString(),
-            read: false,
-            type: 'credit_purchase',
-            status: 'pending_vendor_approval'
-          });
-          navigateTo('messages');
-          alert("Sua proposta com Créditos foi enviada ao vendedor!");
-        } catch (e) { alert("Erro ao processar compra."); }
-
-      } else if (type === 'pix') {
-        try {
-          await addDoc(publicMessagesColl(), {
-            sender: currentUserData.username,
-            buyer: currentUserData.username,
-            seller: prod.seller,
-            productName: prod.name,
-            productId: prod.id,
-            price: prod.price,
-            message: `Olá! Quero comprar o seu produto ${prod.name} via PIX.`,
-            timestamp: new Date().toISOString(),
-            read: false,
-            type: 'pix_purchase',
-            status: 'pending_pix_approval'
-          });
-          navigateTo('messages');
-          alert("Sua mensagem para negociação via PIX foi enviada!");
-        } catch (e) { alert("Erro ao processar compra."); }
+        textEl.value = '';
+      } catch (err) {
+        console.error("Error creating post in Firebase:", err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Publish";
       }
     };
 
-    window.acceptCreditSale = async function(msgId, buyerUser, price, prodId) {
-      if (!currentUserData) return;
+    window.deletePost = async function(postId) {
+      if (!confirm("Tem certeza que deseja deletar este post para sempre?")) return;
+      try {
+        await deleteDoc(publicPostDoc(postId));
+      } catch (e) {
+        console.error("Error deleting post:", e);
+      }
+    };
+
+    window.toggleLike = async function(postId) {
+      if (!authUser || !currentUserData) return;
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let likes = post.likes ? [...post.likes] : [];
+      const idx = likes.indexOf(currentUserData.username);
+
+      if (idx === -1) {
+        likes.push(currentUserData.username);
+      } else {
+        likes.splice(idx, 1);
+      }
 
       try {
-        const buyerSnap = await getDoc(publicUserDoc(buyerUser));
-        if (!buyerSnap.exists()) return alert("Comprador não encontrado.");
-
-        const buyerCredits = buyerSnap.data().credits || 0;
-        if (buyerCredits < price) return alert("O comprador não tem mais créditos suficientes!");
-
-        await updateDoc(publicUserDoc(buyerUser), { credits: buyerCredits - price });
-
-        const sellerCredits = currentUserData.credits || 0;
-        await updateDoc(publicUserDoc(currentUserData.username), { credits: sellerCredits + price });
-
-        if (prodId) {
-          await deleteDoc(publicProductDoc(prodId)).catch(() => {});
-        }
-
-        await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
-
-        alert(`Venda aceita! R$ ${price.toFixed(2)} depositados na sua conta. O produto foi removido do Marketplace.`);
-      } catch (e) { alert("Erro ao aceitar venda."); }
+        await updateDoc(publicPostDoc(postId), { likes: likes });
+      } catch (err) {
+        console.error("Error updating likes in Firebase:", err);
+      }
     };
 
-    window.refuseCreditSale = async function(msgId) {
-      if (!confirm("Recusar venda com créditos? O chat será excluído.")) return;
-      try {
-        await deleteDoc(publicMessageDoc(msgId));
-        activeChatKey = null;
-        renderMessages();
-        alert("Pedido recusado e chat apagado.");
-      } catch (e) { alert("Erro ao recusar."); }
-    };
+    window.toggleFollow = async function(targetName) {
+      if (!authUser || !currentUserData) return;
+      if (targetName.toLowerCase() === currentUserData.username.toLowerCase()) return;
 
-    window.acceptPixSale = async function(msgId, prodId) {
-      if (!confirm("Confirmar que a venda por PIX foi realizada? O produto será removido do Marketplace.")) return;
-      try {
-        if (prodId) {
-          await deleteDoc(publicProductDoc(prodId)).catch(() => {});
-        }
-        await updateDoc(publicMessageDoc(msgId), { status: 'approved' });
-        alert("Venda PIX confirmada! O produto foi excluído do Marketplace.");
-      } catch (e) { alert("Erro ao confirmar venda PIX."); }
-    };
-
-    window.cancelPixOrder = async function(msgId) {
-      if (!confirm("Cancelar pedido PIX?")) return;
-      try {
-        await updateDoc(publicMessageDoc(msgId), { status: 'cancelled' });
-        alert("Pedido PIX cancelado.");
-      } catch (e) { alert("Erro ao cancelar."); }
-    };
-
-    window.openDirectMsgModal = function(targetName) {
-      document.getElementById('modal-msg-target-name').innerText = `Mensagem para ${targetName}`;
-      document.getElementById('direct-msg-target-username').value = targetName;
-      document.getElementById('direct-msg-text').value = '';
-      document.getElementById('modal-direct-msg').classList.remove('hidden');
-    };
-
-    window.closeDirectMsgModal = function() {
-      document.getElementById('modal-direct-msg').classList.add('hidden');
-    };
-
-    window.sendDirectMessageFromProfile = async function() {
-      const targetUser = document.getElementById('direct-msg-target-username').value;
-      const text = document.getElementById('direct-msg-text').value.trim();
-      if (!text || !currentUserData) return;
-
-      try {
-        await addDoc(publicMessagesColl(), {
-          sender: currentUserData.username,
-          buyer: currentUserData.username,
-          seller: targetUser,
-          productName: '[Perfil]',
-          message: text,
-          timestamp: new Date().toISOString(),
-          read: false
-        });
-        closeDirectMsgModal();
-        alert(`Mensagem enviada para ${targetUser}!`);
-      } catch (e) { alert("Erro ao enviar mensagem."); }
-    };
-
-    window.toggleFollow = async function(targetUsername) {
-      if (!currentUserData || targetUsername.toLowerCase() === currentUserData.username.toLowerCase()) return;
-
-      const targetKey = targetUsername.toLowerCase();
+      const targetKey = targetName.toLowerCase();
       const targetUser = usersMap[targetKey];
       if (!targetUser) return;
 
@@ -1315,8 +1055,8 @@
       const isFollowing = myFollowing.includes(targetUser.username);
 
       if (isFollowing) {
-        myFollowing = myFollowing.filter(u => u !== targetUser.username);
-        targetFollowers = targetFollowers.filter(u => u !== currentUserData.username);
+        myFollowing = myFollowing.filter(x => x !== targetUser.username);
+        targetFollowers = targetFollowers.filter(x => x !== currentUserData.username);
       } else {
         myFollowing.push(targetUser.username);
         targetFollowers.push(currentUserData.username);
@@ -1325,275 +1065,41 @@
       try {
         await updateDoc(publicUserDoc(currentUserData.username), { following: myFollowing });
         await updateDoc(publicUserDoc(targetUser.username), { followers: targetFollowers });
-      } catch (e) {}
-    };
-
-    const EMOJI_OPTIONS = ['❤️', '😂', '😮', '😢', '😡', '👍', '🔥', '🎉'];
-
-    window.startReactPress = function(e, itemId, type) {
-      e.stopPropagation();
-      isLongPress = false;
-      pressTimer = setTimeout(() => {
-        isLongPress = true;
-        showReactionPicker(itemId, type);
-      }, 500);
-    };
-
-    window.cancelReactPress = function() {
-      if (pressTimer) clearTimeout(pressTimer);
-    };
-
-    window.handleReactClick = function(e, itemId, type) {
-      e.stopPropagation();
-      if (isLongPress) return;
-      toggleReaction(itemId, '❤️', type);
-    };
-
-    function showReactionPicker(itemId, type) {
-      hideAllReactionPickers();
-      const container = document.getElementById(`react-picker-area-${type}-${itemId}`);
-      if (!container) return;
-
-      const picker = document.createElement('div');
-      picker.className = 'reaction-picker';
-      picker.onclick = (e) => e.stopPropagation();
-
-      EMOJI_OPTIONS.forEach(emoji => {
-        const span = document.createElement('span');
-        span.innerText = emoji;
-        span.onclick = (e) => {
-          e.stopPropagation();
-          toggleReaction(itemId, emoji, type);
-          hideAllReactionPickers();
-        };
-        picker.appendChild(span);
-      });
-
-      container.appendChild(picker);
-    }
-
-    window.hideAllReactionPickers = function() {
-      document.querySelectorAll('.reaction-picker').forEach(el => el.remove());
-    };
-
-    window.toggleReaction = async function(itemId, emoji, type) {
-      if (!currentUserData) return;
-
-      const isPost = type === 'post';
-      const targetDoc = isPost ? publicPostDoc(itemId) : publicProductDoc(itemId);
-      const targetList = isPost ? postsList : productsList;
-      const item = targetList.find(i => i.id === itemId);
-
-      if (!item) return;
-
-      let reactions = item.reactions ? { ...item.reactions } : {};
-      const myUser = currentUserData.username;
-
-      if (reactions[myUser] === emoji) {
-        delete reactions[myUser];
-      } else {
-        reactions[myUser] = emoji;
+      } catch (err) {
+        console.error("Error updating follow status in Firebase:", err);
       }
-
-      try {
-        await updateDoc(targetDoc, { reactions });
-      } catch (e) {}
-    };
-
-    function calculateTopReactions(reactionsObj) {
-      if (!reactionsObj) return { top3: [], totalCount: 0, myEmoji: null };
-
-      const myUser = currentUserData ? currentUserData.username : '';
-      const counts = {};
-      let totalCount = 0;
-      let myEmoji = reactionsObj[myUser] || null;
-
-      Object.values(reactionsObj).forEach(emoji => {
-        counts[emoji] = (counts[emoji] || 0) + 1;
-        totalCount++;
-      });
-
-      const sortedEmojis = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
-      const top3 = sortedEmojis.slice(0, 3);
-
-      return { top3, totalCount, myEmoji };
-    }
-
-    // POST IMAGE PREVIEW & SUBMIT
-    document.getElementById('post-image-file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          selectedPostImageBase64 = evt.target.result;
-          document.getElementById('post-img-preview').innerHTML = `<img src="${selectedPostImageBase64}" style="max-width:100%; max-height:180px; border-radius:4px;">`;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    window.submitPost = async function() {
-      if (!currentUserData) return;
-      const textEl = document.getElementById('post-input');
-      const content = textEl.value.trim();
-      const imageUrl = selectedPostImageBase64 || '';
-
-      if (!content && !imageUrl) return alert("Escreva um texto ou adicione uma foto para publicar.");
-
-      if (containsProfanity(content)) {
-        return alert("Erro: O seu post contém palavrões ou termos impróprios e não pode ser publicado publicamente.");
-      }
-
-      try {
-        await addDoc(publicPostsColl(), { 
-          author: currentUserData.username, 
-          content, 
-          imageUrl, 
-          timestamp: new Date().toISOString(), 
-          reactions: {}, 
-          comments: [] 
-        });
-        textEl.value = '';
-        selectedPostImageBase64 = null;
-        document.getElementById('post-image-file').value = '';
-        document.getElementById('post-img-preview').innerHTML = '';
-      } catch (e) {}
-    };
-
-    window.deletePost = async function(postId) {
-      if (!confirm("Apagar post?")) return;
-      try { await deleteDoc(publicPostDoc(postId)); } catch (e) {}
-    };
-
-    window.toggleCommentBox = function(postId) {
-      const box = document.getElementById(`comments-box-${postId}`);
-      if (box) box.classList.toggle('hidden');
-    };
-
-    window.addComment = async function(postId) {
-      if (!currentUserData) return;
-      const input = document.getElementById(`comment-input-${postId}`);
-      const text = input.value.trim();
-      if (!text) return;
-
-      if (containsProfanity(text)) {
-        return alert("Erro: O seu comentário contém palavrões e não pode ser publicado.");
-      }
-
-      const post = postsList.find(p => p.id === postId);
-      if (!post) return;
-
-      let comments = post.comments ? [...post.comments] : [];
-      comments.push({
-        id: 'c_' + Date.now(),
-        author: currentUserData.username,
-        text: text,
-        timestamp: new Date().toISOString()
-      });
-
-      try {
-        await updateDoc(publicPostDoc(postId), { comments });
-        input.value = '';
-      } catch (e) {}
-    };
-
-    window.deleteComment = async function(postId, commentId) {
-      if (!currentUserData) return;
-      const post = postsList.find(p => p.id === postId);
-      if (!post) return;
-
-      let comments = post.comments ? post.comments.filter(c => c.id !== commentId) : [];
-      try { await updateDoc(publicPostDoc(postId), { comments }); } catch (e) {}
     };
 
     function buildPostCard(post) {
-      const authorObj = usersMap[post.author.toLowerCase()];
+      const authorKey = post.author ? post.author.toLowerCase() : '';
+      const authorObj = usersMap[authorKey];
       const isBot = authorObj && authorObj.isBot;
-      const isVerified = authorObj && authorObj.verified;
+      const isLiked = post.likes && currentUserData && post.likes.includes(currentUserData.username);
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
       const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(post.author);
-      const comments = post.comments || [];
-
-      const { top3, totalCount, myEmoji } = calculateTopReactions(post.reactions);
 
       const div = document.createElement('div');
-      div.className = isVerified ? 'card verified-post' : 'card';
+      div.className = 'post-card';
       div.innerHTML = `
-        <div class="item-header">
-          <div class="author-container" onclick="navigateTo('profile', '${escapeStr(post.author)}')">
-            ${renderAvatar(authorObj, 'small')}
-            <div>
-              <span class="author-name">${escapeHtml(post.author)}</span>
-              ${isVerified ? '<span style="font-size:14px; margin-left:2px;" title="Verificado">✅</span>' : ''}
-              ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
-            </div>
+        <div class="post-header">
+          <div class="author-info">
+            <span class="author-name" onclick="viewProfile('${escapeStr(post.author)}')">${escapeHtml(post.author)}</span>
+            ${isBot ? `<span class="bot-badge">[BOT]</span>` : ''}
+            <span class="post-date">• ${formatTime(post.timestamp)}</span>
           </div>
-          <div>
-            <span class="item-date">${new Date(post.timestamp).toLocaleString()}</span>
-            ${isSelf ? `<button onclick="deletePost('${post.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
-          </div>
-        </div>
-        ${post.content ? `<div class="item-content">${escapeHtml(post.content)}</div>` : ''}
-        ${post.imageUrl ? `<img src="${escapeHtml(post.imageUrl)}" class="post-img">` : ''}
-        
-        <div style="display:flex; gap:12px; margin-bottom:8px; align-items:center; position:relative;">
-          <div id="react-picker-area-post-${post.id}" style="position:relative;"></div>
-          <button 
-            onmousedown="startReactPress(event, '${post.id}', 'post')" 
-            onmouseup="cancelReactPress()" 
-            mouseleave="cancelReactPress()" 
-            ontouchstart="startReactPress(event, '${post.id}', 'post')" 
-            ontouchend="cancelReactPress()"
-            onclick="handleReactClick(event, '${post.id}', 'post')"
-          >
-            ${myEmoji ? `${myEmoji} Curtido` : '♡ Curtir'}
-          </button>
-          
-          <span style="font-size:13px; color:#5f6368; cursor:default;">
-            ${top3.join('')} <strong>${totalCount}</strong>
-          </span>
-
-          <button onclick="toggleCommentBox('${post.id}')">
-            💬 Comentários (${comments.length})
-          </button>
-
-          ${!isSelf && !isBot ? `
-            <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size:11px; padding:2px 8px; margin-left:auto;">
-              ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
+          ${!isSelf ? `
+            <button onclick="toggleFollow('${escapeStr(post.author)}')" style="font-size: 12px; padding: 4px 8px;">
+              ${isFollowing ? 'Unfollow' : 'Follow'}
             </button>
-          ` : ''}
+          ` : `
+            <button onclick="deletePost('${post.id}')" class="btn-danger" style="font-size: 11px; padding: 3px 6px;">Excluir</button>
+          `}
         </div>
-
-        <div id="comments-box-${post.id}" class="comments-section hidden">
-          <div style="display:flex; gap:6px; margin-bottom:8px;">
-            <input type="text" id="comment-input-${post.id}" placeholder="Escreva um comentário..." dir="ltr" style="margin-bottom:0;">
-            <button class="btn-primary" onclick="addComment('${post.id}')">Enviar</button>
-          </div>
-          <div id="comments-list-${post.id}">
-            ${comments.length === 0 ? '<p style="color:#70757a; font-size:12px;">Sem comentários ainda.</p>' : ''}
-            ${comments.map(c => {
-              const cAuthorObj = usersMap[c.author.toLowerCase()];
-              const cVerified = cAuthorObj && cAuthorObj.verified;
-              return `
-              <div class="comment-item">
-                <div class="comment-header">
-                  <div style="display:flex; align-items:center; gap:6px;">
-                    ${renderAvatar(cAuthorObj, 'small')}
-                    <strong>${escapeHtml(c.author)}</strong>
-                    ${cVerified ? '<span style="font-size:12px; margin-left:2px;">✅</span>' : ''}
-                  </div>
-                  <div>
-                    <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
-                    ${currentUserData && c.author.toLowerCase() === currentUserData.username.toLowerCase() ? `
-                      <button onclick="deleteComment('${post.id}', '${c.id}')" style="font-size:10px; padding:1px 4px; color:#d93025; border:none; background:none; cursor:pointer;">✕ Apagar</button>
-                    ` : ''}
-                  </div>
-                </div>
-                <div style="margin-top:4px;">${escapeHtml(c.text)}</div>
-              </div>
-            `;
-            }).join('')}
-          </div>
+        <div class="post-content">${escapeHtml(post.content)}</div>
+        <div class="post-footer">
+          <button onclick="toggleLike('${post.id}')" style="font-size: 13px;">
+            ${isLiked ? '♥ Liked' : '♡ Like'} (${post.likes ? post.likes.length : 0})
+          </button>
         </div>
       `;
       return div;
@@ -1601,361 +1107,349 @@
 
     function renderFeed() {
       const list = document.getElementById('feed-list');
-      list.innerHTML = postsList.length === 0 ? '<p style="color:#70757a;">Sem posts.</p>' : '';
+      list.innerHTML = '';
+
+      if (postsList.length === 0) {
+        list.innerHTML = '<p style="color:#70757a;">No posts in Firebase yet.</p>';
+        return;
+      }
+
       postsList.forEach(p => list.appendChild(buildPostCard(p)));
     }
 
-    document.getElementById('prod-image-file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          selectedImageBase64 = evt.target.result;
-          document.getElementById('prod-img-preview').innerHTML = `<img src="${selectedImageBase64}" style="max-width:100%; max-height:150px; border-radius:4px;">`;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+    /* IMAGE UPLOAD FUNCTION WITH BASE64 FALLBACK */
+    async function processImageUpload(file) {
+      return new Promise((resolve) => {
+        // First try Cloudinary upload
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-    window.openCreateProductModal = function() {
-      document.getElementById('modal-product-title').innerText = 'Criar Produto';
-      document.getElementById('prod-edit-id').value = '';
-      document.getElementById('prod-name').value = '';
-      document.getElementById('prod-price').value = '';
-      document.getElementById('prod-category').value = 'Electronics';
-      document.getElementById('prod-condition').value = 'New';
-      document.getElementById('prod-location').value = '';
-      document.getElementById('prod-availability').value = 'Single Item';
-      document.getElementById('prod-delivery').value = 'Local Pickup';
-      document.getElementById('prod-tags').value = '';
-      document.getElementById('prod-desc').value = '';
-      document.getElementById('prod-image-file').value = '';
-      document.getElementById('prod-img-preview').innerHTML = '';
-      selectedImageBase64 = null;
-      document.getElementById('modal-product').classList.remove('hidden');
-    };
-
-    window.closeProductModal = function() { document.getElementById('modal-product').classList.add('hidden'); };
-
-    window.saveProduct = async function() {
-      const name = document.getElementById('prod-name').value.trim();
-      const price = parseFloat(document.getElementById('prod-price').value);
-      const category = document.getElementById('prod-category').value;
-      const condition = document.getElementById('prod-condition').value;
-      const location = document.getElementById('prod-location').value.trim();
-      const availability = document.getElementById('prod-availability').value;
-      const delivery = document.getElementById('prod-delivery').value;
-      const tags = document.getElementById('prod-tags').value.trim();
-      const desc = document.getElementById('prod-desc').value.trim();
-      const editId = document.getElementById('prod-edit-id').value;
-      const fileInput = document.getElementById('prod-image-file');
-
-      if (!name || isNaN(price) || !location) return alert("Please fill Title, Price and Location.");
-
-      if (containsProfanity(name) || containsProfanity(desc)) {
-        return alert("Erro: O título ou a descrição do produto contêm palavrões ou termos impróprios. Por favor, corrija.");
-      }
-
-      let imageUrl = selectedImageBase64 || '';
-
-      const productPayload = {
-        seller: currentUserData.username,
-        name, price, category, condition, location, availability, delivery, tags, description: desc, imageUrl, reactions: {},
-        timestamp: new Date().toISOString()
-      };
-
-      try {
-        if (editId) {
-          await updateDoc(publicProductDoc(editId), productPayload);
-        } else {
-          await addDoc(publicProductsColl(), productPayload);
-        }
-        closeProductModal();
-      } catch (e) { alert("Erro ao salvar produto."); }
-    };
-
-    window.deleteProduct = async function(id) {
-      if (!confirm("Apagar produto?")) return;
-      try { await deleteDoc(publicProductDoc(id)); } catch (e) {}
-    };
-
-    window.openReportModal = function(prodId, prodName, sellerName) {
-      document.getElementById('report-prod-id').value = prodId;
-      document.getElementById('report-prod-name').value = prodName;
-      document.getElementById('report-seller-name').value = sellerName;
-      document.getElementById('report-category').value = 'Conteúdo Sexual';
-      document.getElementById('report-other-text').value = '';
-      toggleReportOtherText();
-      document.getElementById('modal-report').classList.remove('hidden');
-    };
-
-    window.closeReportModal = function() { document.getElementById('modal-report').classList.add('hidden'); };
-
-    window.toggleReportOtherText = function() {
-      const cat = document.getElementById('report-category').value;
-      document.getElementById('report-other-container').classList.toggle('hidden', cat !== 'Outros');
-    };
-
-    window.submitReport = async function() {
-      const prodId = document.getElementById('report-prod-id').value;
-      const productName = document.getElementById('report-prod-name').value;
-      const seller = document.getElementById('report-seller-name').value;
-      const category = document.getElementById('report-category').value;
-      const otherText = document.getElementById('report-other-text').value.trim();
-
-      const reason = category === 'Outros' ? otherText : category;
-      if (!reason) return alert("Por favor explique o motivo da denúncia.");
-
-      try {
-        await addDoc(publicReportsColl(), {
-          productId: prodId, productName, seller,
-          reporter: currentUserData.username, reason,
-          timestamp: new Date().toISOString(), banned: false
+        fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => {
+          if (!res.ok) throw new Error("Cloudinary error response");
+          return res.json();
+        })
+        .then(data => {
+          if (data.secure_url) {
+            resolve(data.secure_url);
+          } else {
+            throw new Error("No URL returned");
+          }
+        })
+        .catch(() => {
+          // Fallback to local DataURL / Base64 if Cloudinary fails
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => resolve(`https://placehold.co/400x300/e0e0e0/555555?text=Uploaded+Item`);
+          reader.readAsDataURL(file);
         });
-        closeReportModal();
-        alert("Sua denúncia foi feita. Aguarde no máximo de 2 a 7 dias para analisarmos da sua denúncia.");
-      } catch (e) { alert("Erro ao enviar denúncia."); }
-    };
-
-    function buildProductCard(prod) {
-      const sellerObj = usersMap[prod.seller.toLowerCase()];
-      const sellerVerified = sellerObj && sellerObj.verified;
-      const isSelf = currentUserData && prod.seller.toLowerCase() === currentUserData.username.toLowerCase();
-      const { top3, totalCount, myEmoji } = calculateTopReactions(prod.reactions);
-
-      const div = document.createElement('div');
-      div.className = 'card';
-      div.innerHTML = `
-        <div class="item-header">
-          <div class="author-container" onclick="navigateTo('profile', '${escapeStr(prod.seller)}')">
-            ${renderAvatar(sellerObj, 'small')}
-            <span class="author-name">Vendedor: ${escapeHtml(prod.seller)} ${sellerVerified ? '✅' : ''}</span>
-          </div>
-          <span class="item-date">${new Date(prod.timestamp).toLocaleDateString()}</span>
-        </div>
-        ${prod.imageUrl ? `<img src="${escapeHtml(prod.imageUrl)}" class="product-img">` : ''}
-        <h3>${escapeHtml(prod.name)}</h3>
-        <div class="product-price">€ / R$ ${prod.price.toFixed(2)}</div>
-        <div style="font-size: 12px; color: #5f6368; margin-bottom: 6px;">
-          🏷️ <strong>Category:</strong> ${escapeHtml(prod.category || 'General')} | <strong>Condition:</strong> ${escapeHtml(prod.condition || 'New')}
-        </div>
-        <div class="product-location">📍 ${escapeHtml(prod.location)} (${escapeHtml(prod.delivery || 'Local Pickup')})</div>
-        <p class="item-content" style="margin-top:6px;">${escapeHtml(prod.description)}</p>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-          <div style="display:flex; gap:8px; align-items:center;">
-            ${!isSelf ? `
-              <button class="btn-primary" onclick="openBuyTypeModal('${prod.id}')">Comprar</button>
-            ` : `
-              <button class="btn-danger" onclick="deleteProduct('${prod.id}')">Apagar</button>
-            `}
-
-            <div id="react-picker-area-prod-${prod.id}" style="position:relative;"></div>
-            <button 
-              onmousedown="startReactPress(event, '${prod.id}', 'prod')" 
-              onmouseup="cancelReactPress()" 
-              mouseleave="cancelReactPress()" 
-              ontouchstart="startReactPress(event, '${prod.id}', 'prod')" 
-              ontouchend="cancelReactPress()"
-              onclick="handleReactClick(event, '${prod.id}', 'prod')"
-            >
-              ${myEmoji ? `${myEmoji} Curtido` : '♡ Curtir'}
-            </button>
-
-            <span style="font-size:13px; color:#5f6368; cursor:default;">
-              ${top3.join('')} <strong>${totalCount}</strong>
-            </span>
-          </div>
-
-          ${!isSelf ? `<button class="btn-warning" onclick="openReportModal('${prod.id}', '${escapeStr(prod.name)}', '${escapeStr(prod.seller)}')">⚠️ Denunciar</button>` : ''}
-        </div>
-      `;
-      return div;
+      });
     }
 
-    function renderMarketplace() {
-      const list = document.getElementById('marketplace-list');
-      list.innerHTML = productsList.length === 0 ? '<p style="color:#70757a;">Nenhum produto no Marketplace.</p>' : '';
-      productsList.forEach(p => list.appendChild(buildProductCard(p)));
-    }
-
-    window.switchMsgTab = function(tab) {
-      activeMsgSubTab = tab;
-      document.getElementById('msg-tab-profile').classList.toggle('active', tab === 'profile');
-      document.getElementById('msg-tab-marketplace').classList.toggle('active', tab === 'marketplace');
-      renderMessages();
+    /* IMAGE PREVIEW */
+    window.previewSelectedImage = function(input) {
+      const previewBox = document.getElementById('prod-img-preview');
+      previewBox.innerHTML = '';
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewBox.innerHTML = `<img src="${e.target.result}" style="max-height: 120px; border-radius: 6px; border: 1px solid #dadce0;">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
     };
 
-    function renderMessages() {
-      const convListDiv = document.getElementById('messages-conversations-list');
-      const chatViewDiv = document.getElementById('messages-chat-view');
+    /* MARKETPLACE & PRODUCT FUNCTIONS */
+    window.openCreateProductModal = function(editId = null) {
+      const modal = document.getElementById('modal-product-form');
+      const title = document.getElementById('product-form-title');
+      const form = document.getElementById('form-product');
+      
+      form.reset();
+      document.getElementById('product-edit-id').value = '';
+      document.getElementById('prod-img-preview').innerHTML = '';
+      document.getElementById('prod-existing-image').value = '';
 
-      if (activeChatKey) {
-        convListDiv.classList.add('hidden');
-        chatViewDiv.classList.remove('hidden');
-        renderChatView(activeChatKey);
-        return;
+      if (editId) {
+        const prod = productsList.find(p => p.id === editId);
+        if (prod) {
+          title.innerText = "Editar Produto";
+          document.getElementById('product-edit-id').value = prod.id;
+          document.getElementById('prod-name').value = prod.name;
+          document.getElementById('prod-price').value = prod.price;
+          document.getElementById('prod-desc').value = prod.description;
+          document.getElementById('prod-location').value = prod.location;
+          document.getElementById('prod-existing-image').value = prod.imageUrl || '';
+          if (prod.imageUrl) {
+            document.getElementById('prod-img-preview').innerHTML = `<img src="${prod.imageUrl}" style="max-height: 120px; border-radius: 6px; border: 1px solid #dadce0;">`;
+          }
+        }
+      } else {
+        title.innerText = "Criar Produto";
       }
 
-      convListDiv.classList.remove('hidden');
-      chatViewDiv.classList.add('hidden');
-      convListDiv.innerHTML = '';
+      modal.classList.remove('hidden');
+    };
 
+    window.closeProductModal = function() {
+      document.getElementById('modal-product-form').classList.add('hidden');
+    };
+
+    window.handleProductSubmit = async function(e) {
+      e.preventDefault();
       if (!currentUserData) return;
 
-      const userMsgs = messagesList.filter(m => 
-        m.seller.toLowerCase() === currentUserData.username.toLowerCase() || 
-        m.buyer.toLowerCase() === currentUserData.username.toLowerCase()
-      );
+      const editId = document.getElementById('product-edit-id').value;
+      const name = document.getElementById('prod-name').value.trim();
+      const price = parseFloat(document.getElementById('prod-price').value);
+      const description = document.getElementById('prod-desc').value.trim();
+      const location = document.getElementById('prod-location').value.trim();
+      const fileInput = document.getElementById('prod-file');
+      const existingImg = document.getElementById('prod-existing-image').value;
+      const btn = document.getElementById('btn-save-product');
 
-      const filteredMsgs = userMsgs.filter(m => {
-        const isProfileMsg = m.productName === '[Perfil]';
-        return activeMsgSubTab === 'profile' ? isProfileMsg : !isProfileMsg;
-      });
+      btn.disabled = true;
+      btn.innerText = "Salvando...";
 
-      const groups = {};
-      filteredMsgs.forEach(m => {
-        const otherUser = m.seller.toLowerCase() === currentUserData.username.toLowerCase() ? m.buyer : m.seller;
-        const key = `${m.productName}___${otherUser.toLowerCase()}`;
-        if (!groups[key]) groups[key] = { productName: m.productName, otherUser: otherUser, lastMsg: m, msgs: [] };
-        groups[key].msgs.push(m);
-        groups[key].lastMsg = m;
-      });
+      try {
+        let imageUrl = existingImg || `https://placehold.co/400x300/e0e0e0/555555?text=${encodeURIComponent(name)}`;
 
-      const keys = Object.keys(groups);
-      if (keys.length === 0) {
-        convListDiv.innerHTML = `<p style="color:#70757a;">Nenhuma conversa em ${activeMsgSubTab === 'profile' ? 'Mensagens de Perfis' : 'Mensagens do Marketplace'}.</p>`;
+        if (fileInput.files && fileInput.files[0]) {
+          btn.innerText = "Enviando imagem...";
+          imageUrl = await processImageUpload(fileInput.files[0]);
+        }
+
+        const productData = {
+          seller: currentUserData.username,
+          name,
+          price,
+          description,
+          location,
+          imageUrl,
+          timestamp: new Date().toISOString()
+        };
+
+        if (editId) {
+          await updateDoc(publicProductDoc(editId), productData);
+        } else {
+          await addDoc(publicProductsColl(), productData);
+        }
+
+        closeProductModal();
+      } catch (err) {
+        console.error("Error saving product:", err);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Salvar Produto";
+      }
+    };
+
+    window.deleteProduct = async function(prodId) {
+      if (!confirm("Deseja deletar este produto permanentemente?")) return;
+      try {
+        await deleteDoc(publicProductDoc(prodId));
+      } catch (err) {
+        console.error("Error deleting product:", err);
+      }
+    };
+
+    window.buyProduct = async function(prodId) {
+      if (!currentUserData) return;
+      const prod = productsList.find(p => p.id === prodId);
+      if (!prod) return;
+
+      if (prod.seller.toLowerCase() === currentUserData.username.toLowerCase()) {
+        alert("Você não pode comprar seu próprio produto!");
         return;
       }
 
-      keys.forEach(k => {
-        const g = groups[k];
-        const myUser = currentUserData.username.toLowerCase();
-        const otherObj = usersMap[g.otherUser.toLowerCase()];
-        
-        const hasUnread = g.msgs.some(m => {
-          const sender = (m.sender || m.buyer || '').toLowerCase();
-          return sender !== myUser && !m.read;
-        });
-
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.style.cssText = 'cursor:pointer; position:relative;';
-        div.onclick = () => openChatView(k);
-        div.innerHTML = `
-          <div class="item-header">
-            <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : (g.productName.startsWith('Créditos') ? `💳 ${escapeHtml(g.productName)}` : `📦 Produto: ${escapeHtml(g.productName)}`)}</h3>
-            <span class="item-date">${new Date(g.lastMsg.timestamp).toLocaleTimeString()}</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-            ${renderAvatar(otherObj, 'small')}
-            <p style="font-size: 13px; color: #5f6368; margin:0;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
-          </div>
-          <p style="font-size: 13px; margin-top: 6px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message)}"</p>
-        `;
-        convListDiv.appendChild(div);
-      });
-    }
-
-    function openChatView(key) { activeChatKey = key; renderMessages(); }
-    window.closeChatView = function() { activeChatKey = null; renderMessages(); };
-
-    function renderChatView(key) {
-      const parts = key.split('___');
-      const prodName = parts[0];
-      const otherUser = parts[1];
-
-      document.getElementById('chat-title').innerText = prodName === '[Perfil]' ? `Conversa Direta com ${otherUser}` : `${prodName} (com ${otherUser})`;
-
-      const chatMsgs = messagesList.filter(m => {
-        const isUserMatch = (m.seller.toLowerCase() === currentUserData.username.toLowerCase() && m.buyer.toLowerCase() === otherUser) ||
-                            (m.buyer.toLowerCase() === currentUserData.username.toLowerCase() && m.seller.toLowerCase() === otherUser);
-        return m.productName === prodName && isUserMatch;
-      });
-
-      const banner = document.getElementById('chat-action-banner');
-      banner.innerHTML = '';
-      banner.classList.add('hidden');
-
-      const lastMsgWithAction = chatMsgs.find(m => m.status && m.status.startsWith('pending'));
-      if (lastMsgWithAction) {
-        const myName = currentUserData.username.toLowerCase();
-
-        if (lastMsgWithAction.status === 'pending_credits' && myName === 'arnos') {
-          banner.classList.remove('hidden');
-          banner.innerHTML = `
-            <span><strong>Pedido de Créditos:</strong> ${lastMsgWithAction.buyer} quer comprar ${lastMsgWithAction.creditAmount} créditos.</span>
-            <button class="btn-success" onclick="approveCreditsOrder('${lastMsgWithAction.id}', '${lastMsgWithAction.buyer}', ${lastMsgWithAction.creditAmount})">Pedido Feito</button>
-          `;
-        } 
-        else if (lastMsgWithAction.status === 'pending_vendor_approval' && lastMsgWithAction.seller.toLowerCase() === myName) {
-          banner.classList.remove('hidden');
-          banner.innerHTML = `
-            <span><strong>Proposta com Créditos:</strong> Valor R$ ${lastMsgWithAction.price.toFixed(2)}</span>
-            <div style="display:flex; gap:6px;">
-              <button class="btn-success" onclick="acceptCreditSale('${lastMsgWithAction.id}', '${lastMsgWithAction.buyer}', ${lastMsgWithAction.price}, '${lastMsgWithAction.productId}')">Aceitar Crédito</button>
-              <button class="btn-danger" onclick="refuseCreditSale('${lastMsgWithAction.id}')">Recusar</button>
-            </div>
-          `;
-        }
-        else if (lastMsgWithAction.status === 'pending_pix_approval' && lastMsgWithAction.seller.toLowerCase() === myName) {
-          banner.classList.remove('hidden');
-          banner.innerHTML = `
-            <span><strong>Proposta via PIX:</strong> Confirmar venda por PIX?</span>
-            <div style="display:flex; gap:6px;">
-              <button class="btn-success" onclick="acceptPixSale('${lastMsgWithAction.id}', '${lastMsgWithAction.productId}')">Aceitar Venda PIX</button>
-              <button class="btn-danger" onclick="cancelPixOrder('${lastMsgWithAction.id}')">Cancelar Pedido</button>
-            </div>
-          `;
-        }
-      }
-
-      const container = document.getElementById('chat-bubbles');
-      container.innerHTML = '';
-
-      chatMsgs.forEach(m => {
-        const myUser = currentUserData.username.toLowerCase();
-        const senderName = m.sender || (m.buyer.toLowerCase() === myUser ? currentUserData.username : otherUser);
-        const isMine = senderName.toLowerCase() === myUser;
-
-        if (!isMine && !m.read) {
-          updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
-        }
-
-        const bubble = document.createElement('div');
-        bubble.className = `chat-bubble ${isMine ? 'mine' : 'other'}`;
-        bubble.innerHTML = `
-          ${!isMine ? `<span class="chat-sender-tag">${escapeHtml(senderName)}</span>` : ''}
-          ${escapeHtml(m.message)}
-        `;
-        container.appendChild(bubble);
-      });
-
-      container.scrollTop = container.scrollHeight;
-    }
-
-    window.sendChatMessage = async function() {
-      const input = document.getElementById('chat-input');
-      const msg = input.value.trim();
-      if (!msg || !activeChatKey) return;
-
-      const parts = activeChatKey.split('___');
-      const prodName = parts[0];
-      const otherUser = parts[1];
+      const msgText = `I want to buy your product: ${prod.name}`;
 
       try {
         await addDoc(publicMessagesColl(), {
-          sender: currentUserData.username,
-          buyer: currentUserData.username, 
-          seller: otherUser,
-          productName: prodName, 
-          message: msg,
-          timestamp: new Date().toISOString(), 
+          buyer: currentUserData.username,
+          seller: prod.seller,
+          productName: prod.name,
+          productId: prod.id,
+          message: msgText,
+          timestamp: new Date().toISOString(),
           read: false
         });
-        input.value = '';
-      } catch (e) {}
+
+        alert("Mensagem de compra enviada ao vendedor!");
+      } catch (e) {
+        console.error("Error sending buy request:", e);
+      }
     };
+
+    function buildProductCard(prod) {
+      const isSelf = currentUserData && prod.seller.toLowerCase() === currentUserData.username.toLowerCase();
+
+      const card = document.createElement('div');
+      card.className = 'product-card-item';
+      card.innerHTML = `
+        <img src="${prod.imageUrl || 'https://placehold.co/400x300'}" class="product-img" onerror="this.src='https://placehold.co/400x300/dadce0/333?text=No+Image'">
+        <div class="product-body">
+          <div class="product-title">${escapeHtml(prod.name)}</div>
+          <div class="product-price">R$ ${prod.price ? prod.price.toFixed(2) : '0.00'}</div>
+          <div class="product-meta">📍 ${escapeHtml(prod.location || 'N/A')} • Vendedor: <span class="author-name" onclick="viewProfile('${escapeStr(prod.seller)}')">${escapeHtml(prod.seller)}</span></div>
+          <div class="product-desc">${escapeHtml(prod.description)}</div>
+          <div style="margin-top: auto; display: flex; gap: 8px;">
+            ${!isSelf ? `
+              <button onclick="buyProduct('${prod.id}')" class="btn-primary" style="flex:1;">Comprar</button>
+            ` : `
+              <button onclick="openCreateProductModal('${prod.id}')" style="flex:1;">Editar</button>
+              <button onclick="deleteProduct('${prod.id}')" class="btn-danger">Excluir</button>
+            `}
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+    function renderMarketplace() {
+      const grid = document.getElementById('marketplace-grid');
+      grid.innerHTML = '';
+
+      if (productsList.length === 0) {
+        grid.innerHTML = '<p style="color:#70757a; grid-column: 1/-1;">Nenhum produto cadastrado no Marketplace ainda.</p>';
+        return;
+      }
+
+      productsList.forEach(p => grid.appendChild(buildProductCard(p)));
+    }
+
+    window.openMessagesModal = async function() {
+      const modal = document.getElementById('modal-messages');
+      const body = document.getElementById('messages-list-body');
+      body.innerHTML = '';
+
+      if (!currentUserData) return;
+
+      const myName = currentUserData.username.toLowerCase();
+      const userMessages = messagesList.filter(
+        m => m.seller.toLowerCase() === myName || m.buyer.toLowerCase() === myName
+      );
+
+      if (userMessages.length === 0) {
+        body.innerHTML = '<p style="color:#70757a; text-align:center;">Nenhuma mensagem de Marketplace encontrada.</p>';
+      } else {
+        userMessages.forEach(msg => {
+          const isIncoming = msg.seller.toLowerCase() === myName;
+          const item = document.createElement('div');
+          item.className = `message-item ${isIncoming && !msg.read ? 'unread' : ''}`;
+          item.innerHTML = `
+            <div style="font-weight: bold; font-size: 13px; color: #1a73e8;">
+              ${isIncoming ? `De: ${escapeHtml(msg.buyer)}` : `Para: ${escapeHtml(msg.seller)}`}
+            </div>
+            <div style="font-size: 14px; margin: 4px 0;">"${escapeHtml(msg.message)}"</div>
+            <div style="font-size: 11px; color: #70757a;">${formatTime(msg.timestamp)}</div>
+          `;
+          body.appendChild(item);
+
+          if (isIncoming && !msg.read) {
+            updateDoc(publicMessageDoc(msg.id), { read: true });
+          }
+        });
+      }
+
+      modal.classList.remove('hidden');
+    };
+
+    window.closeMessagesModal = function() {
+      document.getElementById('modal-messages').classList.add('hidden');
+    };
+
+    window.viewProfile = function(name) {
+      navigateTo('profile', name);
+    };
+
+    window.switchProfileTab = function(tab) {
+      activeProfileTab = tab;
+      const postsListEl = document.getElementById('profile-posts-list');
+      const vitrineGridEl = document.getElementById('profile-vitrine-grid');
+      const btnPosts = document.getElementById('profile-tab-posts');
+      const btnVitrine = document.getElementById('profile-tab-vitrine');
+
+      if (tab === 'posts') {
+        postsListEl.classList.remove('hidden');
+        vitrineGridEl.classList.add('hidden');
+        btnPosts.classList.add('active');
+        btnVitrine.classList.remove('active');
+      } else {
+        postsListEl.classList.add('hidden');
+        vitrineGridEl.classList.remove('hidden');
+        btnVitrine.classList.add('active');
+        btnPosts.classList.remove('active');
+      }
+    };
+
+    function renderProfile(name) {
+      const userKey = name.toLowerCase();
+      const user = usersMap[userKey];
+      
+      if (!user) {
+        document.getElementById('profile-name-display').innerText = name;
+        document.getElementById('profile-dob-display').innerText = "User not found";
+        document.getElementById('profile-posts-list').innerHTML = '';
+        return;
+      }
+
+      const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
+      const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(user.username);
+
+      document.getElementById('profile-name-display').innerText = user.username;
+      const botTag = document.getElementById('profile-bot-tag');
+      if (user.isBot) botTag.classList.remove('hidden');
+      else botTag.classList.add('hidden');
+
+      document.getElementById('profile-dob-display').innerText = "Born: " + (user.dob || 'N/A');
+
+      const userPosts = postsList.filter(p => p.author && p.author.toLowerCase() === userKey);
+      const userProducts = productsList.filter(p => p.seller && p.seller.toLowerCase() === userKey);
+
+      document.getElementById('stat-posts').innerText = userPosts.length;
+      document.getElementById('stat-products').innerText = userProducts.length;
+      document.getElementById('stat-followers').innerText = user.followers ? user.followers.length : 0;
+      document.getElementById('stat-following').innerText = user.following ? user.following.length : 0;
+
+      const actionArea = document.getElementById('profile-action-btn-area');
+      actionArea.innerHTML = '';
+      
+      if (!isSelf) {
+        const btn = document.createElement('button');
+        btn.innerText = isFollowing ? 'Unfollow' : 'Follow';
+        btn.onclick = () => toggleFollow(user.username);
+        if (!isFollowing) btn.className = 'btn-primary';
+        actionArea.appendChild(btn);
+      } else {
+        const btn = document.createElement('button');
+        btn.innerText = "Criar produto";
+        btn.className = "btn-primary";
+        btn.onclick = () => openCreateProductModal();
+        actionArea.appendChild(btn);
+      }
+
+      const postsEl = document.getElementById('profile-posts-list');
+      postsEl.innerHTML = '';
+      if (userPosts.length === 0) {
+        postsEl.innerHTML = '<p style="color:#70757a;">Nenhum post publicado.</p>';
+      } else {
+        userPosts.forEach(p => postsEl.appendChild(buildPostCard(p)));
+      }
+
+      const vitrineEl = document.getElementById('profile-vitrine-grid');
+      vitrineEl.innerHTML = '';
+      if (userProducts.length === 0) {
+        vitrineEl.innerHTML = '<p style="color:#70757a; grid-column: 1/-1;">Nenhum produto à venda na vitrine.</p>';
+      } else {
+        userProducts.forEach(p => vitrineEl.appendChild(buildProductCard(p)));
+      }
+    }
 
     window.openUserListModal = function(type) {
       if (!currentProfileUsername) return;
@@ -1979,21 +1473,20 @@
           const uObj = usersMap[name.toLowerCase()];
           const uVerified = uObj && uObj.verified;
 
-          const div = document.createElement('div');
-          div.style.cssText = 'border:1px solid #dadce0; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;';
-          div.innerHTML = `
-            <div style="display:flex; align-items:center; gap:8px;">
+          const row = document.createElement('div');
+          row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #eee;';
+          row.innerHTML = `
+            <div class="author-container" onclick="closeUserListModal(); navigateTo('profile', '${escapeStr(name)}')">
               ${renderAvatar(uObj, 'small')}
-              <span class="author-name" onclick="closeUserListModal(); navigateTo('profile', '${escapeStr(name)}')">${escapeHtml(name)}</span>
-              ${uVerified ? '✅' : ''}
+              <span class="author-name">${escapeHtml(name)} ${uVerified ? '✅' : ''}</span>
             </div>
             ${!isSelf ? `
-              <button onclick="toggleFollow('${escapeStr(name)}')" style="font-size:12px;">
+              <button onclick="toggleFollow('${escapeStr(name)}'); openUserListModal('${type}');" style="font-size:11px; padding:2px 8px;">
                 ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
               </button>
             ` : ''}
           `;
-          bodyEl.appendChild(div);
+          bodyEl.appendChild(row);
         });
       }
 
@@ -2004,173 +1497,202 @@
       document.getElementById('modal-user-list').classList.add('hidden');
     };
 
+    // SEARCH & TABS
+    let activeSearchTab = 'profiles';
+
+    document.getElementById('search-input').addEventListener('input', function(e) {
+      const q = e.target.value.trim();
+      if (q.length > 0) {
+        navigateTo('search', q);
+      } else {
+        navigateTo('feed');
+      }
+    });
+
     window.switchSearchTab = function(tab) {
+      activeSearchTab = tab;
+      document.getElementById('tab-btn-profiles').classList.toggle('active', tab === 'profiles');
+      document.getElementById('tab-btn-posts').classList.toggle('active', tab === 'posts');
+      document.getElementById('tab-btn-products').classList.toggle('active', tab === 'products');
+
       document.getElementById('search-results-profiles').classList.toggle('hidden', tab !== 'profiles');
       document.getElementById('search-results-posts').classList.toggle('hidden', tab !== 'posts');
       document.getElementById('search-results-products').classList.toggle('hidden', tab !== 'products');
     };
 
     function renderSearch(query) {
+      const qLower = query.toLowerCase();
       document.getElementById('search-query-text').innerText = query;
-      const q = query.toLowerCase();
 
-      const matchedUsers = Object.keys(usersMap).filter(k => k.includes(q));
-      document.getElementById('count-profiles').innerText = matchedUsers.length;
-      const profDiv = document.getElementById('search-results-profiles');
-      profDiv.innerHTML = matchedUsers.length === 0 ? '<p style="color:#70757a;">Nenhum perfil.</p>' : '';
-      matchedUsers.forEach(k => {
-        const uObj = usersMap[k];
-        const isSelf = currentUserData && uObj.username.toLowerCase() === currentUserData.username.toLowerCase();
-        const isBot = uObj.isBot;
-        const isVerified = uObj.verified;
-        const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(uObj.username);
-
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.style.cssText = 'display:flex; justify-content:space-between; align-items:center;';
-        div.innerHTML = `
-          <div style="display:flex; align-items:center; gap:8px;">
-            ${renderAvatar(uObj, 'small')}
-            <div>
-              <span class="author-name" onclick="navigateTo('profile', '${escapeStr(uObj.username)}')">${escapeHtml(uObj.username)}</span>
-              ${isVerified ? '✅' : ''}
-              ${isBot ? `<span class="bot-badge">BOT</span>` : ''}
+      // Filter Profiles
+      const matchingUsers = Object.values(usersMap).filter(u => u.username.toLowerCase().includes(qLower));
+      document.getElementById('count-profiles').innerText = matchingUsers.length;
+      const profilesContainer = document.getElementById('search-results-profiles');
+      profilesContainer.innerHTML = matchingUsers.length === 0 ? '<p style="color:#70757a;">Nenhum perfil encontrado.</p>' : '';
+      
+      matchingUsers.forEach(u => {
+        const isSelf = currentUserData && u.username.toLowerCase() === currentUserData.username.toLowerCase();
+        const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(u.username);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="author-container" onclick="navigateTo('profile', '${escapeStr(u.username)}')">
+              ${renderAvatar(u, 'small')}
+              <div>
+                <span class="author-name">${escapeHtml(u.username)}</span>
+                ${u.verified ? '✅' : ''}
+                ${u.isBot ? '<span class="bot-badge">BOT</span>' : ''}
+              </div>
             </div>
+            ${!isSelf ? `
+              <button onclick="toggleFollow('${escapeStr(u.username)}')" style="font-size:12px;">
+                ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
+              </button>
+            ` : ''}
           </div>
-          ${!isSelf && !isBot ? `
-            <button onclick="toggleFollow('${escapeStr(uObj.username)}')" style="font-size:12px;">
-              ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
-            </button>
-          ` : ''}
         `;
-        profDiv.appendChild(div);
+        profilesContainer.appendChild(card);
       });
 
-      const matchedPosts = postsList.filter(p => p.content.toLowerCase().includes(q));
-      document.getElementById('count-posts').innerText = matchedPosts.length;
-      const postsDiv = document.getElementById('search-results-posts');
-      postsDiv.innerHTML = matchedPosts.length === 0 ? '<p style="color:#70757a;">Nenhum post.</p>' : '';
-      matchedPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
+      // Filter Posts
+      const matchingPosts = postsList.filter(p => (p.content && p.content.toLowerCase().includes(qLower)) || p.author.toLowerCase().includes(qLower));
+      document.getElementById('count-posts').innerText = matchingPosts.length;
+      const postsContainer = document.getElementById('search-results-posts');
+      postsContainer.innerHTML = matchingPosts.length === 0 ? '<p style="color:#70757a;">Nenhum post encontrado.</p>' : '';
+      matchingPosts.forEach(p => postsContainer.appendChild(buildPostCard(p)));
 
-      const matchedProds = productsList.filter(p => p.name.toLowerCase().includes(q));
-      document.getElementById('count-products').innerText = matchedProds.length;
-      const prodsDiv = document.getElementById('search-results-products');
-      prodsDiv.innerHTML = matchedProds.length === 0 ? '<p style="color:#70757a;">Nenhum produto.</p>' : '';
-      matchedProds.forEach(p => prodsDiv.appendChild(buildProductCard(p)));
+      // Filter Products
+      const matchingProducts = productsList.filter(p => 
+        p.name.toLowerCase().includes(qLower) || 
+        (p.description && p.description.toLowerCase().includes(qLower)) ||
+        p.seller.toLowerCase().includes(qLower) ||
+        (p.tags && p.tags.toLowerCase().includes(qLower))
+      );
+      document.getElementById('count-products').innerText = matchingProducts.length;
+      const productsContainer = document.getElementById('search-results-products');
+      productsContainer.innerHTML = matchingProducts.length === 0 ? '<p style="color:#70757a;">Nenhum produto encontrado.</p>' : '';
+      matchingProducts.forEach(p => productsContainer.appendChild(buildProductCard(p)));
     }
 
-    window.switchProfileTab = function(tab) {
-      document.getElementById('profile-posts-list').classList.toggle('hidden', tab !== 'posts');
-      document.getElementById('profile-vitrine-list').classList.toggle('hidden', tab !== 'vitrine');
-      document.getElementById('profile-reports-list').classList.toggle('hidden', tab !== 'reports');
+    // PROFILE
+    let activeProfileTab = 'posts';
 
+    window.switchProfileTab = function(tab) {
+      activeProfileTab = tab;
       document.getElementById('profile-tab-posts').classList.toggle('active', tab === 'posts');
       document.getElementById('profile-tab-vitrine').classList.toggle('active', tab === 'vitrine');
       document.getElementById('profile-tab-reports').classList.toggle('active', tab === 'reports');
+
+      document.getElementById('profile-posts-list').classList.toggle('hidden', tab !== 'posts');
+      document.getElementById('profile-vitrine-list').classList.toggle('hidden', tab !== 'vitrine');
+      document.getElementById('profile-reports-list').classList.toggle('hidden', tab !== 'reports');
     };
 
-    function renderProfile(name) {
-      const userKey = name.toLowerCase();
-      const user = usersMap[userKey];
-      if (!user) return;
+    function renderProfile(username) {
+      const uKey = username.toLowerCase();
+      const user = usersMap[uKey];
 
-      document.getElementById('profile-name-display').innerText = user.username;
-      document.getElementById('profile-avatar-container').innerHTML = renderAvatar(user, 'large');
-      
-      const verifiedBadge = document.getElementById('profile-verified-badge');
-      if (user.verified) verifiedBadge.classList.remove('hidden');
-      else verifiedBadge.classList.add('hidden');
+      if (!user) {
+        document.getElementById('profile-name-display').innerText = username + " (Não encontrado)";
+        document.getElementById('profile-verified-badge').classList.add('hidden');
+        document.getElementById('profile-bot-badge').classList.add('hidden');
+        document.getElementById('profile-dob-display').innerText = '';
+        document.getElementById('profile-avatar-container').innerHTML = renderAvatar(null, 'large');
+        document.getElementById('profile-action-btn-area').innerHTML = '';
+        document.getElementById('profile-edit-avatar-section').classList.add('hidden');
+        document.getElementById('profile-posts-list').innerHTML = '<p style="color:#70757a;">Utilizador não encontrado.</p>';
+        document.getElementById('profile-vitrine-list').innerHTML = '';
+        document.getElementById('profile-reports-list').innerHTML = '';
+        return;
+      }
 
-      document.getElementById('profile-dob-display').innerText = "Nascimento: " + (user.dob || 'N/A');
-      
-      const botBadge = document.getElementById('profile-bot-badge');
-      if (user.isBot) botBadge.classList.remove('hidden');
-      else botBadge.classList.add('hidden');
-
-      const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
+      const isSelf = currentUserData && user.username.toLowerCase() === currentUserData.username.toLowerCase();
       const isFollowing = currentUserData && currentUserData.following && currentUserData.following.includes(user.username);
 
-      const editAvatarSection = document.getElementById('profile-edit-avatar-section');
-      if (isSelf) {
-        editAvatarSection.classList.remove('hidden');
-      } else {
-        editAvatarSection.classList.add('hidden');
-      }
+      document.getElementById('profile-name-display').innerText = user.username;
+      
+      const verBadge = document.getElementById('profile-verified-badge');
+      if (user.verified) verBadge.classList.remove('hidden'); else verBadge.classList.add('hidden');
 
-      const actionArea = document.getElementById('profile-action-btn-area');
-      actionArea.innerHTML = '';
+      const botBadge = document.getElementById('profile-bot-badge');
+      if (user.isBot) botBadge.classList.remove('hidden'); else botBadge.classList.add('hidden');
+
+      document.getElementById('profile-dob-display').innerText = user.dob ? `Nascido(a) a: ${user.dob}` : '';
+      document.getElementById('profile-avatar-container').innerHTML = renderAvatar(user, 'large');
+
+      // Edit Avatar Section toggle
+      const avatarSection = document.getElementById('profile-edit-avatar-section');
+      if (isSelf) avatarSection.classList.remove('hidden'); else avatarSection.classList.add('hidden');
+
+      // Action buttons
+      const btnArea = document.getElementById('profile-action-btn-area');
+      btnArea.innerHTML = '';
       if (!isSelf && !user.isBot) {
-        const btnFollow = document.createElement('button');
-        btnFollow.innerText = isFollowing ? 'Deixar de seguir' : 'Seguir';
-        btnFollow.onclick = () => toggleFollow(user.username);
-        if (!isFollowing) btnFollow.className = 'btn-primary';
-        actionArea.appendChild(btnFollow);
-
-        const btnMsg = document.createElement('button');
-        btnMsg.innerText = '💬 Enviar Mensagem';
-        btnMsg.onclick = () => openDirectMsgModal(user.username);
-        actionArea.appendChild(btnMsg);
-
-        const btnReportProf = document.createElement('button');
-        btnReportProf.className = 'btn-warning';
-        btnReportProf.innerText = '⚠️ Denunciar Perfil';
-        btnReportProf.onclick = () => openReportProfileModal(user.username);
-        actionArea.appendChild(btnReportProf);
+        btnArea.innerHTML = `
+          <button class="btn-primary" onclick="openDirectMsgModal('${escapeStr(user.username)}')">✉️ Mensagem</button>
+          <button class="${isFollowing ? '' : 'btn-primary'}" onclick="toggleFollow('${escapeStr(user.username)}')">
+            ${isFollowing ? 'Deixar de seguir' : 'Seguir'}
+          </button>
+          <button class="btn-warning" onclick="openReportProfileModal('${escapeStr(user.username)}')">⚠️ Denunciar</button>
+        `;
       }
 
-      const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
-      const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
+      // Stats
+      const userPosts = postsList.filter(p => p.author.toLowerCase() === uKey);
+      const userProducts = productsList.filter(p => p.seller.toLowerCase() === uKey);
 
       document.getElementById('stat-posts').innerText = userPosts.length;
-      document.getElementById('stat-followers').innerText = user.followers ? user.followers.length : 0;
-      document.getElementById('stat-following').innerText = user.following ? user.following.length : 0;
+      document.getElementById('stat-followers').innerText = (user.followers || []).length;
+      document.getElementById('stat-following').innerText = (user.following || []).length;
 
-      const postsDiv = document.getElementById('profile-posts-list');
-      postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Sem publicações.</p>' : '';
-      userPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
+      // Tab contents
+      const postsContainer = document.getElementById('profile-posts-list');
+      postsContainer.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Nenhuma publicação ainda.</p>' : '';
+      userPosts.forEach(p => postsContainer.appendChild(buildPostCard(p)));
 
-      const vitrineDiv = document.getElementById('profile-vitrine-list');
-      vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Sem produtos à venda.</p>' : '';
-      userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
+      const vitrineContainer = document.getElementById('profile-vitrine-list');
+      vitrineContainer.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Nenhum produto na vitrine.</p>' : '';
+      userProducts.forEach(p => vitrineContainer.appendChild(buildProductCard(p)));
 
-      const reportsDiv = document.getElementById('profile-reports-list');
-      const myReports = reportsList.filter(r => r.reporter.toLowerCase() === userKey);
-      reportsDiv.innerHTML = myReports.length === 0 ? '<p style="color:#70757a;">Nenhuma denúncia realizada.</p>' : '';
-
-      myReports.forEach(r => {
-        const div = document.createElement('div');
-        div.className = 'card';
-        div.innerHTML = `
+      const reportsContainer = document.getElementById('profile-reports-list');
+      const userReports = reportsList.filter(r => r.seller && r.seller.toLowerCase() === uKey);
+      reportsContainer.innerHTML = userReports.length === 0 ? '<p style="color:#70757a;">Nenhuma denúncia registada para este perfil.</p>' : '';
+      
+      userReports.forEach(r => {
+        const item = document.createElement('div');
+        item.className = 'card';
+        item.innerHTML = `
           <div class="item-header">
-            <strong>${escapeHtml(r.productName)}</strong>
+            <strong>Motivo: ${escapeHtml(r.reason)}</strong>
             <span class="item-date">${new Date(r.timestamp).toLocaleDateString()}</span>
           </div>
-          <p style="font-size:13px;"><strong>Motivo:</strong> ${escapeHtml(r.reason)}</p>
-          <p style="font-size:13px; margin-top:6px;">
-            <strong>Status:</strong> 
-            ${r.banned 
-              ? `<span style="color:#d93025; font-weight:bold;">Denúncia tratada.</span>` 
-              : `<span style="color:#f2994a; font-weight:bold;">Em análise (Aguarde de 2 a 7 dias)</span>`}
-          </p>
+          <p style="font-size:13px; color:#5f6368;">Denunciado por: <strong>${escapeHtml(r.reporter)}</strong></p>
+          <p style="font-size:13px; color:#5f6368;">Item/Alvo: ${escapeHtml(r.productName || r.productId)}</p>
         `;
-        reportsDiv.appendChild(div);
+        reportsContainer.appendChild(item);
       });
     }
 
-    function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-    function escapeStr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
+    // UTILS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-    window.onload = function() {
-      document.getElementById('search-input').addEventListener('input', function(e) {
-        const val = e.target.value.trim();
-        if (val.length > 0) {
-          navigateTo('search', val);
-        } else {
-          navigateTo('feed');
-        }
-      });
-      initAuth();
-    };
+    function escapeStr(str) {
+      if (!str) return '';
+      return String(str).replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+
+    // INIT
+    initAuth();
   </script>
 </body>
 </html>
+```
