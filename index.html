@@ -116,6 +116,7 @@
 
     .auth-box { max-width: 360px; margin: 40px auto; padding: 24px; background-color: #fff; border: 1px solid #dadce0; border-radius: 8px; }
     .error-msg { color: #d93025; font-size: 13px; margin-bottom: 12px; }
+    .help-banner { background-color: #fce8e6; border: 1px solid #fad2cf; color: #c5221f; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; font-size: 14px; line-height: 1.4; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -180,6 +181,12 @@
 
     <!-- FEED VIEW -->
     <div id="view-feed" class="hidden">
+      <!-- BANNER DE AJUDA / APOIO EMOCIONAL -->
+      <div id="post-support-banner" class="help-banner hidden">
+        <strong>💛 Olá, você não está sozinho.</strong><br>
+        Se está a passar por um momento difícil ou precisa de falar com alguém, ligue para o <strong>188</strong> (Centro de Valorização da Vida - CVV). O atendimento é gratuito, sigiloso e disponível 24 horas por dia.
+      </div>
+
       <div class="card">
         <h3 style="font-size: 15px; margin-bottom: 8px;">Criar uma publicação</h3>
         <textarea id="post-input" rows="3" placeholder="No que estás a pensar?" dir="ltr"></textarea>
@@ -239,30 +246,44 @@
       </div>
 
       <div class="card profile-header">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 16px;">
             <div id="profile-avatar-container"></div>
             <div>
               <h2 id="profile-name-display"></h2>
+              <p style="font-size: 13px; color: #70757a; margin-top: 2px;" id="profile-stats-summary"></p>
             </div>
           </div>
-          <div id="profile-action-btn-area"></div>
+          <div id="profile-action-btn-area" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
         </div>
 
-        <div id="profile-edit-avatar-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
-          <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Alterar Foto de Perfil</label>
-          <input type="file" id="profile-avatar-file" accept="image/*" style="margin-bottom: 6px;">
-          <button class="btn-primary" onclick="saveProfileAvatar()">Guardar Foto de Perfil</button>
+        <!-- CONFIGURAÇÕES DE PRIVACIDADE DO PRÓPRIO PERFIL -->
+        <div id="profile-settings-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
+          <h4 style="font-size: 13px; margin-bottom: 8px;">⚙️ Configurações da Conta</h4>
+          <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="chk-hide-following" onchange="toggleHideFollowingSetting(this.checked)">
+            Ocultar quem estou a seguir no meu perfil
+          </label>
+
+          <div style="margin-top: 12px;">
+            <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Alterar Foto de Perfil</label>
+            <input type="file" id="profile-avatar-file" accept="image/*" style="margin-bottom: 6px;">
+            <button class="btn-primary" onclick="saveProfileAvatar()">Guardar Foto de Perfil</button>
+          </div>
         </div>
       </div>
 
       <div class="tabs">
         <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
+        <button id="profile-tab-following" class="tab-btn" onclick="switchProfileTab('following')">A Seguir</button>
         <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
         <button id="profile-tab-analytics" class="tab-btn" onclick="switchProfileTab('analytics')">📊 Desempenho & Virais</button>
       </div>
 
+      <div id="profile-blocked-message" class="card hidden" style="color:#d93025; text-align:center; font-weight:bold;"></div>
+
       <div id="profile-posts-list"></div>
+      <div id="profile-following-list" class="hidden"></div>
       <div id="profile-vitrine-list" class="hidden"></div>
       
       <!-- ANALYTICS / DESEMPENHO TAB -->
@@ -482,11 +503,9 @@
       });
     }
 
-    // CORREÇÃO: FILTRA INTERAÇÕES DO PRÓPRIO AUTOR PARA NÃO DAR CRÉDITOS
     function calculatePendingEarnings(item) {
       const owner = (item.author || item.seller || '').toLowerCase();
 
-      // Filtra curtidas, comentários e visualizações ignorando os feitos pelo próprio dono
       const validLikes = (item.likes || []).filter(u => u.toLowerCase() !== owner);
       const validComments = (item.comments || []).filter(c => (c.author || '').toLowerCase() !== owner);
       const validViews = (item.views || []).filter(u => u.toLowerCase() !== owner);
@@ -584,7 +603,15 @@
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, credits: 0, avatarUrl: '' };
+        const newUserData = { 
+          username: name, 
+          password: pwd, 
+          credits: 0, 
+          avatarUrl: '',
+          following: [],
+          blockedUsers: [],
+          hideFollowing: false
+        };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
@@ -604,6 +631,8 @@
         if (!userSnap.exists() || userSnap.data().password !== pwd) return showAuthErr("Credenciais incorretas.");
         currentUserData = userSnap.data();
         if (currentUserData.credits === undefined) currentUserData.credits = 0;
+        if (!currentUserData.following) currentUserData.following = [];
+        if (!currentUserData.blockedUsers) currentUserData.blockedUsers = [];
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', currentUserData.username);
         showMainInterface();
@@ -638,6 +667,54 @@
       setupListeners();
       navigateTo('feed');
     }
+
+    // SEGUIR / DEIXAR DE SEGUIR & BLOQUEAR / DESBLOQUEAR
+    window.toggleFollowUser = async function(targetUsername) {
+      if (!currentUserData) return;
+      const myKey = currentUserData.username.toLowerCase();
+      const targetKey = targetUsername.toLowerCase();
+      let following = currentUserData.following ? [...currentUserData.following] : [];
+
+      if (following.includes(targetKey)) {
+        following = following.filter(u => u !== targetKey);
+      } else {
+        following.push(targetKey);
+      }
+
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { following });
+        currentUserData.following = following;
+        renderProfile(targetUsername);
+      } catch (e) {}
+    };
+
+    window.toggleBlockUser = async function(targetUsername) {
+      if (!currentUserData) return;
+      const targetKey = targetUsername.toLowerCase();
+      let blocked = currentUserData.blockedUsers ? [...currentUserData.blockedUsers] : [];
+      const isBlocked = blocked.includes(targetKey);
+
+      if (isBlocked) {
+        blocked = blocked.filter(u => u !== targetKey);
+      } else {
+        if (!confirm(`Tem a certeza que deseja bloquear @${targetUsername}?`)) return;
+        blocked.push(targetKey);
+      }
+
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { blockedUsers: blocked });
+        currentUserData.blockedUsers = blocked;
+        renderProfile(targetUsername);
+      } catch (e) {}
+    };
+
+    window.toggleHideFollowingSetting = async function(isChecked) {
+      if (!currentUserData) return;
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { hideFollowing: isChecked });
+        currentUserData.hideFollowing = isChecked;
+      } catch (e) {}
+    };
 
     // AVATAR UPLOAD
     document.getElementById('profile-avatar-file').addEventListener('change', function(e) {
@@ -881,7 +958,6 @@
         const pending = calculatePendingEarnings(p);
         if (pending > 0) {
           totalToDeposit += pending;
-          // Apenas considera eventos validos de outros utilizadores para marcar cashedOut
           const validLikes = (p.likes || []).filter(u => u.toLowerCase() !== myKey);
           const validComments = (p.comments || []).filter(c => (c.author || '').toLowerCase() !== myKey);
           const validViews = (p.views || []).filter(u => u.toLowerCase() !== myKey);
@@ -920,7 +996,6 @@
       let views = post.views ? [...post.views] : [];
       const myUser = currentUserData.username;
 
-      // Regista a visualização apenas uma vez por conta
       if (!views.includes(myUser)) {
         views.push(myUser);
         try {
@@ -972,12 +1047,16 @@
       const commentsListDiv = document.getElementById('modal-comments-list');
       commentsListDiv.innerHTML = comments.length === 0 ? '<p style="color:#70757a; font-size:12px;">Nenhum comentário.</p>' : '';
       comments.forEach(c => {
+        const isMyComment = currentUserData && c.author.toLowerCase() === currentUserData.username.toLowerCase();
         const div = document.createElement('div');
         div.className = 'comment-item';
         div.innerHTML = `
           <div class="comment-header">
             <strong>${escapeHtml(c.author)}</strong>
-            <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
+            <div>
+              <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
+              ${isMyComment ? `<button onclick="deleteComment('${postId}', '${c.id}')" class="btn-danger" style="padding:1px 4px; font-size:10px; margin-left:6px;">Apagar</button>` : ''}
+            </div>
           </div>
           <div>${escapeHtml(c.text)}</div>
         `;
@@ -1007,6 +1086,18 @@
       } catch (e) {}
     }
 
+    // APAGAR COMENTÁRIO
+    window.deleteComment = async function(postId, commentId) {
+      if (!confirm("Apagar o teu comentário?")) return;
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      const comments = (post.comments || []).filter(c => c.id !== commentId);
+      try {
+        await updateDoc(publicPostDoc(postId), { comments });
+      } catch (e) {}
+    };
+
     // POSTS
     document.getElementById('post-image-file').addEventListener('change', function(e) {
       const file = e.target.files[0];
@@ -1020,11 +1111,32 @@
       }
     });
 
+    // FUNÇÃO DE VERIFICAÇÃO DE CONTEÚDO SENSÍVEL
+    function containsSelfHarmKeywords(text) {
+      if (!text) return false;
+      const lowerText = text.toLowerCase();
+      const forbiddenTerms = [
+        'suicídio', 'suicidio', 'se matar', 'me matar', 'como me matar', 
+        'como se matar', 'tirar minha vida', 'tirar a propria vida',
+        'tirar a própria vida', 'querer morrer', 'quero morrer', 'acabar com a minha vida'
+      ];
+      return forbiddenTerms.some(term => lowerText.includes(term));
+    }
+
     window.submitPost = async function() {
       if (!currentUserData) return;
       const content = document.getElementById('post-input').value.trim();
       const imageUrl = selectedPostImageBase64 || '';
       if (!content && !imageUrl) return alert("Escreva um texto ou adicione uma foto.");
+
+      const banner = document.getElementById('post-support-banner');
+      if (containsSelfHarmKeywords(content)) {
+        banner.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      } else {
+        banner.classList.add('hidden');
+      }
 
       try {
         await addDoc(publicPostsColl(), {
@@ -1062,34 +1174,6 @@
       else likes.push(myUser);
 
       try { await updateDoc(publicPostDoc(postId), { likes }); } catch (e) {}
-    };
-
-    window.toggleCommentBox = function(id) {
-      const el = document.getElementById(`comments-box-${id}`);
-      if (el) el.classList.toggle('hidden');
-    };
-
-    window.addCommentToPost = async function(postId) {
-      if (!currentUserData) return;
-      const input = document.getElementById(`comment-input-${postId}`);
-      const text = input.value.trim();
-      if (!text) return;
-
-      const post = postsList.find(p => p.id === postId);
-      if (!post) return;
-
-      let comments = post.comments ? [...post.comments] : [];
-      comments.push({
-        id: 'c_' + Date.now(),
-        author: currentUserData.username,
-        text,
-        timestamp: new Date().toISOString()
-      });
-
-      try {
-        await updateDoc(publicPostDoc(postId), { comments });
-        input.value = '';
-      } catch (e) {}
     };
 
     // MARKETPLACE
@@ -1240,24 +1324,51 @@
       return div;
     }
 
+    function isBlockedBetween(u1, u2) {
+      if (!u1 || !u2) return false;
+      const o1 = usersMap[u1.toLowerCase()];
+      const o2 = usersMap[u2.toLowerCase()];
+      const b1 = (o1 && o1.blockedUsers) ? o1.blockedUsers.map(x => x.toLowerCase()) : [];
+      const b2 = (o2 && o2.blockedUsers) ? o2.blockedUsers.map(x => x.toLowerCase()) : [];
+      return b1.includes(u2.toLowerCase()) || b2.includes(u1.toLowerCase());
+    }
+
     function renderFeed() {
       const list = document.getElementById('feed-list');
-      list.innerHTML = postsList.length === 0 ? '<p style="color:#70757a;">Sem posts no feed.</p>' : '';
-      postsList.forEach(p => list.appendChild(buildPostCard(p)));
+      list.innerHTML = '';
+      
+      const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
+      const visiblePosts = postsList.filter(p => !isBlockedBetween(myUser, p.author));
+
+      if (visiblePosts.length === 0) {
+        list.innerHTML = '<p style="color:#70757a;">Sem posts no feed.</p>';
+        return;
+      }
+      visiblePosts.forEach(p => list.appendChild(buildPostCard(p)));
     }
 
     function renderMarketplace() {
       const list = document.getElementById('marketplace-list');
-      list.innerHTML = productsList.length === 0 ? '<p style="color:#70757a;">Nenhum produto no Marketplace.</p>' : '';
-      productsList.forEach(p => list.appendChild(buildProductCard(p)));
+      list.innerHTML = '';
+      
+      const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
+      const visibleProducts = productsList.filter(p => !isBlockedBetween(myUser, p.seller));
+
+      if (visibleProducts.length === 0) {
+        list.innerHTML = '<p style="color:#70757a;">Nenhum produto no Marketplace.</p>';
+        return;
+      }
+      visibleProducts.forEach(p => list.appendChild(buildProductCard(p)));
     }
 
     window.switchProfileTab = function(tab) {
       document.getElementById('profile-posts-list').classList.toggle('hidden', tab !== 'posts');
+      document.getElementById('profile-following-list').classList.toggle('hidden', tab !== 'following');
       document.getElementById('profile-vitrine-list').classList.toggle('hidden', tab !== 'vitrine');
       document.getElementById('profile-analytics-list').classList.toggle('hidden', tab !== 'analytics');
 
       document.getElementById('profile-tab-posts').classList.toggle('active', tab === 'posts');
+      document.getElementById('profile-tab-following').classList.toggle('active', tab === 'following');
       document.getElementById('profile-tab-vitrine').classList.toggle('active', tab === 'vitrine');
       document.getElementById('profile-tab-analytics').classList.toggle('active', tab === 'analytics');
     };
@@ -1267,33 +1378,108 @@
       const user = usersMap[userKey];
       if (!user) return;
 
+      const myUserKey = currentUserData ? currentUserData.username.toLowerCase() : '';
+      const isSelf = myUserKey === userKey;
+
+      const myBlockedList = (currentUserData && currentUserData.blockedUsers) ? currentUserData.blockedUsers.map(u=>u.toLowerCase()) : [];
+      const targetBlockedList = (user.blockedUsers) ? user.blockedUsers.map(u=>u.toLowerCase()) : [];
+
+      const IBlockedThem = myBlockedList.includes(userKey);
+      const TheyBlockedMe = targetBlockedList.includes(myUserKey);
+
       document.getElementById('profile-name-display').innerText = user.username;
       document.getElementById('profile-avatar-container').innerHTML = renderAvatar(user, 'large');
 
-      const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
-      document.getElementById('profile-edit-avatar-section').classList.toggle('hidden', !isSelf);
-      
-      // O botão de depósito só aparece se for o próprio perfil
+      const followingArr = user.following || [];
+      document.getElementById('profile-stats-summary').innerText = `A seguir: ${followingArr.length}`;
+
+      document.getElementById('profile-settings-section').classList.toggle('hidden', !isSelf);
+      if (isSelf) {
+        document.getElementById('chk-hide-following').checked = !!user.hideFollowing;
+      }
+
       document.getElementById('profile-deposit-card').classList.toggle('hidden', !isSelf);
 
       const actionArea = document.getElementById('profile-action-btn-area');
       actionArea.innerHTML = '';
+
       if (!isSelf) {
+        const isFollowing = currentUserData && (currentUserData.following || []).map(u=>u.toLowerCase()).includes(userKey);
+        const followBtn = document.createElement('button');
+        followBtn.className = isFollowing ? '' : 'btn-primary';
+        followBtn.innerText = isFollowing ? '✓ A seguir' : '+ Seguir';
+        followBtn.onclick = () => toggleFollowUser(user.username);
+        actionArea.appendChild(followBtn);
+
         const btnMsg = document.createElement('button');
         btnMsg.className = 'btn-primary';
-        btnMsg.innerText = '💬 Enviar Mensagem';
+        btnMsg.innerText = '💬 Mensagem';
         btnMsg.onclick = () => openDirectMsgModal(user.username);
         actionArea.appendChild(btnMsg);
+
+        const blockBtn = document.createElement('button');
+        blockBtn.className = 'btn-danger';
+        blockBtn.innerText = IBlockedThem ? 'Desbloquear Perfil' : 'Bloquear Perfil';
+        blockBtn.onclick = () => toggleBlockUser(user.username);
+        actionArea.appendChild(blockBtn);
       }
 
-      const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
-      const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
-
+      const blockedMsgDiv = document.getElementById('profile-blocked-message');
       const postsDiv = document.getElementById('profile-posts-list');
+      const followingDiv = document.getElementById('profile-following-list');
+      const vitrineDiv = document.getElementById('profile-vitrine-list');
+
+      // VERIFICAÇÃO DE BLOQUEIO
+      if (TheyBlockedMe) {
+        blockedMsgDiv.innerText = "Este perfil não está disponível porque este utilizador bloqueou-o.";
+        blockedMsgDiv.classList.remove('hidden');
+        postsDiv.innerHTML = '';
+        followingDiv.innerHTML = '';
+        vitrineDiv.innerHTML = '';
+        return;
+      } else if (IBlockedThem) {
+        blockedMsgDiv.innerText = `Bloqueou @${user.username}. Desbloqueie para voltar a ver os posts e novidades deste perfil.`;
+        blockedMsgDiv.classList.remove('hidden');
+        postsDiv.innerHTML = '';
+        followingDiv.innerHTML = '';
+        vitrineDiv.innerHTML = '';
+        return;
+      } else {
+        blockedMsgDiv.classList.add('hidden');
+      }
+
+      // POSTS DO PERFIL
+      const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
       postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum post.</p>' : '';
       userPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
 
-      const vitrineDiv = document.getElementById('profile-vitrine-list');
+      // LISTA DE QUEM ESTÁ A SEGUIR (COM PROTEÇÃO DE PRIVACIDADE)
+      followingDiv.innerHTML = '';
+      if (!isSelf && user.hideFollowing) {
+        followingDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem esta pessoa está a seguir. Ela ativou esta opção para ninguém ver.</p>`;
+      } else {
+        if (followingArr.length === 0) {
+          followingDiv.innerHTML = '<p style="color:#70757a;">Não está a seguir ninguém.</p>';
+        } else {
+          followingArr.forEach(targetU => {
+            const targetObj = usersMap[targetU.toLowerCase()];
+            const item = document.createElement('div');
+            item.className = 'card';
+            item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;';
+            item.innerHTML = `
+              <div class="author-container" onclick="navigateTo('profile', '${escapeStr(targetU)}')">
+                ${renderAvatar(targetObj, 'small')}
+                <span class="author-name">${escapeHtml(targetU)}</span>
+              </div>
+              <button onclick="navigateTo('profile', '${escapeStr(targetU)}')">Ver Perfil</button>
+            `;
+            followingDiv.appendChild(item);
+          });
+        }
+      }
+
+      // VITRINE DO PERFIL
+      const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
       vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum produto na vitrine.</p>' : '';
       userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
 
@@ -1349,4 +1535,3 @@
   </script>
 </body>
 </html>
-
