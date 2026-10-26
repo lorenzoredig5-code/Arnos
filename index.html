@@ -56,7 +56,12 @@
     .author-container:hover .author-name { text-decoration: underline; }
 
     /* BADGE & CREDITS */
-    .credits-display { background-color: #e6f4ea; color: #137333; padding: 6px 14px; border-radius: 16px; font-weight: bold; font-size: 18px; border: 1px solid #ceedd6; display: inline-flex; align-items: center; gap: 6px; }
+    .badge-container { position: relative; display: inline-block; }
+    .badge {
+      position: absolute; top: -6px; right: -6px; background-color: #d93025; color: #ffffff;
+      border: 2px solid #ffffff; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold;
+    }
+    .credits-display { background-color: #e6f4ea; color: #137333; padding: 6px 14px; border-radius: 16px; font-weight: bold; font-size: 16px; border: 1px solid #ceedd6; display: inline-flex; align-items: center; gap: 6px; }
 
     /* CONTAINER & CARDS */
     .container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
@@ -74,6 +79,13 @@
     .comments-section { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
     .comment-item { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; }
     .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+
+    /* CHAT BOX */
+    .chat-container { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; border: 1px solid #dadce0; padding: 12px; border-radius: 8px; margin-bottom: 12px; background-color: #fcfcfc; }
+    .chat-bubble { padding: 8px 12px; border-radius: 12px; max-width: 75%; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+    .chat-bubble.mine { background-color: #e8f0fe; align-self: flex-end; color: #1a73e8; border-bottom-right-radius: 2px; }
+    .chat-bubble.other { background-color: #ffffff; align-self: flex-start; color: #202124; border: 1px solid #dadce0; border-bottom-left-radius: 2px; }
+    .chat-sender-tag { font-size: 10px; font-weight: bold; margin-bottom: 2px; color: #5f6368; display: block; }
 
     /* TABS */
     .tabs { display: flex; border-bottom: 1px solid #dadce0; margin-bottom: 16px; overflow-x: auto; }
@@ -113,6 +125,12 @@
     <nav>
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('marketplace')">Marketplace</button>
+      
+      <div class="badge-container">
+        <button onclick="navigateTo('messages')">Mensagens</button>
+        <span id="msg-badge" class="badge hidden">0</span>
+      </div>
+
       <span class="credits-display">💳 <span id="user-credits-val">0.00</span></span>
       <button onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')">Meu Perfil</button>
       <span id="nav-user-link" class="nav-user" onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')"></span>
@@ -173,6 +191,28 @@
         <button class="btn-primary" onclick="openCreateProductModal()">+ Criar Produto</button>
       </div>
       <div id="marketplace-list"></div>
+    </div>
+
+    <!-- MESSAGES VIEW -->
+    <div id="view-messages" class="hidden">
+      <h2 style="margin-bottom: 12px;">Mensagens / Marketplace</h2>
+      
+      <div class="tabs">
+        <button id="msg-tab-profile" class="tab-btn active" onclick="switchMsgTab('profile')">Mensagens de Perfis</button>
+        <button id="msg-tab-marketplace" class="tab-btn" onclick="switchMsgTab('marketplace')">Mensagens do Marketplace</button>
+      </div>
+
+      <div id="messages-conversations-list"></div>
+      
+      <div id="messages-chat-view" class="hidden">
+        <button onclick="closeChatView()" style="margin-bottom: 12px;">← Voltar para Conversas</button>
+        <h3 id="chat-title" style="margin-bottom: 8px;"></h3>
+        <div id="chat-bubbles" class="chat-container"></div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." dir="ltr" style="margin-bottom:0;">
+          <button class="btn-primary" onclick="sendChatMessage()">Enviar</button>
+        </div>
+      </div>
     </div>
 
     <!-- PROFILE VIEW -->
@@ -264,6 +304,22 @@
     </div>
   </div>
 
+  <!-- MODAL: ENVIAR MENSAGEM DIRETA DE PERFIL -->
+  <div id="modal-direct-msg" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-msg-target-name">Enviar Mensagem</h3>
+        <button onclick="closeDirectMsgModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="direct-msg-target-username">
+        <label style="font-size: 12px; font-weight: bold;">Sua Mensagem</label>
+        <textarea id="direct-msg-text" rows="4" placeholder="Escreva a sua mensagem aqui..." dir="ltr"></textarea>
+        <button onclick="sendDirectMessageFromProfile()" class="btn-primary" style="width: 100%; margin-top: 8px;">Enviar Mensagem</button>
+      </div>
+    </div>
+  </div>
+
   <!-- FIREBASE SCRIPTS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -291,10 +347,13 @@
     let usersMap = {};
     let postsList = [];
     let productsList = [];
+    let messagesList = [];
     let currentProfileUsername = null;
     let selectedPostImageBase64 = null;
     let selectedProductImageBase64 = null;
     let selectedAvatarBase64 = null;
+    let activeChatKey = null;
+    let activeMsgSubTab = 'profile';
 
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
@@ -302,6 +361,8 @@
     const publicPostDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'posts', id);
     const publicProductsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'products');
     const publicProductDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
+    const publicMessagesColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+    const publicMessageDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'messages', id);
 
     window.currentUserData = currentUserData;
 
@@ -364,17 +425,21 @@
         productsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         refreshCurrentView();
       });
+
+      onSnapshot(publicMessagesColl(), (snapshot) => {
+        messagesList = [];
+        snapshot.forEach(docSnap => messagesList.push({ id: docSnap.id, ...docSnap.data() }));
+        messagesList.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        updateUnreadBadge();
+        refreshCurrentView();
+      });
     }
 
     function calculatePendingEarnings(item) {
       const likesCount = (item.likes || []).length;
       const commentsCount = (item.comments || []).length;
-      const totalEventsCount = likesCount + commentsCount;
-
       const cashedOutCount = item.cashedOutEventsCount || 0;
-      const uncashedEventsCount = Math.max(0, totalEventsCount - cashedOutCount);
 
-      // Cada evento não resgatado vale proporções (Média para cálculo de curtidas 0.01 e comentários 0.05)
       const uncashedLikes = Math.max(0, likesCount - Math.min(likesCount, cashedOutCount));
       const uncashedComments = Math.max(0, commentsCount - Math.max(0, cashedOutCount - likesCount));
 
@@ -388,7 +453,6 @@
         const profCredits = document.getElementById('profile-main-credits');
         if (profCredits) profCredits.innerText = val.toFixed(2);
 
-        // Calcula total pendente
         const myKey = currentUserData.username.toLowerCase();
         const myPosts = postsList.filter(p => p.author.toLowerCase() === myKey);
         const myProducts = productsList.filter(p => p.seller.toLowerCase() === myKey);
@@ -402,10 +466,30 @@
       }
     }
 
+    function updateUnreadBadge() {
+      if (!currentUserData) return;
+      const myUser = currentUserData.username.toLowerCase();
+      const unreadCount = messagesList.filter(m => {
+        const sender = (m.sender || m.buyer || '').toLowerCase();
+        const isTargetUser = (m.seller.toLowerCase() === myUser || m.buyer.toLowerCase() === myUser);
+        const isNotMine = sender !== myUser;
+        return isTargetUser && isNotMine && !m.read;
+      }).length;
+
+      const badge = document.getElementById('msg-badge');
+      if (unreadCount > 0) { 
+        badge.innerText = unreadCount; 
+        badge.classList.remove('hidden'); 
+      } else { 
+        badge.classList.add('hidden'); 
+      }
+    }
+
     function refreshCurrentView() {
       if (!document.getElementById('view-auth').classList.contains('hidden')) return;
       if (!document.getElementById('view-feed').classList.contains('hidden')) renderFeed();
       else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
+      else if (!document.getElementById('view-messages').classList.contains('hidden')) renderMessages();
       else if (!document.getElementById('view-profile').classList.contains('hidden')) {
         if (currentProfileUsername) renderProfile(currentProfileUsername);
       }
@@ -480,6 +564,7 @@
       document.getElementById('view-auth').classList.remove('hidden');
       document.getElementById('view-feed').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
+      document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
     }
 
@@ -518,15 +603,207 @@
     window.navigateTo = function(view, arg = null) {
       document.getElementById('view-feed').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
+      document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
 
       if (view === 'feed') { document.getElementById('view-feed').classList.remove('hidden'); renderFeed(); }
       else if (view === 'marketplace') { document.getElementById('view-marketplace').classList.remove('hidden'); renderMarketplace(); }
+      else if (view === 'messages') { document.getElementById('view-messages').classList.remove('hidden'); renderMessages(); }
       else if (view === 'profile') {
         document.getElementById('view-profile').classList.remove('hidden');
         currentProfileUsername = arg || currentUserData.username;
         renderProfile(currentProfileUsername);
       }
+    };
+
+    // MESSAGES / CHAT LOGIC
+    window.switchMsgTab = function(tab) {
+      activeMsgSubTab = tab;
+      document.getElementById('msg-tab-profile').classList.toggle('active', tab === 'profile');
+      document.getElementById('msg-tab-marketplace').classList.toggle('active', tab === 'marketplace');
+      renderMessages();
+    };
+
+    function renderMessages() {
+      const convListDiv = document.getElementById('messages-conversations-list');
+      const chatViewDiv = document.getElementById('messages-chat-view');
+
+      if (activeChatKey) {
+        convListDiv.classList.add('hidden');
+        chatViewDiv.classList.remove('hidden');
+        renderChatView(activeChatKey);
+        return;
+      }
+
+      convListDiv.classList.remove('hidden');
+      chatViewDiv.classList.add('hidden');
+      convListDiv.innerHTML = '';
+
+      if (!currentUserData) return;
+
+      const userMsgs = messagesList.filter(m => 
+        m.seller.toLowerCase() === currentUserData.username.toLowerCase() || 
+        m.buyer.toLowerCase() === currentUserData.username.toLowerCase()
+      );
+
+      const filteredMsgs = userMsgs.filter(m => {
+        const isProfileMsg = m.productName === '[Perfil]';
+        return activeMsgSubTab === 'profile' ? isProfileMsg : !isProfileMsg;
+      });
+
+      const groups = {};
+      filteredMsgs.forEach(m => {
+        const otherUser = m.seller.toLowerCase() === currentUserData.username.toLowerCase() ? m.buyer : m.seller;
+        const key = `${m.productName}___${otherUser.toLowerCase()}`;
+        if (!groups[key]) groups[key] = { productName: m.productName, otherUser: otherUser, lastMsg: m, msgs: [] };
+        groups[key].msgs.push(m);
+        groups[key].lastMsg = m;
+      });
+
+      const keys = Object.keys(groups);
+      if (keys.length === 0) {
+        convListDiv.innerHTML = `<p style="color:#70757a;">Nenhuma conversa nesta categoria.</p>`;
+        return;
+      }
+
+      keys.forEach(k => {
+        const g = groups[k];
+        const myUser = currentUserData.username.toLowerCase();
+        const otherObj = usersMap[g.otherUser.toLowerCase()];
+        
+        const hasUnread = g.msgs.some(m => {
+          const sender = (m.sender || m.buyer || '').toLowerCase();
+          return sender !== myUser && !m.read;
+        });
+
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.cssText = 'cursor:pointer; position:relative;';
+        div.onclick = () => openChatView(k);
+        div.innerHTML = `
+          <div class="item-header">
+            <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : `📦 Produto: ${escapeHtml(g.productName)}`}</h3>
+            <span class="item-date">${new Date(g.lastMsg.timestamp).toLocaleTimeString()}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+            ${renderAvatar(otherObj, 'small')}
+            <p style="font-size: 13px; color: #5f6368; margin:0;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
+          </div>
+          <p style="font-size: 13px; margin-top: 6px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message)}"</p>
+        `;
+        convListDiv.appendChild(div);
+      });
+    }
+
+    function openChatView(key) { activeChatKey = key; renderMessages(); }
+    window.closeChatView = function() { activeChatKey = null; renderMessages(); };
+
+    function renderChatView(key) {
+      const parts = key.split('___');
+      const prodName = parts[0];
+      const otherUser = parts[1];
+
+      document.getElementById('chat-title').innerText = prodName === '[Perfil]' ? `Conversa Direta com ${otherUser}` : `${prodName} (com ${otherUser})`;
+
+      const chatMsgs = messagesList.filter(m => {
+        const isUserMatch = (m.seller.toLowerCase() === currentUserData.username.toLowerCase() && m.buyer.toLowerCase() === otherUser) ||
+                            (m.buyer.toLowerCase() === currentUserData.username.toLowerCase() && m.seller.toLowerCase() === otherUser);
+        return m.productName === prodName && isUserMatch;
+      });
+
+      const container = document.getElementById('chat-bubbles');
+      container.innerHTML = '';
+
+      chatMsgs.forEach(m => {
+        const myUser = currentUserData.username.toLowerCase();
+        const senderName = m.sender || (m.buyer.toLowerCase() === myUser ? currentUserData.username : otherUser);
+        const isMine = senderName.toLowerCase() === myUser;
+
+        if (!isMine && !m.read) {
+          updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
+        }
+
+        const bubble = document.createElement('div');
+        bubble.className = `chat-bubble ${isMine ? 'mine' : 'other'}`;
+        bubble.innerHTML = `
+          ${!isMine ? `<span class="chat-sender-tag">${escapeHtml(senderName)}</span>` : ''}
+          ${escapeHtml(m.message)}
+        `;
+        container.appendChild(bubble);
+      });
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    window.sendChatMessage = async function() {
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg || !activeChatKey) return;
+
+      const parts = activeChatKey.split('___');
+      const prodName = parts[0];
+      const otherUser = parts[1];
+
+      try {
+        await addDoc(publicMessagesColl(), {
+          sender: currentUserData.username,
+          buyer: currentUserData.username, 
+          seller: otherUser,
+          productName: prodName, 
+          message: msg,
+          timestamp: new Date().toISOString(), 
+          read: false
+        });
+        input.value = '';
+      } catch (e) {}
+    };
+
+    window.openDirectMsgModal = function(targetName) {
+      document.getElementById('modal-msg-target-name').innerText = `Mensagem para ${targetName}`;
+      document.getElementById('direct-msg-target-username').value = targetName;
+      document.getElementById('direct-msg-text').value = '';
+      document.getElementById('modal-direct-msg').classList.remove('hidden');
+    };
+
+    window.closeDirectMsgModal = function() {
+      document.getElementById('modal-direct-msg').classList.add('hidden');
+    };
+
+    window.sendDirectMessageFromProfile = async function() {
+      const targetUser = document.getElementById('direct-msg-target-username').value;
+      const text = document.getElementById('direct-msg-text').value.trim();
+      if (!text || !currentUserData) return;
+
+      try {
+        await addDoc(publicMessagesColl(), {
+          sender: currentUserData.username,
+          buyer: currentUserData.username,
+          seller: targetUser,
+          productName: '[Perfil]',
+          message: text,
+          timestamp: new Date().toISOString(),
+          read: false
+        });
+        closeDirectMsgModal();
+        alert(`Mensagem enviada para ${targetUser}!`);
+        navigateTo('messages');
+      } catch (e) { alert("Erro ao enviar mensagem."); }
+    };
+
+    window.contactSellerAboutProduct = async function(sellerName, productName) {
+      if (!currentUserData || sellerName.toLowerCase() === currentUserData.username.toLowerCase()) return;
+      try {
+        await addDoc(publicMessagesColl(), {
+          sender: currentUserData.username,
+          buyer: currentUserData.username,
+          seller: sellerName,
+          productName: productName,
+          message: `Olá! Tenho interesse no seu produto ${productName}.`,
+          timestamp: new Date().toISOString(),
+          read: false
+        });
+        navigateTo('messages');
+      } catch (e) { alert("Erro ao iniciar chat."); }
     };
 
     // DEPÓSITO UNIFICADO
@@ -538,7 +815,6 @@
 
       let totalToDeposit = 0;
 
-      // Resgata dos posts
       for (const p of myPosts) {
         const pending = calculatePendingEarnings(p);
         if (pending > 0) {
@@ -548,7 +824,6 @@
         }
       }
 
-      // Resgata do marketplace
       for (const prod of myProducts) {
         const pending = calculatePendingEarnings(prod);
         if (pending > 0) {
@@ -749,6 +1024,8 @@
             💬 Comentários (${comments.length})
           </button>
 
+          ${!isSelf ? `<button onclick="openDirectMsgModal('${escapeStr(post.author)}')" style="font-size:11px;">💬 Mensagem</button>` : ''}
+
           ${isSelf ? `<span style="font-size:12px; color:#137333; font-weight:bold; margin-left:auto;">Pendente: R$ ${pendingVal.toFixed(2)}</span>` : ''}
         </div>
 
@@ -800,10 +1077,13 @@
         <div class="product-price">€ / R$ ${prod.price.toFixed(2)}</div>
         <p class="item-content" style="margin-top:6px;">${escapeHtml(prod.description)}</p>
         
-        <div style="display:flex; align-items:center; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <button onclick="toggleLikeProduct('${prod.id}')" class="${hasLiked ? 'btn-primary' : ''}">
             ${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})
           </button>
+          
+          ${!isSelf ? `<button class="btn-success" onclick="contactSellerAboutProduct('${escapeStr(prod.seller)}', '${escapeStr(prod.name)}')">💬 Negociar / Comprar</button>` : ''}
+
           ${isSelf ? `<span style="font-size:12px; color:#137333; font-weight:bold; margin-left:auto;">Pendente: R$ ${pendingVal.toFixed(2)}</span>` : ''}
         </div>
       `;
@@ -854,12 +1134,10 @@
       vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum produto na vitrine.</p>' : '';
       userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
 
-      // DESEMPENHO E VIRAIS
       renderAnalytics(userPosts);
     }
 
     function renderAnalytics(userPosts) {
-      // Calendário simples dos últimos 7 dias
       const calGrid = document.getElementById('calendar-grid-container');
       calGrid.innerHTML = '';
       const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -871,7 +1149,6 @@
         calGrid.appendChild(div);
       });
 
-      // Top posts
       const tbody = document.getElementById('top-posts-table-body');
       tbody.innerHTML = userPosts.length === 0 ? '<tr><td colspan="3">Sem dados.</td></tr>' : '';
 
