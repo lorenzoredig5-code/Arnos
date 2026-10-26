@@ -39,9 +39,6 @@
     button.btn-success { background-color: #188038; border-color: #188038; color: #ffffff; font-weight: bold; }
     button.btn-success:hover { background-color: #13652b; }
     button.btn-danger { background-color: #d93025; border-color: #d93025; color: #ffffff; }
-    button.btn-warning { background-color: #f2994a; border-color: #f2994a; color: #ffffff; }
-    button.btn-dev { background-color: #9333ea; border-color: #9333ea; color: #ffffff; font-weight: bold; }
-    button.btn-dev:hover { background-color: #7e22ce; }
 
     nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
@@ -59,22 +56,11 @@
     .author-container:hover .author-name { text-decoration: underline; }
 
     /* BADGE & CREDITS */
-    .badge-container { position: relative; display: inline-block; }
-    .badge {
-      position: absolute; top: -6px; right: -6px; background-color: #d93025; color: #ffffff;
-      border: 2px solid #ffffff; border-radius: 50%; padding: 2px 6px; font-size: 10px; font-weight: bold;
-    }
-    .credits-display { background-color: #e6f4ea; color: #137333; padding: 4px 10px; border-radius: 16px; font-weight: bold; font-size: 13px; border: 1px solid #ceedd6; }
+    .credits-display { background-color: #e6f4ea; color: #137333; padding: 6px 14px; border-radius: 16px; font-weight: bold; font-size: 18px; border: 1px solid #ceedd6; display: inline-flex; align-items: center; gap: 6px; }
 
     /* CONTAINER & CARDS */
     .container { max-width: 800px; margin: 16px auto; padding: 0 12px; }
     .card { background-color: #ffffff; border: 1px solid #dadce0; border-radius: 8px; padding: 16px; margin-bottom: 16px; position: relative; }
-    
-    .card.verified-post {
-      border: 2px solid #00f0ff;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
-      background: linear-gradient(135deg, #ffffff 0%, #f4fbff 100%);
-    }
 
     .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .author-name { font-weight: bold; color: #1a73e8; }
@@ -83,25 +69,6 @@
     .post-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
     .product-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
     .product-price { font-size: 18px; font-weight: bold; color: #188038; margin-bottom: 4px; }
-    
-    .bot-badge {
-      background-color: #e8f0fe; color: #1a73e8; border: 1px solid #aecbfa;
-      font-size: 10px; padding: 1px 4px; border-radius: 3px; font-weight: bold; margin-left: 4px;
-    }
-
-    /* EMOJI REACTION POPUP */
-    .reaction-picker {
-      position: absolute; background: #ffffff; border: 1px solid #dadce0;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 24px; padding: 6px 10px;
-      display: flex; gap: 8px; z-index: 200; transform: translateY(-45px); animation: fadeIn 0.15s ease-in-out;
-    }
-    .reaction-picker span { font-size: 20px; cursor: pointer; transition: transform 0.1s; display: inline-block; }
-    .reaction-picker span:hover { transform: scale(1.3); }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-35px); }
-      to { opacity: 1; transform: translateY(-45px); }
-    }
 
     /* COMMENTS SECTION */
     .comments-section { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
@@ -112,6 +79,15 @@
     .tabs { display: flex; border-bottom: 1px solid #dadce0; margin-bottom: 16px; overflow-x: auto; }
     .tab-btn { border: none; background: none; border-radius: 0; padding: 8px 16px; border-bottom: 3px solid transparent; color: #5f6368; font-weight: bold; white-space: nowrap; }
     .tab-btn.active { border-bottom-color: #1a73e8; color: #1a73e8; }
+
+    /* ANALYTICS TABLE & CALENDAR */
+    .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    .stats-table th, .stats-table td { border: 1px solid #dadce0; padding: 8px 12px; text-align: left; }
+    .stats-table th { background-color: #f1f3f4; }
+
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; text-align: center; }
+    .calendar-day { border: 1px solid #dadce0; border-radius: 4px; padding: 6px 2px; font-size: 11px; background-color: #ffffff; }
+    .calendar-day.active { background-color: #e6f4ea; border-color: #34a853; font-weight: bold; }
 
     /* MODAL */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
@@ -124,23 +100,20 @@
     .hidden { display: none !important; }
   </style>
 </head>
-<body onclick="hideAllReactionPickers()">
+<body>
 
   <!-- HEADER -->
   <header id="app-header" class="hidden">
     <div class="logo" onclick="navigateTo('feed')">Arnos</div>
     
     <div class="search-bar-container">
-      <input type="text" id="search-input" placeholder="Pesquisar perfil, post ou produto..." autocomplete="off" dir="ltr">
+      <input type="text" id="search-input" placeholder="Pesquisar..." autocomplete="off" dir="ltr">
     </div>
 
     <nav>
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('marketplace')">Marketplace</button>
-      
       <span class="credits-display">💳 <span id="user-credits-val">0.00</span></span>
-      <button class="btn-dev" onclick="openDevModal()">⚙️ Dev</button>
-
       <button onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')">Meu Perfil</button>
       <span id="nav-user-link" class="nav-user" onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')"></span>
       <button onclick="logout()">Log out</button>
@@ -162,9 +135,7 @@
         <input type="text" id="signup-username" required placeholder="Nome de utilizador" dir="ltr">
         <label style="font-size:12px; font-weight:bold;">Palavra-passe</label>
         <input type="password" id="signup-password" required placeholder="Mínimo 6 caracteres" dir="ltr">
-        <label style="font-size:12px; font-weight:bold;">Data de Nascimento</label>
-        <input type="date" id="signup-dob" required style="margin-bottom: 12px;">
-        <button type="submit" id="btn-signup" class="btn-primary" style="width: 100%;">Criar Conta</button>
+        <button type="submit" class="btn-primary" style="width: 100%;">Criar Conta</button>
         <p style="text-align: center; font-size: 13px; margin-top: 16px;">
           Já tens conta? <a href="#" onclick="toggleAuth('login')" style="color: #1a73e8;">Entrar</a>
         </p>
@@ -175,7 +146,7 @@
         <input type="text" id="login-username" required placeholder="Nome de utilizador" dir="ltr">
         <label style="font-size:12px; font-weight:bold;">Palavra-passe</label>
         <input type="password" id="login-password" required placeholder="Palavra-passe" dir="ltr">
-        <button type="submit" id="btn-login" class="btn-primary" style="width: 100%;">Entrar</button>
+        <button type="submit" class="btn-primary" style="width: 100%;">Entrar</button>
         <p style="text-align: center; font-size: 13px; margin-top: 16px;">
           Não tens conta? <a href="#" onclick="toggleAuth('signup')" style="color: #1a73e8;">Criar uma</a>
         </p>
@@ -187,12 +158,10 @@
       <div class="card">
         <h3 style="font-size: 15px; margin-bottom: 8px;">Criar uma publicação</h3>
         <textarea id="post-input" rows="3" placeholder="No que estás a pensar?" dir="ltr"></textarea>
-        
         <label style="font-size: 12px; font-weight: bold; display: block; margin-top: 6px;">Adicionar Foto ao Post (Opcional)</label>
         <input type="file" id="post-image-file" accept="image/*" style="margin-bottom: 8px;">
         <div id="post-img-preview" style="margin-bottom: 12px;"></div>
-
-        <button id="btn-publish-post" onclick="submitPost()" class="btn-primary">Publicar</button>
+        <button onclick="submitPost()" class="btn-primary">Publicar</button>
       </div>
       <div id="feed-list"></div>
     </div>
@@ -206,96 +175,91 @@
       <div id="marketplace-list"></div>
     </div>
 
-    <!-- SEARCH VIEW -->
-    <div id="view-search" class="hidden">
-      <h3 style="margin-bottom: 12px;">Resultados para "<span id="search-query-text"></span>"</h3>
-      <div class="tabs">
-        <button id="tab-btn-profiles" class="tab-btn active" onclick="switchSearchTab('profiles')">Perfis (<span id="count-profiles">0</span>)</button>
-        <button id="tab-btn-posts" class="tab-btn" onclick="switchSearchTab('posts')">Posts (<span id="count-posts">0</span>)</button>
-        <button id="tab-btn-products" class="tab-btn" onclick="switchSearchTab('products')">Marketplace (<span id="count-products">0</span>)</button>
-      </div>
-
-      <div id="search-results-profiles"></div>
-      <div id="search-results-posts" class="hidden"></div>
-      <div id="search-results-products" class="hidden"></div>
-    </div>
-
     <!-- PROFILE VIEW -->
     <div id="view-profile" class="hidden">
+      <!-- PAINEL DE DEPÓSITO E SALDO -->
+      <div class="card" style="text-align: center; background: #ffffff; border: 2px solid #dadce0;">
+        <div class="credits-display" style="margin-bottom: 12px;">
+          💳 <span id="profile-main-credits">0.00</span>
+        </div>
+        <br>
+        <button class="btn-success" onclick="depositAllPendingCredits()" style="padding: 10px 20px; font-size: 14px; width: 100%; max-width: 320px;">
+          Depositar Créditos dos Posts e Marketplace
+        </button>
+        <p style="font-size: 13px; color: #5f6368; margin-top: 8px;">
+          total pendente: <strong>R$ <span id="profile-pending-total">0.00</span></strong>
+        </p>
+      </div>
+
       <div class="card profile-header">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <div id="profile-avatar-container"></div>
-            <div>
-              <h2 id="profile-name-display" style="display: inline-block;"></h2>
-              <span id="profile-verified-badge" style="font-size: 18px; margin-left: 4px;" title="Conta Verificada">✅</span>
-            </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div id="profile-avatar-container"></div>
+          <div>
+            <h2 id="profile-name-display"></h2>
           </div>
         </div>
 
-        <div class="profile-stats" style="display:flex; gap:16px; margin-top:12px; font-size:13px; color:#5f6368;">
-          <span><strong id="stat-posts">0</strong> Posts</span>
+        <div id="profile-edit-avatar-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
+          <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Alterar Foto de Perfil</label>
+          <input type="file" id="profile-avatar-file" accept="image/*" style="margin-bottom: 6px;">
+          <button class="btn-primary" onclick="saveProfileAvatar()">Guardar Foto de Perfil</button>
         </div>
       </div>
 
       <div class="tabs">
-        <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
-        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
+        <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Minhas Publicações</button>
+        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Minha Vitrine (Marketplace)</button>
+        <button id="profile-tab-analytics" class="tab-btn" onclick="switchProfileTab('analytics')">📊 Desempenho & Virais</button>
       </div>
 
       <div id="profile-posts-list"></div>
       <div id="profile-vitrine-list" class="hidden"></div>
-    </div>
-
-  </div>
-
-  <!-- MODAL: PAINEL DEV -->
-  <div id="modal-dev" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 style="color: #9333ea;">⚙️ Painel do Desenvolvedor / Seus Dados</h3>
-        <button onclick="closeDevModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div style="background: #f3e8ff; border: 1px solid #d8b4fe; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
-          <p style="font-size: 14px; font-weight: bold; color: #6b21a8;">Seu Saldo Atual: 💳 R$ <span id="dev-modal-credits">0.00</span></p>
-          <p style="font-size: 12px; color: #6b21a8; margin-top: 4px;">Cada curtida recebida nos seus posts ou produtos rende automaticamente <strong>+0,01</strong> de crédito!</p>
+      
+      <!-- ANALYTICS / DESEMPENHO TAB -->
+      <div id="profile-analytics-list" class="hidden">
+        <div class="card">
+          <h3>📅 Calendário de Ganhos & Viralização</h3>
+          <p style="font-size: 12px; color: #5f6368;">Dias com maior taxa de interação e rendimento acumulado no Arnos.</p>
+          <div id="calendar-grid-container" class="calendar-grid"></div>
         </div>
 
-        <h4 style="margin-bottom: 6px;">Seus Posts (<span id="dev-post-count">0</span>):</h4>
-        <div id="dev-posts-container" style="max-height: 150px; overflow-y: auto; border: 1px solid #dadce0; padding: 8px; border-radius: 6px; margin-bottom: 12px; font-size: 13px;"></div>
-
-        <h4 style="margin-bottom: 6px;">Seu Marketplace / Produtos:</h4>
-        <div id="dev-products-container" style="max-height: 150px; overflow-y: auto; border: 1px solid #dadce0; padding: 8px; border-radius: 6px; font-size: 13px;"></div>
+        <div class="card">
+          <h3>🏆 Top Posts e Rendimentos</h3>
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>Texto do Post</th>
+                <th>Interações</th>
+                <th>Total Gerado</th>
+              </tr>
+            </thead>
+            <tbody id="top-posts-table-body"></tbody>
+          </table>
+        </div>
       </div>
+
     </div>
+
   </div>
 
-  <!-- MODAL: CRIAR / EDITAR PRODUTO -->
+  <!-- MODAL: CRIAR PRODUTO -->
   <div id="modal-product" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modal-product-title">Criar Produto</h3>
+        <h3>Publicar no Marketplace</h3>
         <button onclick="closeProductModal()">✕</button>
       </div>
       <div class="modal-body">
-        <label style="font-size: 12px; font-weight: bold;">Título do Produto *</label>
-        <input type="text" id="prod-name" required placeholder="Ex: Tênis Nike Tam 40" dir="ltr">
-
-        <label style="font-size: 12px; font-weight: bold;">Preço (R$) *</label>
+        <label style="font-size: 12px; font-weight: bold;">Nome do Produto *</label>
+        <input type="text" id="prod-name" required placeholder="Ex: Tênis Nike" dir="ltr">
+        <label style="font-size: 12px; font-weight: bold;">Preço (€ / R$) *</label>
         <input type="number" id="prod-price" step="0.01" required placeholder="0.00" dir="ltr">
-
-        <label style="font-size: 12px; font-weight: bold;">Localização *</label>
-        <input type="text" id="prod-location" required placeholder="Ex: São Paulo, SP" dir="ltr">
-
         <label style="font-size: 12px; font-weight: bold;">Descrição</label>
-        <textarea id="prod-desc" rows="3" placeholder="Detalhes do produto..." dir="ltr"></textarea>
-
+        <textarea id="prod-desc" rows="3" placeholder="Detalhes do item..." dir="ltr"></textarea>
         <label style="font-size: 12px; font-weight: bold;">Foto do Produto</label>
         <input type="file" id="prod-image-file" accept="image/*" style="margin-bottom: 8px;">
         <div id="prod-img-preview" style="margin-bottom: 12px;"></div>
-
-        <button onclick="saveProduct()" class="btn-primary" style="width: 100%;">Salvar e Publicar Produto</button>
+        <button onclick="saveProduct()" class="btn-primary" style="width: 100%;">Publicar na Vitrine</button>
       </div>
     </div>
   </div>
@@ -303,18 +267,20 @@
   <!-- FIREBASE SCRIPTS -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, addDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'arnos-app';
-    const firebaseConfig = {
-      apiKey: "AIzaSyCxFcZGxHBILooE1U_UsySdzPU_lCyt2Bw",
-      authDomain: "sitefjrebase.firebaseapp.com",
-      projectId: "sitefjrebase",
-      storageBucket: "sitefjrebase.firebasestorage.app",
-      messagingSenderId: "667261334607",
-      appId: "1:667261334607:web:dec574c7521bb0f885a63a"
-    };
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "AIzaSyCxFcZGxHBILooE1U_UsySdzPU_lCyt2Bw",
+          authDomain: "sitefjrebase.firebaseapp.com",
+          projectId: "sitefjrebase",
+          storageBucket: "sitefjrebase.firebasestorage.app",
+          messagingSenderId: "667261334607",
+          appId: "1:667261334607:web:dec574c7521bb0f885a63a"
+        };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -326,8 +292,9 @@
     let postsList = [];
     let productsList = [];
     let currentProfileUsername = null;
-    let selectedImageBase64 = null;
     let selectedPostImageBase64 = null;
+    let selectedProductImageBase64 = null;
+    let selectedAvatarBase64 = null;
 
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
@@ -340,9 +307,13 @@
 
     async function initAuth() {
       try {
-        await signInAnonymously(auth);
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
       } catch (err) {
-        console.error("Erro auth anônima:", err);
+        try { await signInAnonymously(auth); } catch (e) {}
       }
     }
 
@@ -357,7 +328,6 @@
           const userSnap = await getDoc(publicUserDoc(savedUsername));
           if (userSnap.exists()) {
             currentUserData = userSnap.data();
-            if (currentUserData.credits === undefined) currentUserData.credits = 0;
             window.currentUserData = currentUserData;
             showMainInterface();
             return;
@@ -396,10 +366,39 @@
       });
     }
 
+    function calculatePendingEarnings(item) {
+      const likesCount = (item.likes || []).length;
+      const commentsCount = (item.comments || []).length;
+      const totalEventsCount = likesCount + commentsCount;
+
+      const cashedOutCount = item.cashedOutEventsCount || 0;
+      const uncashedEventsCount = Math.max(0, totalEventsCount - cashedOutCount);
+
+      // Cada evento não resgatado vale proporções (Média para cálculo de curtidas 0.01 e comentários 0.05)
+      const uncashedLikes = Math.max(0, likesCount - Math.min(likesCount, cashedOutCount));
+      const uncashedComments = Math.max(0, commentsCount - Math.max(0, cashedOutCount - likesCount));
+
+      return (uncashedLikes * 0.01) + (uncashedComments * 0.05);
+    }
+
     function updateCreditsUI() {
       if (currentUserData) {
         const val = currentUserData.credits || 0;
         document.getElementById('user-credits-val').innerText = val.toFixed(2);
+        const profCredits = document.getElementById('profile-main-credits');
+        if (profCredits) profCredits.innerText = val.toFixed(2);
+
+        // Calcula total pendente
+        const myKey = currentUserData.username.toLowerCase();
+        const myPosts = postsList.filter(p => p.author.toLowerCase() === myKey);
+        const myProducts = productsList.filter(p => p.seller.toLowerCase() === myKey);
+
+        let totalPending = 0;
+        myPosts.forEach(p => totalPending += calculatePendingEarnings(p));
+        myProducts.forEach(p => totalPending += calculatePendingEarnings(p));
+
+        const pendingEl = document.getElementById('profile-pending-total');
+        if (pendingEl) pendingEl.innerText = totalPending.toFixed(2);
       }
     }
 
@@ -434,13 +433,12 @@
       if (!authUser) await initAuth();
       const name = document.getElementById('signup-username').value.trim();
       const pwd = document.getElementById('signup-password').value;
-      const dob = document.getElementById('signup-dob').value;
-      if (!name || !pwd || !dob) return showAuthErr("Preencha todos os campos.");
+      if (!name || !pwd) return showAuthErr("Preencha todos os campos.");
 
       try {
         const docSnap = await getDoc(publicUserDoc(name));
         if (docSnap.exists()) return showAuthErr("Utilizador já existe.");
-        const newUserData = { username: name, password: pwd, dob: dob, credits: 0 };
+        const newUserData = { username: name, password: pwd, credits: 0, avatarUrl: '' };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
         window.currentUserData = currentUserData;
@@ -494,74 +492,79 @@
       navigateTo('feed');
     }
 
+    // AVATAR UPLOAD
+    document.getElementById('profile-avatar-file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => { selectedAvatarBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    window.saveProfileAvatar = async function() {
+      if (!selectedAvatarBase64 || !currentUserData) return alert("Selecione uma imagem.");
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { avatarUrl: selectedAvatarBase64 });
+        currentUserData.avatarUrl = selectedAvatarBase64;
+        selectedAvatarBase64 = null;
+        document.getElementById('profile-avatar-file').value = '';
+        alert("Foto de perfil atualizada!");
+        renderProfile(currentUserData.username);
+      } catch (e) { alert("Erro ao atualizar foto."); }
+    };
+
     // NAVIGATION
     window.navigateTo = function(view, arg = null) {
       document.getElementById('view-feed').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
-      document.getElementById('view-search').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
 
       if (view === 'feed') { document.getElementById('view-feed').classList.remove('hidden'); renderFeed(); }
       else if (view === 'marketplace') { document.getElementById('view-marketplace').classList.remove('hidden'); renderMarketplace(); }
       else if (view === 'profile') {
         document.getElementById('view-profile').classList.remove('hidden');
-        currentProfileUsername = arg || (currentUserData ? currentUserData.username : '');
+        currentProfileUsername = arg || currentUserData.username;
         renderProfile(currentProfileUsername);
       }
     };
 
-    // DEV MODAL
-    window.openDevModal = function() {
+    // DEPÓSITO UNIFICADO
+    window.depositAllPendingCredits = async function() {
       if (!currentUserData) return;
-      document.getElementById('dev-modal-credits').innerText = (currentUserData.credits || 0).toFixed(2);
-      
-      const myPosts = postsList.filter(p => p.author.toLowerCase() === currentUserData.username.toLowerCase());
-      document.getElementById('dev-post-count').innerText = myPosts.length;
-      document.getElementById('dev-posts-container').innerHTML = myPosts.length === 0 ? 'Nenhum post publicado.' : myPosts.map(p => `• ${escapeHtml(p.content || '[Foto]')} (Curtidas: ${Object.keys(p.reactions || {}).length})`).join('<br>');
+      const myKey = currentUserData.username.toLowerCase();
+      const myPosts = postsList.filter(p => p.author.toLowerCase() === myKey);
+      const myProducts = productsList.filter(p => p.seller.toLowerCase() === myKey);
 
-      const myProds = productsList.filter(p => p.seller.toLowerCase() === currentUserData.username.toLowerCase());
-      document.getElementById('dev-products-container').innerHTML = myProds.length === 0 ? 'Nenhum produto no Marketplace.' : myProds.map(pr => `• ${escapeHtml(pr.name)} - R$ ${pr.price.toFixed(2)} (Curtidas: ${Object.keys(pr.reactions || {}).length})`).join('<br>');
+      let totalToDeposit = 0;
 
-      document.getElementById('modal-dev').classList.remove('hidden');
-    };
-    window.closeDevModal = function() {
-      document.getElementById('modal-dev').classList.add('hidden');
-    };
-
-    // CURTIDAS E CRÉDITOS (+0,01 por like)
-    window.toggleReaction = async function(itemId, type) {
-      if (!currentUserData) return;
-      const isPost = type === 'post';
-      const targetDoc = isPost ? publicPostDoc(itemId) : publicProductDoc(itemId);
-      const targetList = isPost ? postsList : productsList;
-      const item = targetList.find(i => i.id === itemId);
-      if (!item) return;
-
-      let reactions = item.reactions ? { ...item.reactions } : {};
-      const myUser = currentUserData.username;
-      const ownerName = isPost ? item.author : item.seller;
-
-      let isLiking = false;
-      if (reactions[myUser]) {
-        delete reactions[myUser];
-      } else {
-        reactions[myUser] = '❤️';
-        isLiking = true;
-      }
-
-      try {
-        await updateDoc(targetDoc, { reactions });
-
-        // Adiciona ou remove 0,01 de crédito para o dono do post/produto
-        if (ownerName.toLowerCase() !== myUser.toLowerCase()) {
-          const ownerRef = publicUserDoc(ownerName);
-          await updateDoc(ownerRef, {
-            credits: increment(isLiking ? 0.01 : -0.01)
-          });
+      // Resgata dos posts
+      for (const p of myPosts) {
+        const pending = calculatePendingEarnings(p);
+        if (pending > 0) {
+          totalToDeposit += pending;
+          const totalEvents = (p.likes || []).length + (p.comments || []).length;
+          await updateDoc(publicPostDoc(p.id), { cashedOutEventsCount: totalEvents });
         }
-      } catch (e) {
-        console.error("Erro ao curtir:", e);
       }
+
+      // Resgata do marketplace
+      for (const prod of myProducts) {
+        const pending = calculatePendingEarnings(prod);
+        if (pending > 0) {
+          totalToDeposit += pending;
+          const totalEvents = (prod.likes || []).length + (prod.comments || []).length;
+          await updateDoc(publicProductDoc(prod.id), { cashedOutEventsCount: totalEvents });
+        }
+      }
+
+      if (totalToDeposit <= 0) return alert("Não tens créditos acumulados para depositar no momento.");
+
+      const newBalance = (currentUserData.credits || 0) + totalToDeposit;
+      await updateDoc(publicUserDoc(currentUserData.username), { credits: newBalance });
+      currentUserData.credits = newBalance;
+      updateCreditsUI();
+      alert(`Depósito concluído com sucesso! R$ ${totalToDeposit.toFixed(2)} foram adicionados à tua conta.`);
     };
 
     // POSTS
@@ -569,9 +572,9 @@
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = function(evt) {
+        reader.onload = (evt) => {
           selectedPostImageBase64 = evt.target.result;
-          document.getElementById('post-img-preview').innerHTML = `<img src="${selectedPostImageBase64}" style="max-width:100%; max-height:180px; border-radius:4px;">`;
+          document.getElementById('post-img-preview').innerHTML = `<img src="${selectedPostImageBase64}" style="max-width:100%; max-height:150px; border-radius:4px;">`;
         };
         reader.readAsDataURL(file);
       }
@@ -579,32 +582,147 @@
 
     window.submitPost = async function() {
       if (!currentUserData) return;
-      const textEl = document.getElementById('post-input');
-      const content = textEl.value.trim();
+      const content = document.getElementById('post-input').value.trim();
       const imageUrl = selectedPostImageBase64 || '';
       if (!content && !imageUrl) return alert("Escreva um texto ou adicione uma foto.");
 
       try {
-        await addDoc(publicPostsColl(), { 
-          author: currentUserData.username, 
-          content, 
-          imageUrl, 
-          timestamp: new Date().toISOString(), 
-          reactions: {}
+        await addDoc(publicPostsColl(), {
+          author: currentUserData.username,
+          content,
+          imageUrl,
+          timestamp: new Date().toISOString(),
+          likes: [],
+          comments: [],
+          cashedOutEventsCount: 0
         });
-        textEl.value = '';
+        document.getElementById('post-input').value = '';
         selectedPostImageBase64 = null;
         document.getElementById('post-image-file').value = '';
         document.getElementById('post-img-preview').innerHTML = '';
       } catch (e) {}
     };
 
+    window.deletePost = async function(id) {
+      if (!confirm("Apagar post?")) return;
+      try { await deleteDoc(publicPostDoc(id)); } catch (e) {}
+    };
+
+    window.toggleLikePost = async function(postId) {
+      if (!currentUserData) return;
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let likes = post.likes ? [...post.likes] : [];
+      const myUser = currentUserData.username;
+      const hasLiked = likes.includes(myUser);
+
+      if (hasLiked) likes = likes.filter(u => u !== myUser);
+      else likes.push(myUser);
+
+      try { await updateDoc(publicPostDoc(postId), { likes }); } catch (e) {}
+    };
+
+    window.toggleCommentBox = function(id) {
+      const el = document.getElementById(`comments-box-${id}`);
+      if (el) el.classList.toggle('hidden');
+    };
+
+    window.addCommentToPost = async function(postId) {
+      if (!currentUserData) return;
+      const input = document.getElementById(`comment-input-${postId}`);
+      const text = input.value.trim();
+      if (!text) return;
+
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let comments = post.comments ? [...post.comments] : [];
+      comments.push({
+        id: 'c_' + Date.now(),
+        author: currentUserData.username,
+        text,
+        timestamp: new Date().toISOString()
+      });
+
+      try {
+        await updateDoc(publicPostDoc(postId), { comments });
+        input.value = '';
+      } catch (e) {}
+    };
+
+    // MARKETPLACE
+    document.getElementById('prod-image-file').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          selectedProductImageBase64 = evt.target.result;
+          document.getElementById('prod-img-preview').innerHTML = `<img src="${selectedProductImageBase64}" style="max-width:100%; max-height:150px; border-radius:4px;">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    window.openCreateProductModal = function() {
+      document.getElementById('prod-name').value = '';
+      document.getElementById('prod-price').value = '';
+      document.getElementById('prod-desc').value = '';
+      document.getElementById('prod-image-file').value = '';
+      document.getElementById('prod-img-preview').innerHTML = '';
+      selectedProductImageBase64 = null;
+      document.getElementById('modal-product').classList.remove('hidden');
+    };
+
+    window.closeProductModal = function() { document.getElementById('modal-product').classList.add('hidden'); };
+
+    window.saveProduct = async function() {
+      const name = document.getElementById('prod-name').value.trim();
+      const price = parseFloat(document.getElementById('prod-price').value);
+      const desc = document.getElementById('prod-desc').value.trim();
+      if (!name || isNaN(price)) return alert("Preencha o nome e o preço.");
+
+      try {
+        await addDoc(publicProductsColl(), {
+          seller: currentUserData.username,
+          name, price, description: desc,
+          imageUrl: selectedProductImageBase64 || '',
+          timestamp: new Date().toISOString(),
+          likes: [],
+          comments: [],
+          cashedOutEventsCount: 0
+        });
+        closeProductModal();
+      } catch (e) {}
+    };
+
+    window.deleteProduct = async function(id) {
+      if (!confirm("Apagar produto?")) return;
+      try { await deleteDoc(publicProductDoc(id)); } catch (e) {}
+    };
+
+    window.toggleLikeProduct = async function(prodId) {
+      if (!currentUserData) return;
+      const prod = productsList.find(p => p.id === prodId);
+      if (!prod) return;
+
+      let likes = prod.likes ? [...prod.likes] : [];
+      const myUser = currentUserData.username;
+      const hasLiked = likes.includes(myUser);
+
+      if (hasLiked) likes = likes.filter(u => u !== myUser);
+      else likes.push(myUser);
+
+      try { await updateDoc(publicProductDoc(prodId), { likes }); } catch (e) {}
+    };
+
     function buildPostCard(post) {
       const authorObj = usersMap[post.author.toLowerCase()];
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
-      const reactions = post.reactions || {};
-      const totalLikes = Object.keys(reactions).length;
-      const myLiked = currentUserData && reactions[currentUserData.username];
+      const likes = post.likes || [];
+      const comments = post.comments || [];
+      const hasLiked = currentUserData && likes.includes(currentUserData.username);
+      const pendingVal = calculatePendingEarnings(post);
 
       const div = document.createElement('div');
       div.className = 'card';
@@ -614,15 +732,79 @@
             ${renderAvatar(authorObj, 'small')}
             <span class="author-name">${escapeHtml(post.author)}</span>
           </div>
-          <span class="item-date">${new Date(post.timestamp).toLocaleString()}</span>
+          <div>
+            <span class="item-date">${new Date(post.timestamp).toLocaleString()}</span>
+            ${isSelf ? `<button onclick="deletePost('${post.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
+          </div>
         </div>
         ${post.content ? `<div class="item-content">${escapeHtml(post.content)}</div>` : ''}
         ${post.imageUrl ? `<img src="${escapeHtml(post.imageUrl)}" class="post-img">` : ''}
         
-        <div style="display:flex; gap:12px; align-items:center;">
-          <button onclick="toggleReaction('${post.id}', 'post')">
-            ${myLiked ? '❤️ Curtido' : '♡ Curtir'} (${totalLikes})
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <button onclick="toggleLikePost('${post.id}')" class="${hasLiked ? 'btn-primary' : ''}">
+            ${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})
           </button>
+          
+          <button onclick="toggleCommentBox('${post.id}')">
+            💬 Comentários (${comments.length})
+          </button>
+
+          ${isSelf ? `<span style="font-size:12px; color:#137333; font-weight:bold; margin-left:auto;">Pendente: R$ ${pendingVal.toFixed(2)}</span>` : ''}
+        </div>
+
+        <div id="comments-box-${post.id}" class="comments-section hidden">
+          <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <input type="text" id="comment-input-${post.id}" placeholder="Escreva um comentário..." dir="ltr" style="margin-bottom:0;">
+            <button class="btn-primary" onclick="addCommentToPost('${post.id}')">Enviar</button>
+          </div>
+          <div>
+            ${comments.length === 0 ? '<p style="color:#70757a; font-size:12px;">Sem comentários.</p>' : ''}
+            ${comments.map(c => `
+              <div class="comment-item">
+                <div class="comment-header">
+                  <strong>${escapeHtml(c.author)}</strong>
+                  <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
+                </div>
+                <div>${escapeHtml(c.text)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    function buildProductCard(prod) {
+      const sellerObj = usersMap[prod.seller.toLowerCase()];
+      const isSelf = currentUserData && prod.seller.toLowerCase() === currentUserData.username.toLowerCase();
+      const likes = prod.likes || [];
+      const comments = prod.comments || [];
+      const hasLiked = currentUserData && likes.includes(currentUserData.username);
+      const pendingVal = calculatePendingEarnings(prod);
+
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <div class="item-header">
+          <div class="author-container" onclick="navigateTo('profile', '${escapeStr(prod.seller)}')">
+            ${renderAvatar(sellerObj, 'small')}
+            <span class="author-name">Vendedor: ${escapeHtml(prod.seller)}</span>
+          </div>
+          <div>
+            <span class="item-date">${new Date(prod.timestamp).toLocaleDateString()}</span>
+            ${isSelf ? `<button onclick="deleteProduct('${prod.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
+          </div>
+        </div>
+        ${prod.imageUrl ? `<img src="${escapeHtml(prod.imageUrl)}" class="product-img">` : ''}
+        <h3>${escapeHtml(prod.name)}</h3>
+        <div class="product-price">€ / R$ ${prod.price.toFixed(2)}</div>
+        <p class="item-content" style="margin-top:6px;">${escapeHtml(prod.description)}</p>
+        
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button onclick="toggleLikeProduct('${prod.id}')" class="${hasLiked ? 'btn-primary' : ''}">
+            ${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})
+          </button>
+          ${isSelf ? `<span style="font-size:12px; color:#137333; font-weight:bold; margin-left:auto;">Pendente: R$ ${pendingVal.toFixed(2)}</span>` : ''}
         </div>
       `;
       return div;
@@ -630,88 +812,24 @@
 
     function renderFeed() {
       const list = document.getElementById('feed-list');
-      list.innerHTML = postsList.length === 0 ? '<p style="color:#70757a;">Sem posts.</p>' : '';
+      list.innerHTML = postsList.length === 0 ? '<p style="color:#70757a;">Sem posts no feed.</p>' : '';
       postsList.forEach(p => list.appendChild(buildPostCard(p)));
-    }
-
-    // MARKETPLACE
-    document.getElementById('prod-image-file').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          selectedImageBase64 = evt.target.result;
-          document.getElementById('prod-img-preview').innerHTML = `<img src="${selectedImageBase64}" style="max-width:100%; max-height:150px; border-radius:4px;">`;
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    window.openCreateProductModal = function() {
-      document.getElementById('modal-product').classList.remove('hidden');
-    };
-    window.closeProductModal = function() {
-      document.getElementById('modal-product').classList.add('hidden');
-    };
-
-    window.saveProduct = async function() {
-      const name = document.getElementById('prod-name').value.trim();
-      const price = parseFloat(document.getElementById('prod-price').value);
-      const location = document.getElementById('prod-location').value.trim();
-      const desc = document.getElementById('prod-desc').value.trim();
-      if (!name || isNaN(price) || !location) return alert("Preencha Título, Preço e Localização.");
-
-      try {
-        await addDoc(publicProductsColl(), {
-          seller: currentUserData.username,
-          name, price, location, description: desc,
-          imageUrl: selectedImageBase64 || '',
-          reactions: {},
-          timestamp: new Date().toISOString()
-        });
-        closeProductModal();
-      } catch (e) { alert("Erro ao salvar produto."); }
-    };
-
-    function buildProductCard(prod) {
-      const sellerObj = usersMap[prod.seller.toLowerCase()];
-      const reactions = prod.reactions || {};
-      const totalLikes = Object.keys(reactions).length;
-      const myLiked = currentUserData && reactions[currentUserData.username];
-
-      const div = document.createElement('div');
-      div.className = 'card';
-      div.innerHTML = `
-        <div class="item-header">
-          <span class="author-name">Vendedor: ${escapeHtml(prod.seller)}</span>
-          <span class="item-date">${new Date(prod.timestamp).toLocaleDateString()}</span>
-        </div>
-        ${prod.imageUrl ? `<img src="${escapeHtml(prod.imageUrl)}" class="product-img">` : ''}
-        <h3>${escapeHtml(prod.name)}</h3>
-        <div class="product-price">R$ ${prod.price.toFixed(2)}</div>
-        <div style="font-size: 12px; color: #5f6368; margin-bottom: 6px;">📍 ${escapeHtml(prod.location)}</div>
-        <p class="item-content">${escapeHtml(prod.description)}</p>
-        
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <button onclick="toggleReaction('${prod.id}', 'prod')">
-            ${myLiked ? '❤️ Curtido' : '♡ Curtir'} (${totalLikes})
-          </button>
-        </div>
-      `;
-      return div;
     }
 
     function renderMarketplace() {
       const list = document.getElementById('marketplace-list');
-      list.innerHTML = productsList.length === 0 ? '<p style="color:#70757a;">Nenhum produto.</p>' : '';
+      list.innerHTML = productsList.length === 0 ? '<p style="color:#70757a;">Nenhum produto no Marketplace.</p>' : '';
       productsList.forEach(p => list.appendChild(buildProductCard(p)));
     }
 
     window.switchProfileTab = function(tab) {
       document.getElementById('profile-posts-list').classList.toggle('hidden', tab !== 'posts');
       document.getElementById('profile-vitrine-list').classList.toggle('hidden', tab !== 'vitrine');
+      document.getElementById('profile-analytics-list').classList.toggle('hidden', tab !== 'analytics');
+
       document.getElementById('profile-tab-posts').classList.toggle('active', tab === 'posts');
       document.getElementById('profile-tab-vitrine').classList.toggle('active', tab === 'vitrine');
+      document.getElementById('profile-tab-analytics').classList.toggle('active', tab === 'analytics');
     };
 
     function renderProfile(name) {
@@ -722,18 +840,61 @@
       document.getElementById('profile-name-display').innerText = user.username;
       document.getElementById('profile-avatar-container').innerHTML = renderAvatar(user, 'large');
 
+      const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
+      document.getElementById('profile-edit-avatar-section').classList.toggle('hidden', !isSelf);
+
       const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
       const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
 
-      document.getElementById('stat-posts').innerText = userPosts.length;
-
       const postsDiv = document.getElementById('profile-posts-list');
-      postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Sem publicações.</p>' : '';
+      postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum post.</p>' : '';
       userPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
 
       const vitrineDiv = document.getElementById('profile-vitrine-list');
-      vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Sem produtos à venda.</p>' : '';
+      vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum produto na vitrine.</p>' : '';
       userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
+
+      // DESEMPENHO E VIRAIS
+      renderAnalytics(userPosts);
+    }
+
+    function renderAnalytics(userPosts) {
+      // Calendário simples dos últimos 7 dias
+      const calGrid = document.getElementById('calendar-grid-container');
+      calGrid.innerHTML = '';
+      const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      
+      days.forEach((dayName, idx) => {
+        const div = document.createElement('div');
+        div.className = `calendar-day ${idx === new Date().getDay() ? 'active' : ''}`;
+        div.innerHTML = `<strong>${dayName}</strong><br>${idx === new Date().getDay() ? 'Viral 🚀' : 'Ok'}`;
+        calGrid.appendChild(div);
+      });
+
+      // Top posts
+      const tbody = document.getElementById('top-posts-table-body');
+      tbody.innerHTML = userPosts.length === 0 ? '<tr><td colspan="3">Sem dados.</td></tr>' : '';
+
+      const sorted = [...userPosts].sort((a, b) => {
+        const interA = (a.likes || []).length + (a.comments || []).length;
+        const interB = (b.likes || []).length + (b.comments || []).length;
+        return interB - interA;
+      });
+
+      sorted.forEach(p => {
+        const likes = (p.likes || []).length;
+        const comments = (p.comments || []).length;
+        const totalEvents = likes + comments;
+        const generatedVal = (likes * 0.01) + (comments * 0.05);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(p.content || '[Foto]')}</td>
+          <td>❤️ ${likes} | 💬 ${comments} (<strong>${totalEvents}</strong>)</td>
+          <td style="color:#137333; font-weight:bold;">R$ ${generatedVal.toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
     function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
