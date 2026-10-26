@@ -70,8 +70,8 @@
     .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .author-name { font-weight: bold; color: #1a73e8; }
     .item-date { font-size: 12px; color: #70757a; }
-    .item-content { font-size: 14px; margin-bottom: 12px; white-space: pre-wrap; }
-    .post-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
+    .item-content { font-size: 14px; margin-bottom: 12px; white-space: pre-wrap; cursor: pointer; }
+    .post-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; cursor: pointer; }
     .product-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; border: 1px solid #eee; }
     .product-price { font-size: 18px; font-weight: bold; color: #188038; margin-bottom: 4px; }
 
@@ -103,7 +103,7 @@
 
     /* MODAL */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-card { background: #fff; border-radius: 8px; border: 1px solid #dadce0; width: 90%; max-width: 520px; max-height: 90vh; display: flex; flex-direction: column; }
+    .modal-card { background: #fff; border-radius: 8px; border: 1px solid #dadce0; width: 90%; max-width: 580px; max-height: 90vh; display: flex; flex-direction: column; }
     .modal-header { padding: 12px 16px; border-bottom: 1px solid #dadce0; display: flex; justify-content: space-between; align-items: center; }
     .modal-body { padding: 16px; overflow-y: auto; flex: 1; }
 
@@ -217,8 +217,8 @@
 
     <!-- PROFILE VIEW -->
     <div id="view-profile" class="hidden">
-      <!-- PAINEL DE DEPÓSITO E SALDO -->
-      <div class="card" style="text-align: center; background: #ffffff; border: 2px solid #dadce0;">
+      <!-- PAINEL DE DEPÓSITO E SALDO (VISÍVEL APENAS NO PRÓPRIO PERFIL) -->
+      <div id="profile-deposit-card" class="card hidden" style="text-align: center; background: #ffffff; border: 2px solid #dadce0;">
         <div class="credits-display" style="margin-bottom: 12px;">
           💳 <span id="profile-main-credits">0.00</span>
         </div>
@@ -232,11 +232,14 @@
       </div>
 
       <div class="card profile-header">
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <div id="profile-avatar-container"></div>
-          <div>
-            <h2 id="profile-name-display"></h2>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div id="profile-avatar-container"></div>
+            <div>
+              <h2 id="profile-name-display"></h2>
+            </div>
           </div>
+          <div id="profile-action-btn-area"></div>
         </div>
 
         <div id="profile-edit-avatar-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
@@ -247,8 +250,8 @@
       </div>
 
       <div class="tabs">
-        <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Minhas Publicações</button>
-        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Minha Vitrine (Marketplace)</button>
+        <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
+        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
         <button id="profile-tab-analytics" class="tab-btn" onclick="switchProfileTab('analytics')">📊 Desempenho & Virais</button>
       </div>
 
@@ -269,7 +272,7 @@
             <thead>
               <tr>
                 <th>Texto do Post</th>
-                <th>Interações</th>
+                <th>Interações / Visualizações</th>
                 <th>Total Gerado</th>
               </tr>
             </thead>
@@ -280,6 +283,41 @@
 
     </div>
 
+  </div>
+
+  <!-- MODAL: VISUALIZAR POST DEDICADO -->
+  <div id="modal-view-post" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div id="modal-post-avatar"></div>
+          <div>
+            <h4 id="modal-post-author" style="margin:0; color:#1a73e8;"></h4>
+            <span id="modal-post-date" style="font-size:11px; color:#70757a;"></span>
+          </div>
+        </div>
+        <button class="btn-danger" onclick="closePostModal()">Sair do Post</button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-post-content" style="font-size:15px; margin-bottom:12px; white-space:pre-wrap;"></div>
+        <div id="modal-post-image-container"></div>
+
+        <div style="display:flex; align-items:center; gap:12px; margin-top:12px; padding-top:8px; border-top:1px solid #eee;">
+          <button id="modal-post-like-btn" class="btn-primary">❤️ Curtir</button>
+          <span style="font-size:13px; color:#5f6368;">💬 <strong id="modal-post-comments-count">0</strong> Comentários</span>
+          <span style="font-size:13px; color:#1a73e8; font-weight:bold; margin-left:auto;">👁️ <span id="modal-post-views-count">0</span> Visualizações</span>
+        </div>
+
+        <div class="comments-section" style="margin-top:16px;">
+          <h4 style="margin-bottom:8px; font-size:14px;">Comentários</h4>
+          <div style="display:flex; gap:6px; margin-bottom:12px;">
+            <input type="text" id="modal-comment-input" placeholder="Escreva um comentário..." dir="ltr" style="margin-bottom:0;">
+            <button class="btn-primary" id="modal-btn-send-comment">Enviar</button>
+          </div>
+          <div id="modal-comments-list"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL: CRIAR PRODUTO -->
@@ -349,6 +387,7 @@
     let productsList = [];
     let messagesList = [];
     let currentProfileUsername = null;
+    let activeOpenedPostId = null;
     let selectedPostImageBase64 = null;
     let selectedProductImageBase64 = null;
     let selectedAvatarBase64 = null;
@@ -416,6 +455,7 @@
         postsList = [];
         snapshot.forEach(docSnap => postsList.push({ id: docSnap.id, ...docSnap.data() }));
         postsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        if (activeOpenedPostId) renderOpenedPostModal(activeOpenedPostId);
         refreshCurrentView();
       });
 
@@ -438,12 +478,19 @@
     function calculatePendingEarnings(item) {
       const likesCount = (item.likes || []).length;
       const commentsCount = (item.comments || []).length;
+      const viewsCount = (item.views || []).length;
+
       const cashedOutCount = item.cashedOutEventsCount || 0;
 
       const uncashedLikes = Math.max(0, likesCount - Math.min(likesCount, cashedOutCount));
-      const uncashedComments = Math.max(0, commentsCount - Math.max(0, cashedOutCount - likesCount));
+      const remainingAfterLikes = Math.max(0, cashedOutCount - likesCount);
 
-      return (uncashedLikes * 0.01) + (uncashedComments * 0.05);
+      const uncashedComments = Math.max(0, commentsCount - Math.min(commentsCount, remainingAfterLikes));
+      const remainingAfterComments = Math.max(0, remainingAfterLikes - commentsCount);
+
+      const uncashedViews = Math.max(0, viewsCount - remainingAfterComments);
+
+      return (uncashedLikes * 0.01) + (uncashedComments * 0.05) + (uncashedViews * 0.50);
     }
 
     function updateCreditsUI() {
@@ -819,7 +866,7 @@
         const pending = calculatePendingEarnings(p);
         if (pending > 0) {
           totalToDeposit += pending;
-          const totalEvents = (p.likes || []).length + (p.comments || []).length;
+          const totalEvents = (p.likes || []).length + (p.comments || []).length + (p.views || []).length;
           await updateDoc(publicPostDoc(p.id), { cashedOutEventsCount: totalEvents });
         }
       }
@@ -828,7 +875,7 @@
         const pending = calculatePendingEarnings(prod);
         if (pending > 0) {
           totalToDeposit += pending;
-          const totalEvents = (prod.likes || []).length + (prod.comments || []).length;
+          const totalEvents = (prod.likes || []).length + (prod.comments || []).length + (prod.views || []).length;
           await updateDoc(publicProductDoc(prod.id), { cashedOutEventsCount: totalEvents });
         }
       }
@@ -841,6 +888,102 @@
       updateCreditsUI();
       alert(`Depósito concluído com sucesso! R$ ${totalToDeposit.toFixed(2)} foram adicionados à tua conta.`);
     };
+
+    // VISUALIZAÇÃO DEDICADA DO POST (VISUALIZAÇÃO ÚNICA REGISTADA)
+    window.openPostModal = async function(postId) {
+      activeOpenedPostId = postId;
+      const post = postsList.find(p => p.id === postId);
+      if (!post || !currentUserData) return;
+
+      let views = post.views ? [...post.views] : [];
+      const myUser = currentUserData.username;
+
+      // Regista a visualização apenas uma vez por conta
+      if (!views.includes(myUser)) {
+        views.push(myUser);
+        try {
+          await updateDoc(publicPostDoc(postId), { views });
+        } catch (e) {}
+      }
+
+      renderOpenedPostModal(postId);
+      document.getElementById('modal-view-post').classList.remove('hidden');
+    };
+
+    window.closePostModal = function() {
+      activeOpenedPostId = null;
+      document.getElementById('modal-view-post').classList.add('hidden');
+    };
+
+    function renderOpenedPostModal(postId) {
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      const authorObj = usersMap[post.author.toLowerCase()];
+      document.getElementById('modal-post-avatar').innerHTML = renderAvatar(authorObj, 'small');
+      document.getElementById('modal-post-author').innerText = post.author;
+      document.getElementById('modal-post-date').innerText = new Date(post.timestamp).toLocaleString();
+      document.getElementById('modal-post-content').innerText = post.content || '';
+
+      const imgContainer = document.getElementById('modal-post-image-container');
+      if (post.imageUrl) {
+        imgContainer.innerHTML = `<img src="${escapeHtml(post.imageUrl)}" class="post-img">`;
+      } else {
+        imgContainer.innerHTML = '';
+      }
+
+      const likes = post.likes || [];
+      const comments = post.comments || [];
+      const views = post.views || [];
+      const hasLiked = currentUserData && likes.includes(currentUserData.username);
+
+      const likeBtn = document.getElementById('modal-post-like-btn');
+      likeBtn.innerText = `${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})`;
+      likeBtn.onclick = () => toggleLikePost(postId);
+
+      document.getElementById('modal-post-comments-count').innerText = comments.length;
+      document.getElementById('modal-post-views-count').innerText = views.length;
+
+      const sendBtn = document.getElementById('modal-btn-send-comment');
+      sendBtn.onclick = () => addCommentFromModal(postId);
+
+      const commentsListDiv = document.getElementById('modal-comments-list');
+      commentsListDiv.innerHTML = comments.length === 0 ? '<p style="color:#70757a; font-size:12px;">Nenhum comentário.</p>' : '';
+      comments.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'comment-item';
+        div.innerHTML = `
+          <div class="comment-header">
+            <strong>${escapeHtml(c.author)}</strong>
+            <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
+          </div>
+          <div>${escapeHtml(c.text)}</div>
+        `;
+        commentsListDiv.appendChild(div);
+      });
+    }
+
+    async function addCommentFromModal(postId) {
+      const input = document.getElementById('modal-comment-input');
+      const text = input.value.trim();
+      if (!text || !currentUserData) return;
+
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let comments = post.comments ? [...post.comments] : [];
+      comments.push({
+        id: 'c_' + Date.now(),
+        author: currentUserData.username,
+        text,
+        timestamp: new Date().toISOString()
+      });
+
+      try {
+        await updateDoc(publicPostDoc(postId), { comments });
+        input.value = '';
+      } catch (e) {}
+    }
 
     // POSTS
     document.getElementById('post-image-file').addEventListener('change', function(e) {
@@ -869,6 +1012,7 @@
           timestamp: new Date().toISOString(),
           likes: [],
           comments: [],
+          views: [],
           cashedOutEventsCount: 0
         });
         document.getElementById('post-input').value = '';
@@ -965,6 +1109,7 @@
           timestamp: new Date().toISOString(),
           likes: [],
           comments: [],
+          views: [],
           cashedOutEventsCount: 0
         });
         closeProductModal();
@@ -996,6 +1141,7 @@
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
       const likes = post.likes || [];
       const comments = post.comments || [];
+      const views = post.views || [];
       const hasLiked = currentUserData && likes.includes(currentUserData.username);
       const pendingVal = calculatePendingEarnings(post);
 
@@ -1012,40 +1158,23 @@
             ${isSelf ? `<button onclick="deletePost('${post.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
           </div>
         </div>
-        ${post.content ? `<div class="item-content">${escapeHtml(post.content)}</div>` : ''}
-        ${post.imageUrl ? `<img src="${escapeHtml(post.imageUrl)}" class="post-img">` : ''}
+        ${post.content ? `<div class="item-content" onclick="openPostModal('${post.id}')">${escapeHtml(post.content)}</div>` : ''}
+        ${post.imageUrl ? `<img src="${escapeHtml(post.imageUrl)}" class="post-img" onclick="openPostModal('${post.id}')">` : ''}
         
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <button onclick="toggleLikePost('${post.id}')" class="${hasLiked ? 'btn-primary' : ''}">
             ${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})
           </button>
           
-          <button onclick="toggleCommentBox('${post.id}')">
+          <button onclick="openPostModal('${post.id}')">
             💬 Comentários (${comments.length})
           </button>
+
+          <span style="font-size:12px; color:#1a73e8; cursor:pointer;" onclick="openPostModal('${post.id}')">👁️ ${views.length} viz</span>
 
           ${!isSelf ? `<button onclick="openDirectMsgModal('${escapeStr(post.author)}')" style="font-size:11px;">💬 Mensagem</button>` : ''}
 
           ${isSelf ? `<span style="font-size:12px; color:#137333; font-weight:bold; margin-left:auto;">Pendente: R$ ${pendingVal.toFixed(2)}</span>` : ''}
-        </div>
-
-        <div id="comments-box-${post.id}" class="comments-section hidden">
-          <div style="display:flex; gap:6px; margin-bottom:8px;">
-            <input type="text" id="comment-input-${post.id}" placeholder="Escreva um comentário..." dir="ltr" style="margin-bottom:0;">
-            <button class="btn-primary" onclick="addCommentToPost('${post.id}')">Enviar</button>
-          </div>
-          <div>
-            ${comments.length === 0 ? '<p style="color:#70757a; font-size:12px;">Sem comentários.</p>' : ''}
-            ${comments.map(c => `
-              <div class="comment-item">
-                <div class="comment-header">
-                  <strong>${escapeHtml(c.author)}</strong>
-                  <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
-                </div>
-                <div>${escapeHtml(c.text)}</div>
-              </div>
-            `).join('')}
-          </div>
         </div>
       `;
       return div;
@@ -1055,7 +1184,6 @@
       const sellerObj = usersMap[prod.seller.toLowerCase()];
       const isSelf = currentUserData && prod.seller.toLowerCase() === currentUserData.username.toLowerCase();
       const likes = prod.likes || [];
-      const comments = prod.comments || [];
       const hasLiked = currentUserData && likes.includes(currentUserData.username);
       const pendingVal = calculatePendingEarnings(prod);
 
@@ -1122,6 +1250,19 @@
 
       const isSelf = currentUserData && name.toLowerCase() === currentUserData.username.toLowerCase();
       document.getElementById('profile-edit-avatar-section').classList.toggle('hidden', !isSelf);
+      
+      // O botão de depósito só aparece se for o próprio perfil
+      document.getElementById('profile-deposit-card').classList.toggle('hidden', !isSelf);
+
+      const actionArea = document.getElementById('profile-action-btn-area');
+      actionArea.innerHTML = '';
+      if (!isSelf) {
+        const btnMsg = document.createElement('button');
+        btnMsg.className = 'btn-primary';
+        btnMsg.innerText = '💬 Enviar Mensagem';
+        btnMsg.onclick = () => openDirectMsgModal(user.username);
+        actionArea.appendChild(btnMsg);
+      }
 
       const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
       const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
@@ -1153,21 +1294,22 @@
       tbody.innerHTML = userPosts.length === 0 ? '<tr><td colspan="3">Sem dados.</td></tr>' : '';
 
       const sorted = [...userPosts].sort((a, b) => {
-        const interA = (a.likes || []).length + (a.comments || []).length;
-        const interB = (b.likes || []).length + (b.comments || []).length;
+        const interA = (a.likes || []).length + (a.comments || []).length + (a.views || []).length;
+        const interB = (b.likes || []).length + (b.comments || []).length + (b.views || []).length;
         return interB - interA;
       });
 
       sorted.forEach(p => {
         const likes = (p.likes || []).length;
         const comments = (p.comments || []).length;
-        const totalEvents = likes + comments;
-        const generatedVal = (likes * 0.01) + (comments * 0.05);
+        const views = (p.views || []).length;
+        const totalEvents = likes + comments + views;
+        const generatedVal = (likes * 0.01) + (comments * 0.05) + (views * 0.50);
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${escapeHtml(p.content || '[Foto]')}</td>
-          <td>❤️ ${likes} | 💬 ${comments} (<strong>${totalEvents}</strong>)</td>
+          <td>❤️ ${likes} | 💬 ${comments} | 👁️ ${views} (<strong>${totalEvents}</strong>)</td>
           <td style="color:#137333; font-weight:bold;">R$ ${generatedVal.toFixed(2)}</td>
         `;
         tbody.appendChild(tr);
