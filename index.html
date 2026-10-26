@@ -482,10 +482,18 @@
       });
     }
 
+    // CORREÇÃO: FILTRA INTERAÇÕES DO PRÓPRIO AUTOR PARA NÃO DAR CRÉDITOS
     function calculatePendingEarnings(item) {
-      const likesCount = (item.likes || []).length;
-      const commentsCount = (item.comments || []).length;
-      const viewsCount = (item.views || []).length;
+      const owner = (item.author || item.seller || '').toLowerCase();
+
+      // Filtra curtidas, comentários e visualizações ignorando os feitos pelo próprio dono
+      const validLikes = (item.likes || []).filter(u => u.toLowerCase() !== owner);
+      const validComments = (item.comments || []).filter(c => (c.author || '').toLowerCase() !== owner);
+      const validViews = (item.views || []).filter(u => u.toLowerCase() !== owner);
+
+      const likesCount = validLikes.length;
+      const commentsCount = validComments.length;
+      const viewsCount = validViews.length;
 
       const cashedOutCount = item.cashedOutEventsCount || 0;
 
@@ -873,8 +881,12 @@
         const pending = calculatePendingEarnings(p);
         if (pending > 0) {
           totalToDeposit += pending;
-          const totalEvents = (p.likes || []).length + (p.comments || []).length + (p.views || []).length;
-          await updateDoc(publicPostDoc(p.id), { cashedOutEventsCount: totalEvents });
+          // Apenas considera eventos validos de outros utilizadores para marcar cashedOut
+          const validLikes = (p.likes || []).filter(u => u.toLowerCase() !== myKey);
+          const validComments = (p.comments || []).filter(c => (c.author || '').toLowerCase() !== myKey);
+          const validViews = (p.views || []).filter(u => u.toLowerCase() !== myKey);
+          const totalValidEvents = validLikes.length + validComments.length + validViews.length;
+          await updateDoc(publicPostDoc(p.id), { cashedOutEventsCount: totalValidEvents });
         }
       }
 
@@ -882,8 +894,11 @@
         const pending = calculatePendingEarnings(prod);
         if (pending > 0) {
           totalToDeposit += pending;
-          const totalEvents = (prod.likes || []).length + (prod.comments || []).length + (prod.views || []).length;
-          await updateDoc(publicProductDoc(prod.id), { cashedOutEventsCount: totalEvents });
+          const validLikes = (prod.likes || []).filter(u => u.toLowerCase() !== myKey);
+          const validComments = (prod.comments || []).filter(c => (c.author || '').toLowerCase() !== myKey);
+          const validViews = (prod.views || []).filter(u => u.toLowerCase() !== myKey);
+          const totalValidEvents = validLikes.length + validComments.length + validViews.length;
+          await updateDoc(publicProductDoc(prod.id), { cashedOutEventsCount: totalValidEvents });
         }
       }
 
@@ -1307,16 +1322,18 @@
       });
 
       sorted.forEach(p => {
-        const likes = (p.likes || []).length;
-        const comments = (p.comments || []).length;
-        const views = (p.views || []).length;
-        const totalEvents = likes + comments + views;
-        const generatedVal = (likes * 0.01) + (comments * 0.05) + (views * 0.50);
+        const owner = p.author.toLowerCase();
+        const validLikes = (p.likes || []).filter(u => u.toLowerCase() !== owner).length;
+        const validComments = (p.comments || []).filter(c => (c.author || '').toLowerCase() !== owner).length;
+        const validViews = (p.views || []).filter(u => u.toLowerCase() !== owner).length;
+
+        const totalEvents = validLikes + validComments + validViews;
+        const generatedVal = (validLikes * 0.01) + (validComments * 0.05) + (validViews * 0.50);
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${escapeHtml(p.content || '[Foto]')}</td>
-          <td>❤️ ${likes} | 💬 ${comments} | 👁️ ${views} (<strong>${totalEvents}</strong>)</td>
+          <td>❤️ ${validLikes} | 💬 ${validComments} | 👁️ ${validViews} (<strong>${totalEvents}</strong>)</td>
           <td style="color:#137333; font-weight:bold;">R$ ${generatedVal.toFixed(2)}</td>
         `;
         tbody.appendChild(tr);
@@ -1332,3 +1349,4 @@
   </script>
 </body>
 </html>
+
