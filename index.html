@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -44,6 +43,29 @@
     nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
 
+    /* BADGES DA CONTA ARNOS (DONO & BOT) */
+    .badge-square {
+      display: inline-block; padding: 2px 6px; font-size: 10px; font-weight: bold;
+      border-radius: 4px; margin-left: 4px; vertical-align: middle; color: #ffffff; text-transform: uppercase;
+    }
+    .badge-dono { background-color: #d93025; border: 1px solid #b31412; }
+    .badge-bot { background-color: #1a73e8; border: 1px solid #1557b0; }
+
+    /* BORDA COLORIDA E ANIMADA NOS POSTS DO ARNOS */
+    @keyframes rainbowBorder {
+      0% { border-color: #ff0000; }
+      20% { border-color: #ff7f00; }
+      40% { border-color: #ffff00; }
+      60% { border-color: #00ff00; }
+      80% { border-color: #0000ff; }
+      100% { border-color: #8b00ff; }
+    }
+    .card-arnos-special {
+      border: 3px solid #ff0000 !important;
+      animation: rainbowBorder 4s infinite linear;
+      box-shadow: 0 0 10px rgba(255,0,0,0.2);
+    }
+
     /* AVATAR SYSTEM */
     .user-avatar {
       width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
@@ -72,7 +94,6 @@
     .author-name { font-weight: bold; color: #1a73e8; }
     .item-date { font-size: 12px; color: #70757a; }
     
-    /* TEXTO TRUNCADO EM 2 LINHAS COM TRÊS PONTINHOS (...) */
     .item-content {
       font-size: 14px; margin-bottom: 12px; white-space: pre-wrap; cursor: pointer;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
@@ -100,34 +121,10 @@
     .tab-btn { border: none; background: none; border-radius: 0; padding: 8px 16px; border-bottom: 3px solid transparent; color: #5f6368; font-weight: bold; white-space: nowrap; }
     .tab-btn.active { border-bottom-color: #1a73e8; color: #1a73e8; }
 
-    /* STATS INTERATIVOS NO PERFIL */
-    .profile-stat-item { cursor: pointer; font-size: 13px; color: #1a73e8; }
-    .profile-stat-item:hover { text-decoration: underline; }
-
     /* ANALYTICS TABLE & CALENDAR */
     .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
     .stats-table th, .stats-table td { border: 1px solid #dadce0; padding: 8px 12px; text-align: left; }
     .stats-table th { background-color: #f1f3f4; }
-
-    /* BADGES & ESTILOS DA CONTA 'ARNOS' */
-    .badge-box {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px;
-      color: #ffffff; text-transform: uppercase; margin-left: 4px; line-height: 1;
-      vertical-align: middle; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    }
-    .badge-dono { background: linear-gradient(135deg, #ff416c, #ff4b2b); border: 1px solid #ff2a55; }
-    .badge-bot { background: linear-gradient(135deg, #8e2de2, #4a00e0); border: 1px solid #7a1cd1; }
-
-    /* BORDA COLORIDA PARA POSTS DA CONTA 'ARNOS' */
-    .card-arnos-post {
-      position: relative;
-      border: 2px solid transparent !important;
-      background-clip: padding-box, border-box !important;
-      background-origin: padding-box, border-box !important;
-      background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, #ff007f, #7928ca, #0070f3, #00dfd8) !important;
-      box-shadow: 0 4px 15px rgba(121, 40, 202, 0.2);
-    }
 
     .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; text-align: center; }
     .calendar-day { border: 1px solid #dadce0; border-radius: 4px; padding: 6px 2px; font-size: 11px; background-color: #ffffff; }
@@ -142,6 +139,8 @@
     .auth-box { max-width: 360px; margin: 40px auto; padding: 24px; background-color: #fff; border: 1px solid #dadce0; border-radius: 8px; }
     .error-msg { color: #d93025; font-size: 13px; margin-bottom: 12px; }
     .help-banner { background-color: #fce8e6; border: 1px solid #fad2cf; color: #c5221f; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; font-size: 14px; line-height: 1.4; }
+    .loading-step-item { font-size: 13px; color: #5f6368; margin-bottom: 6px; text-align: left; display: flex; align-items: center; gap: 8px; }
+    .loading-step-item.done { color: #188038; font-weight: bold; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -158,7 +157,6 @@
     <nav>
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('marketplace')">Marketplace</button>
-      <button id="btn-admin-panel" class="btn-primary hidden" onclick="navigateTo('admin')" style="background: linear-gradient(135deg, #7928ca, #ff007f); border:none;">⚙️ Painel ADM</button>
       
       <div class="badge-container">
         <button onclick="navigateTo('messages')">Mensagens</button>
@@ -166,6 +164,7 @@
       </div>
 
       <span class="credits-display">💳 <span id="user-credits-val">0.00</span></span>
+      <button id="nav-adm-btn" class="btn-danger hidden" onclick="navigateTo('admin')">⚙️ Painel ADM</button>
       <button onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')">Meu Perfil</button>
       <span id="nav-user-link" class="nav-user" onclick="navigateTo('profile', currentUserData ? currentUserData.username : '')"></span>
       <button onclick="logout()">Log out</button>
@@ -175,7 +174,22 @@
   <!-- CONTAINER PRINCIPAL -->
   <div class="container">
 
-    <div id="view-loading" style="text-align: center; padding: 40px; color: #70757a;">Carregando Arnos...</div>
+    <!-- LOADING VIEW COM STATUS DETALHADO -->
+    <div id="view-loading" class="card" style="text-align: center; padding: 30px; max-width: 480px; margin: 40px auto;">
+      <h3 style="margin-bottom: 16px; color: #1a73e8;">🔄 A carregar o Arnos...</h3>
+      <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">Estamos a preparar a tua experiência. Aguarde um momento enquanto sincronizamos a rede:</p>
+
+      <div style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+        <div id="step-users" class="loading-step-item"><span>⏳</span> 👤 <strong>Contas e Perfis:</strong> A carregar utilizadores...</div>
+        <div id="step-posts" class="loading-step-item"><span>⏳</span> 📝 <strong>Feed de Publicações:</strong> A obter posts recentes...</div>
+        <div id="step-market" class="loading-step-item"><span>⏳</span> 🛍️ <strong>Marketplace:</strong> A organizar a vitrine...</div>
+        <div id="step-messages" class="loading-step-item"><span>⏳</span> 💬 <strong>Mensagens & Chat:</strong> A sincronizar conversas...</div>
+        <div id="step-credits" class="loading-step-item"><span>⏳</span> 💳 <strong>Saldos & Permissões:</strong> A verificar créditos e conta arnos...</div>
+        <div id="step-security" class="loading-step-item"><span>⏳</span> 🛡️ <strong>Segurança & Moderação:</strong> A ativar filtro CVV 188...</div>
+      </div>
+
+      <p style="font-size: 11px; color: #70757a;">Se a ligação demorar, serás redirecionado automaticamente.</p>
+    </div>
 
     <!-- AUTH VIEW -->
     <div id="view-auth" class="auth-box hidden">
@@ -224,6 +238,47 @@
       <div id="feed-list"></div>
     </div>
 
+    <!-- ADMIN PANEL VIEW (EXCLUSIVO PARA A CONTA "arnos") -->
+    <div id="view-admin" class="hidden">
+      <div class="card" style="border: 2px solid #d93025; background: #fff5f5;">
+        <h2 style="color: #d93025; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          ⚙️ Painel Administrativo Arnos
+          <span class="badge-square badge-dono">Dono</span>
+          <span class="badge-square badge-bot">Bot</span>
+        </h2>
+        <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">Gestão exclusiva para a conta principal <strong>arnos</strong>.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+          <div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #dadce0;">
+            <span style="font-size: 11px; color: #70757a;">Total de Utilizadores</span>
+            <h3 id="adm-total-users">0</h3>
+          </div>
+          <div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #dadce0;">
+            <span style="font-size: 11px; color: #70757a;">Total de Publicações</span>
+            <h3 id="adm-total-posts">0</h3>
+          </div>
+          <div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #dadce0;">
+            <span style="font-size: 11px; color: #70757a;">Total de Produtos</span>
+            <h3 id="adm-total-products">0</h3>
+          </div>
+        </div>
+
+        <div style="background: #fff; padding: 16px; border-radius: 6px; border: 1px solid #dadce0; margin-bottom: 16px;">
+          <h3 style="font-size: 14px; margin-bottom: 8px;">💳 Adicionar Créditos a um Utilizador</h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="text" id="adm-target-user" placeholder="Nome do utilizador" dir="ltr" style="flex:1; margin-bottom:0;">
+            <input type="number" id="adm-credit-amount" step="0.50" placeholder="Valor (R$)" dir="ltr" style="width:120px; margin-bottom:0;">
+            <button class="btn-success" onclick="adminAddCredits()">Adicionar</button>
+          </div>
+        </div>
+
+        <div style="background: #fff; padding: 16px; border-radius: 6px; border: 1px solid #dadce0;">
+          <h3 style="font-size: 14px; margin-bottom: 8px;">🗑️ Moderação Global de Posts</h3>
+          <div id="adm-posts-moderation-list"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- MARKETPLACE VIEW -->
     <div id="view-marketplace" class="hidden">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -257,7 +312,6 @@
 
     <!-- PROFILE VIEW -->
     <div id="view-profile" class="hidden">
-      <!-- PAINEL DE DEPÓSITO E SALDO (VISÍVEL APENAS NO PRÓPRIO PERFIL) -->
       <div id="profile-deposit-card" class="card hidden" style="text-align: center; background: #ffffff; border: 2px solid #dadce0;">
         <div class="credits-display" style="margin-bottom: 12px;">
           💳 <span id="profile-main-credits">0.00</span>
@@ -276,25 +330,18 @@
           <div style="display: flex; align-items: center; gap: 16px;">
             <div id="profile-avatar-container"></div>
             <div>
-              <div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
-                <h2 id="profile-name-display" style="margin:0;"></h2>
-                <span id="profile-badges-container"></span>
-              </div>
-              <div style="display: flex; gap: 12px; margin-top: 4px;">
-                <span class="profile-stat-item" onclick="switchProfileTab('followers')">Seguidores: <strong id="profile-followers-count">0</strong></span>
-                <span class="profile-stat-item" onclick="switchProfileTab('following')">A seguir: <strong id="profile-following-count">0</strong></span>
-              </div>
+              <h2 id="profile-name-display" style="display: inline-flex; align-items: center; gap: 4px;"></h2>
+              <p style="font-size: 13px; color: #70757a; margin-top: 2px;" id="profile-stats-summary"></p>
             </div>
           </div>
           <div id="profile-action-btn-area" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
         </div>
 
-        <!-- CONFIGURAÇÕES DE PRIVACIDADE DO PRÓPRIO PERFIL -->
         <div id="profile-settings-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
           <h4 style="font-size: 13px; margin-bottom: 8px;">⚙️ Configurações da Conta</h4>
           <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
             <input type="checkbox" id="chk-hide-following" onchange="toggleHideFollowingSetting(this.checked)">
-            Ocultar seguidores e quem estou a seguir no meu perfil
+            Ocultar minhas listas de seguidores e a seguir no meu perfil
           </label>
 
           <div style="margin-top: 12px;">
@@ -312,49 +359,48 @@
         <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
         <button id="profile-tab-analytics" class="tab-btn" onclick="switchProfileTab('analytics')">📊 Desempenho & Virais</button>
       </div>
-    <!-- VIEW ADMIN PANEL (EXCLUSIVO CONTA ARNOS) -->
-    <div id="view-admin" class="hidden">
-      <div class="card" style="border: 2px solid #7928ca; background: linear-gradient(180deg, #ffffff, #fdfaff);">
-        <h2 style="color: #7928ca; margin-bottom: 8px; display:flex; align-items:center; gap:8px;">
-          👑 Painel de Administração - Arnos
-        </h2>
-        <p style="font-size: 13px; color: #5f6368;">Gestão global de utilizadores, créditos e moderação de conteúdos.</p>
+
+      <div id="profile-blocked-message" class="card hidden" style="color:#d93025; text-align:center; font-weight:bold;"></div>
+
+      <div id="profile-posts-list"></div>
+      <div id="profile-followers-list" class="hidden"></div>
+      <div id="profile-following-list" class="hidden"></div>
+      <div id="profile-vitrine-list" class="hidden"></div>
+      
+      <div id="profile-analytics-list" class="hidden">
+        <div class="card">
+          <h3>📅 Calendário de Ganhos & Viralização</h3>
+          <p style="font-size: 12px; color: #5f6368;">Dias com maior taxa de interação e rendimento acumulado no Arnos.</p>
+          <div id="calendar-grid-container" class="calendar-grid"></div>
+        </div>
+
+        <div class="card">
+          <h3>🏆 Top Posts e Rendimentos</h3>
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>Texto do Post</th>
+                <th>Interações / Visualizações</th>
+                <th>Total Gerado</th>
+              </tr>
+            </thead>
+            <tbody id="top-posts-table-body"></tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>👥 Gestão de Utilizadores</h3>
-        <table class="stats-table">
-          <thead>
-            <tr>
-              <th>Utilizador</th>
-              <th>Créditos</th>
-              <th>Seguidores</th>
-              <th>Ações ADM</th>
-            </tr>
-          </thead>
-          <tbody id="admin-users-table-body"></tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <h3>📝 Moderação Global de Publicações</h3>
-        <div id="admin-posts-list"></div>
-      </div>
     </div>
 
   </div>
 
   <!-- MODAL: VISUALIZAR POST DEDICADO -->
   <div id="modal-view-post" class="modal-overlay hidden">
-    <div class="modal-card" id="modal-card-box">
+    <div class="modal-card">
       <div class="modal-header">
         <div style="display:flex; align-items:center; gap:8px;">
           <div id="modal-post-avatar"></div>
           <div>
-            <div style="display:flex; align-items:center; gap:4px;">
-              <h4 id="modal-post-author" style="margin:0; color:#1a73e8;"></h4>
-              <span id="modal-post-badges"></span>
-            </div>
+            <h4 id="modal-post-author" style="margin:0; color:#1a73e8; display:flex; align-items:center; gap:4px;"></h4>
             <span id="modal-post-date" style="font-size:11px; color:#70757a;"></span>
           </div>
         </div>
@@ -467,7 +513,25 @@
 
     window.currentUserData = currentUserData;
 
+    function markLoadingStep(stepId) {
+      const el = document.getElementById(stepId);
+      if (el) {
+        el.classList.add('done');
+        const icon = el.querySelector('span');
+        if (icon) icon.innerText = '✅';
+      }
+    }
+
     async function initAuth() {
+      // Timeout de segurança para evitar tela travada se a ligação ao Firebase demorar
+      setTimeout(() => {
+        const loadingDiv = document.getElementById('view-loading');
+        if (loadingDiv && !loadingDiv.classList.contains('hidden')) {
+          loadingDiv.classList.add('hidden');
+          if (!currentUserData) showAuthInterface();
+        }
+      }, 3000);
+
       try {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
           await signInWithCustomToken(auth, __initial_auth_token);
@@ -481,9 +545,6 @@
 
     onAuthStateChanged(auth, async (user) => {
       authUser = user;
-      document.getElementById('view-loading').classList.add('hidden');
-      if (!user) { showAuthInterface(); return; }
-
       const savedUsername = localStorage.getItem('arnos_logged_username');
       if (savedUsername) {
         try {
@@ -496,6 +557,7 @@
           }
         } catch (e) {}
       }
+      document.getElementById('view-loading').classList.add('hidden');
       showAuthInterface();
     });
 
@@ -510,6 +572,8 @@
           window.currentUserData = currentUserData;
           updateCreditsUI();
         }
+        markLoadingStep('step-users');
+        markLoadingStep('step-credits');
         refreshCurrentView();
       });
 
@@ -518,6 +582,8 @@
         snapshot.forEach(docSnap => postsList.push({ id: docSnap.id, ...docSnap.data() }));
         postsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         if (activeOpenedPostId) renderOpenedPostModal(activeOpenedPostId);
+        markLoadingStep('step-posts');
+        markLoadingStep('step-security');
         refreshCurrentView();
       });
 
@@ -525,6 +591,7 @@
         productsList = [];
         snapshot.forEach(docSnap => productsList.push({ id: docSnap.id, ...docSnap.data() }));
         productsList.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        markLoadingStep('step-market');
         refreshCurrentView();
       });
 
@@ -533,6 +600,7 @@
         snapshot.forEach(docSnap => messagesList.push({ id: docSnap.id, ...docSnap.data() }));
         messagesList.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
         updateUnreadBadge();
+        markLoadingStep('step-messages');
         refreshCurrentView();
       });
     }
@@ -578,6 +646,11 @@
 
         const pendingEl = document.getElementById('profile-pending-total');
         if (pendingEl) pendingEl.innerText = totalPending.toFixed(2);
+
+        const admBtn = document.getElementById('nav-adm-btn');
+        if (admBtn) {
+          admBtn.classList.toggle('hidden', currentUserData.username.toLowerCase() !== 'arnos');
+        }
       }
     }
 
@@ -605,9 +678,17 @@
       if (!document.getElementById('view-feed').classList.contains('hidden')) renderFeed();
       else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
       else if (!document.getElementById('view-messages').classList.contains('hidden')) renderMessages();
+      else if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminPanel();
       else if (!document.getElementById('view-profile').classList.contains('hidden')) {
         if (currentProfileUsername) renderProfile(currentProfileUsername);
       }
+    }
+
+    function renderBadges(username) {
+      if ((username || '').toLowerCase() === 'arnos') {
+        return `<span class="badge-square badge-dono">Dono</span><span class="badge-square badge-bot">Bot</span>`;
+      }
+      return '';
     }
 
     function renderAvatar(userObj, sizeClass = '') {
@@ -617,14 +698,6 @@
         return `<img src="${escapeHtml(userObj.avatarUrl)}" class="user-avatar ${sizeClass}">`;
       }
       return `<div class="user-avatar ${sizeClass}">${initial}</div>`;
-    }
-
-    // RETORNA AS BADGES/QUADRADOS DO UTILIZADOR
-    function getUserBadgesHtml(username) {
-      if ((username || '').toLowerCase() === 'arnos') {
-        return `<span class="badge-box badge-dono">Dono</span><span class="badge-box badge-bot">Bot</span>`;
-      }
-      return '';
     }
 
     // AUTH
@@ -694,27 +767,71 @@
 
     function showAuthInterface() {
       document.getElementById('app-header').classList.add('hidden');
+      document.getElementById('view-loading').classList.add('hidden');
       document.getElementById('view-auth').classList.remove('hidden');
       document.getElementById('view-feed').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
       document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
+      document.getElementById('view-admin').classList.add('hidden');
     }
 
     function showMainInterface() {
       document.getElementById('app-header').classList.remove('hidden');
+      document.getElementById('view-loading').classList.add('hidden');
       document.getElementById('view-auth').classList.add('hidden');
       document.getElementById('nav-user-link').innerText = currentUserData.username;
-      
-      // EXIBIR BOTÃO ADM SE FOR O USER 'ARNOS'
-      const isAdmin = currentUserData.username.toLowerCase() === 'arnos';
-      const adminBtn = document.getElementById('btn-admin-panel');
-      if (adminBtn) adminBtn.classList.toggle('hidden', !isAdmin);
-
       updateCreditsUI();
       setupListeners();
       navigateTo('feed');
     }
+
+    // ADMIN FUNCTIONS
+    function renderAdminPanel() {
+      if (!currentUserData || currentUserData.username.toLowerCase() !== 'arnos') {
+        navigateTo('feed');
+        return;
+      }
+
+      document.getElementById('adm-total-users').innerText = Object.keys(usersMap).length;
+      document.getElementById('adm-total-posts').innerText = postsList.length;
+      document.getElementById('adm-total-products').innerText = productsList.length;
+
+      const listDiv = document.getElementById('adm-posts-moderation-list');
+      listDiv.innerHTML = postsList.length === 0 ? '<p style="font-size:12px; color:#70757a;">Nenhum post.</p>' : '';
+
+      postsList.forEach(p => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-size: 13px;';
+        div.innerHTML = `
+          <div>
+            <strong>@${escapeHtml(p.author)}</strong>: ${escapeHtml(p.content || '[Foto]')}
+            <br><span style="font-size:10px; color:#70757a;">${new Date(p.timestamp).toLocaleString()}</span>
+          </div>
+          <button class="btn-danger" style="padding:2px 6px; font-size:11px;" onclick="deletePost('${p.id}')">Remover</button>
+        `;
+        listDiv.appendChild(div);
+      });
+    }
+
+    window.adminAddCredits = async function() {
+      const username = document.getElementById('adm-target-user').value.trim();
+      const amount = parseFloat(document.getElementById('adm-credit-amount').value);
+
+      if (!username || isNaN(amount)) return alert("Preencha o utilizador e o valor.");
+      const userDoc = publicUserDoc(username);
+
+      try {
+        const snap = await getDoc(userDoc);
+        if (!snap.exists()) return alert("Utilizador não encontrado.");
+        
+        const currentCredits = snap.data().credits || 0;
+        await updateDoc(userDoc, { credits: currentCredits + amount });
+        alert(`Adicionados R$ ${amount.toFixed(2)} ao utilizador @${username}!`);
+        document.getElementById('adm-target-user').value = '';
+        document.getElementById('adm-credit-amount').value = '';
+      } catch (e) { alert("Erro ao adicionar créditos."); }
+    };
 
     // SEGUIR / DEIXAR DE SEGUIR & BLOQUEAR / DESBLOQUEAR
     window.toggleFollowUser = async function(targetUsername) {
@@ -796,14 +913,7 @@
       if (view === 'feed') { document.getElementById('view-feed').classList.remove('hidden'); renderFeed(); }
       else if (view === 'marketplace') { document.getElementById('view-marketplace').classList.remove('hidden'); renderMarketplace(); }
       else if (view === 'messages') { document.getElementById('view-messages').classList.remove('hidden'); renderMessages(); }
-      else if (view === 'admin') {
-        if (!currentUserData || currentUserData.username.toLowerCase() !== 'arnos') {
-          alert("Acesso restrito à administração.");
-          return navigateTo('feed');
-        }
-        document.getElementById('view-admin').classList.remove('hidden');
-        renderAdminPanel();
-      }
+      else if (view === 'admin') { document.getElementById('view-admin').classList.remove('hidden'); renderAdminPanel(); }
       else if (view === 'profile') {
         document.getElementById('view-profile').classList.remove('hidden');
         currentProfileUsername = arg || currentUserData.username;
@@ -882,7 +992,7 @@
           </div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
             ${renderAvatar(otherObj, 'small')}
-            <p style="font-size: 13px; color: #5f6368; margin:0;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
+            <p style="font-size: 13px; color: #5f6368; margin:0;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${renderBadges(g.otherUser)} ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
           </div>
           <p style="font-size: 13px; margin-top: 6px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message)}"</p>
         `;
@@ -898,7 +1008,7 @@
       const prodName = parts[0];
       const otherUser = parts[1];
 
-      document.getElementById('chat-title').innerText = prodName === '[Perfil]' ? `Conversa Direta com ${otherUser}` : `${prodName} (com ${otherUser})`;
+      document.getElementById('chat-title').innerHTML = (prodName === '[Perfil]' ? `Conversa Direta com ${escapeHtml(otherUser)}` : `${escapeHtml(prodName)} (com ${escapeHtml(otherUser)})`) + ' ' + renderBadges(otherUser);
 
       const chatMsgs = messagesList.filter(m => {
         const isUserMatch = (m.seller.toLowerCase() === currentUserData.username.toLowerCase() && m.buyer.toLowerCase() === otherUser) ||
@@ -921,7 +1031,7 @@
         const bubble = document.createElement('div');
         bubble.className = `chat-bubble ${isMine ? 'mine' : 'other'}`;
         bubble.innerHTML = `
-          ${!isMine ? `<span class="chat-sender-tag">${escapeHtml(senderName)}</span>` : ''}
+          ${!isMine ? `<span class="chat-sender-tag">${escapeHtml(senderName)} ${renderBadges(senderName)}</span>` : ''}
           ${escapeHtml(m.message)}
         `;
         container.appendChild(bubble);
@@ -1072,17 +1182,9 @@
       const post = postsList.find(p => p.id === postId);
       if (!post) return;
 
-      const modalBox = document.getElementById('modal-card-box');
-      if (post.author.toLowerCase() === 'arnos') {
-        modalBox.classList.add('card-arnos-post');
-      } else {
-        modalBox.classList.remove('card-arnos-post');
-      }
-
       const authorObj = usersMap[post.author.toLowerCase()];
       document.getElementById('modal-post-avatar').innerHTML = renderAvatar(authorObj, 'small');
-      document.getElementById('modal-post-author').innerText = post.author;
-      document.getElementById('modal-post-badges').innerHTML = getUserBadgesHtml(post.author);
+      document.getElementById('modal-post-author').innerHTML = escapeHtml(post.author) + ' ' + renderBadges(post.author);
       document.getElementById('modal-post-date').innerText = new Date(post.timestamp).toLocaleString();
       document.getElementById('modal-post-content').innerText = post.content || '';
 
@@ -1092,16 +1194,32 @@
       } else {
         imgContainer.innerHTML = '';
       }
-<!-- ... existing code ... baseline comment mapping
+
+      const likes = post.likes || [];
+      const comments = post.comments || [];
+      const views = post.views || [];
+      const hasLiked = currentUserData && likes.includes(currentUserData.username);
+
+      const likeBtn = document.getElementById('modal-post-like-btn');
+      likeBtn.innerText = `${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})`;
+      likeBtn.onclick = () => toggleLikePost(postId);
+
+      document.getElementById('modal-post-comments-count').innerText = comments.length;
+      document.getElementById('modal-post-views-count').innerText = views.length;
+
+      const sendBtn = document.getElementById('modal-btn-send-comment');
+      sendBtn.onclick = () => addCommentFromModal(postId);
+
+      const commentsListDiv = document.getElementById('modal-comments-list');
+      commentsListDiv.innerHTML = comments.length === 0 ? '<p style="color:#70757a; font-size:12px;">Nenhum comentário.</p>' : '';
       comments.forEach(c => {
         const isMyComment = currentUserData && c.author.toLowerCase() === currentUserData.username.toLowerCase();
         const div = document.createElement('div');
         div.className = 'comment-item';
         div.innerHTML = `
           <div class="comment-header">
-            <div style="display:flex; align-items:center; gap:4px;">
-              <strong>${escapeHtml(c.author)}</strong>
-              ${getUserBadgesHtml(c.author)}
+            <div>
+              <strong>${escapeHtml(c.author)}</strong> ${renderBadges(c.author)}
             </div>
             <div>
               <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
@@ -1294,8 +1412,9 @@
 
     function buildPostCard(post) {
       const authorObj = usersMap[post.author.toLowerCase()];
-      const isArnos = post.author.toLowerCase() === 'arnos';
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
+      const isArnos = post.author.toLowerCase() === 'arnos';
+
       const likes = post.likes || [];
       const comments = post.comments || [];
       const views = post.views || [];
@@ -1303,17 +1422,17 @@
       const pendingVal = calculatePendingEarnings(post);
 
       const div = document.createElement('div');
-      div.className = `card ${isArnos ? 'card-arnos-post' : ''}`;
+      div.className = `card ${isArnos ? 'card-arnos-special' : ''}`;
       div.innerHTML = `
         <div class="item-header">
           <div class="author-container" onclick="navigateTo('profile', '${escapeStr(post.author)}')">
             ${renderAvatar(authorObj, 'small')}
             <span class="author-name">${escapeHtml(post.author)}</span>
-            ${getUserBadgesHtml(post.author)}
+            ${renderBadges(post.author)}
           </div>
           <div>
             <span class="item-date">${new Date(post.timestamp).toLocaleString()}</span>
-            ${isSelf || (currentUserData && currentUserData.username.toLowerCase() === 'arnos') ? `<button onclick="deletePost('${post.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
+            ${isSelf ? `<button onclick="deletePost('${post.id}')" class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;">Apagar</button>` : ''}
           </div>
         </div>
         ${post.content ? `<div class="item-content" onclick="openPostModal('${post.id}')">${escapeHtml(post.content)}</div>` : ''}
@@ -1352,6 +1471,7 @@
           <div class="author-container" onclick="navigateTo('profile', '${escapeStr(prod.seller)}')">
             ${renderAvatar(sellerObj, 'small')}
             <span class="author-name">Vendedor: ${escapeHtml(prod.seller)}</span>
+            ${renderBadges(prod.seller)}
           </div>
           <div>
             <span class="item-date">${new Date(prod.timestamp).toLocaleDateString()}</span>
@@ -1427,14 +1547,6 @@
       document.getElementById('profile-tab-analytics').classList.toggle('active', tab === 'analytics');
     };
 
-    function getFollowersList(targetUserKey) {
-      return Object.keys(usersMap).filter(uKey => {
-        const uObj = usersMap[uKey];
-        const following = (uObj && uObj.following) ? uObj.following.map(x => x.toLowerCase()) : [];
-        return following.includes(targetUserKey);
-      });
-    }
-
     function renderProfile(name) {
       const userKey = name.toLowerCase();
       const user = usersMap[userKey];
@@ -1449,15 +1561,16 @@
       const IBlockedThem = myBlockedList.includes(userKey);
       const TheyBlockedMe = targetBlockedList.includes(myUserKey);
 
-      document.getElementById('profile-name-display').innerText = user.username;
-      document.getElementById('profile-badges-container').innerHTML = getUserBadgesHtml(user.username);
+      document.getElementById('profile-name-display').innerHTML = escapeHtml(user.username) + ' ' + renderBadges(user.username);
       document.getElementById('profile-avatar-container').innerHTML = renderAvatar(user, 'large');
 
       const followingArr = user.following || [];
-      const followersArr = getFollowersList(userKey);
+      const followersArr = Object.values(usersMap).filter(u => (u.following || []).map(x => x.toLowerCase()).includes(userKey));
 
-      document.getElementById('profile-following-count').innerText = followingArr.length;
-      document.getElementById('profile-followers-count').innerText = followersArr.length;
+      document.getElementById('profile-stats-summary').innerHTML = `
+        <span style="cursor:pointer; text-decoration:underline;" onclick="switchProfileTab('followers')">Seguidores: <strong>${followersArr.length}</strong></span> &nbsp;•&nbsp; 
+        <span style="cursor:pointer; text-decoration:underline;" onclick="switchProfileTab('following')">A seguir: <strong>${followingArr.length}</strong></span>
+      `;
 
       document.getElementById('profile-settings-section').classList.toggle('hidden', !isSelf);
       if (isSelf) {
@@ -1522,33 +1635,32 @@
       postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum post.</p>' : '';
       userPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
 
-      // LISTA DE SEGUIDORES (COM PROTEÇÃO DE PRIVACIDADE)
+      // SEGUIDORES
       followersDiv.innerHTML = '';
       if (!isSelf && user.hideFollowing) {
-        followersDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem segue esta pessoa. Ela ativou esta opção para ninguém ver.</p>`;
+        followersDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem esta pessoa está a seguir ou os seus seguidores. Ela ativou esta opção para ninguém ver.</p>`;
       } else {
         if (followersArr.length === 0) {
-          followersDiv.innerHTML = '<p style="color:#70757a;">Ainda não tem nenhum seguidor.</p>';
+          followersDiv.innerHTML = '<p style="color:#70757a;">Ninguém está a seguir este perfil ainda.</p>';
         } else {
-          followersArr.forEach(followerKey => {
-            const followerObj = usersMap[followerKey];
-            const followerName = followerObj ? followerObj.username : followerKey;
+          followersArr.forEach(followerObj => {
             const item = document.createElement('div');
             item.className = 'card';
             item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;';
             item.innerHTML = `
-              <div class="author-container" onclick="navigateTo('profile', '${escapeStr(followerName)}')">
+              <div class="author-container" onclick="navigateTo('profile', '${escapeStr(followerObj.username)}')">
                 ${renderAvatar(followerObj, 'small')}
-                <span class="author-name">${escapeHtml(followerName)}</span>
+                <span class="author-name">${escapeHtml(followerObj.username)}</span>
+                ${renderBadges(followerObj.username)}
               </div>
-              <button onclick="navigateTo('profile', '${escapeStr(followerName)}')">Ver Perfil</button>
+              <button onclick="navigateTo('profile', '${escapeStr(followerObj.username)}')">Ver Perfil</button>
             `;
             followersDiv.appendChild(item);
           });
         }
       }
 
-      // LISTA DE QUEM ESTÁ A SEGUIR (COM PROTEÇÃO DE PRIVACIDADE)
+      // A SEGUIR
       followingDiv.innerHTML = '';
       if (!isSelf && user.hideFollowing) {
         followingDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem esta pessoa está a seguir. Ela ativou esta opção para ninguém ver.</p>`;
@@ -1565,6 +1677,7 @@
               <div class="author-container" onclick="navigateTo('profile', '${escapeStr(targetU)}')">
                 ${renderAvatar(targetObj, 'small')}
                 <span class="author-name">${escapeHtml(targetU)}</span>
+                ${renderBadges(targetU)}
               </div>
               <button onclick="navigateTo('profile', '${escapeStr(targetU)}')">Ver Perfil</button>
             `;
@@ -1581,69 +1694,52 @@
       renderAnalytics(userPosts);
     }
 
-    // PAINEL ADMINISTRATIVO (CONTA ARNOS)
-    function renderAdminPanel() {
-      const tbody = document.getElementById('admin-users-table-body');
-      tbody.innerHTML = '';
+    function renderAnalytics(userPosts) {
+      const calGrid = document.getElementById('calendar-grid-container');
+      calGrid.innerHTML = '';
+      const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+      
+      days.forEach((dayName, idx) => {
+        const div = document.createElement('div');
+        div.className = `calendar-day ${idx === new Date().getDay() ? 'active' : ''}`;
+        div.innerHTML = `<strong>${dayName}</strong><br>${idx === new Date().getDay() ? 'Viral 🚀' : 'Ok'}`;
+        calGrid.appendChild(div);
+      });
 
-      Object.keys(usersMap).forEach(uKey => {
-        const u = usersMap[uKey];
-        const followers = getFollowersList(uKey).length;
+      const tbody = document.getElementById('top-posts-table-body');
+      tbody.innerHTML = userPosts.length === 0 ? '<tr><td colspan="3">Sem dados.</td></tr>' : '';
+
+      const sorted = [...userPosts].sort((a, b) => {
+        const interA = (a.likes || []).length + (a.comments || []).length + (a.views || []).length;
+        const interB = (b.likes || []).length + (b.comments || []).length + (b.views || []).length;
+        return interB - interA;
+      });
+
+      sorted.forEach(p => {
+        const owner = p.author.toLowerCase();
+        const validLikes = (p.likes || []).filter(u => u.toLowerCase() !== owner).length;
+        const validComments = (p.comments || []).filter(c => (c.author || '').toLowerCase() !== owner).length;
+        const validViews = (p.views || []).filter(u => u.toLowerCase() !== owner).length;
+
+        const totalEvents = validLikes + validComments + validViews;
+        const generatedVal = (validLikes * 0.01) + (validComments * 0.05) + (validViews * 0.50);
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>
-            <strong>${escapeHtml(u.username)}</strong>
-            ${getUserBadgesHtml(u.username)}
-          </td>
-          <td>R$ ${(u.credits || 0).toFixed(2)}</td>
-          <td>${followers}</td>
-          <td>
-            <button class="btn-primary" style="padding:2px 6px; font-size:11px;" onclick="adminAddCredits('${escapeStr(u.username)}')">+ Créditos</button>
-            ${u.username.toLowerCase() !== 'arnos' ? `<button class="btn-danger" style="padding:2px 6px; font-size:11px;" onclick="adminResetUser('${escapeStr(u.username)}')">Resetar</button>` : ''}
-          </td>
+          <td>${escapeHtml(p.content || '[Foto]')}</td>
+          <td>❤️ ${validLikes} | 💬 ${validComments} | 👁️ ${validViews} (<strong>${totalEvents}</strong>)</td>
+          <td style="color:#137333; font-weight:bold;">R$ ${generatedVal.toFixed(2)}</td>
         `;
         tbody.appendChild(tr);
       });
-
-      const adminPostsDiv = document.getElementById('admin-posts-list');
-      adminPostsDiv.innerHTML = postsList.length === 0 ? '<p style="color:#70757a;">Sem posts cadastrados.</p>' : '';
-      postsList.forEach(p => {
-        const d = document.createElement('div');
-        d.className = 'card';
-        d.style.marginBottom = '8px';
-        d.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span><strong>@${escapeHtml(p.author)}</strong>: ${escapeHtml(p.content || '[Sem texto]')}</span>
-            <button class="btn-danger" onclick="deletePost('${p.id}')">Excluir Post</button>
-          </div>
-        `;
-        adminPostsDiv.appendChild(d);
-      });
     }
 
-    window.adminAddCredits = async function(targetUsername) {
-      const amountStr = prompt(`Adicionar quantos créditos para @${targetUsername}?`, "10.00");
-      if (!amountStr) return;
-      const val = parseFloat(amountStr);
-      if (isNaN(val) || val <= 0) return alert("Valor inválido.");
+    function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function escapeStr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-      const targetDoc = publicUserDoc(targetUsername);
-      const targetObj = usersMap[targetUsername.toLowerCase()];
-      if (!targetObj) return;
-
-      const newBal = (targetObj.credits || 0) + val;
-      await updateDoc(targetDoc, { credits: newBal });
-      alert(`Adicionados R$ ${val.toFixed(2)} para @${targetUsername}!`);
-      renderAdminPanel();
+    window.onload = function() {
+      initAuth();
     };
-
-    window.adminResetUser = async function(targetUsername) {
-      if (!confirm(`Tem a certeza que quer resetar os créditos de @${targetUsername}?`)) return;
-      await updateDoc(publicUserDoc(targetUsername), { credits: 0 });
-      alert(`Créditos de @${targetUsername} foram zerados.`);
-      renderAdminPanel();
-    };
-
-    function renderAnalytics(userPosts) {
-<!-- ... existing code -->
-```
+  </script>
+</body>
+</html>
