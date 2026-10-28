@@ -3,11 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v1.12 - Liquid Glass</title>
+  <title>Arnos v1.12 - Liquid Glass & Memes</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, Helvetica, sans-serif; background-color: #f8f9fa; color: #222222; line-height: 1.5; }
+    body { 
+      font-family: Arial, Helvetica, sans-serif; 
+      background-color: #f8f9fa; 
+      color: #222222; 
+      line-height: 1.5; 
+      transition: background 0.8s ease, color 0.5s ease;
+    }
+
+    /* TEMA DINÂMICO ARNOS (DIA/NOITE) */
+    body.theme-day {
+      background: radial-gradient(circle at center, #fff9e6, #f7e199, #ebcc66) !important;
+      color: #222222 !important;
+    }
+    body.theme-night {
+      background: radial-gradient(circle at center, #101c33, #080f1d, #02050a) !important;
+      color: #f1f3f4 !important;
+    }
+    body.theme-night .card, 
+    body.theme-night header, 
+    body.theme-night .modal-card, 
+    body.theme-night .auth-box,
+    body.theme-night .update-floating-bar {
+      background-color: rgba(18, 28, 48, 0.95) !important;
+      color: #f1f3f4 !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+    body.theme-night input, 
+    body.theme-night select, 
+    body.theme-night textarea {
+      background-color: #0b1324 !important;
+      color: #ffffff !important;
+      border-color: #1e2d4a !important;
+    }
 
     /* HEADER & NAVIGATION */
     header {
@@ -63,90 +95,45 @@
     }
 
     button::before {
-      content: "";
-      position: absolute;
-      z-index: 1;
-      top: 15%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 12px);
-      height: calc(100% - 12px);
-      border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      filter: blur(4px);
-      pointer-events: none;
+      content: ""; position: absolute; z-index: 1; top: 15%; left: 50%;
+      transform: translateX(-50%); width: calc(100% - 12px); height: calc(100% - 12px);
+      border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.6);
+      filter: blur(4px); pointer-events: none;
     }
 
     button:hover {
-      background: rgba(255, 255, 255, 0.45);
-      transform: translateY(-2px);
-      filter: brightness(1.05);
+      background: rgba(255, 255, 255, 0.45); transform: translateY(-2px); filter: brightness(1.05);
       box-shadow:
         inset 2px -2px 1px -1px rgba(255, 255, 255, 1),
         inset -2px 2px 1px -1px rgba(255, 255, 255, 1),
         inset 6px -6px 1px -6px rgba(255, 255, 255, 0.8),
         inset -6px 6px 1px -6px rgba(255, 255, 255, 0.8),
-        inset 0 0 4px rgba(0, 0, 0, 0.4),
-        0 6px 15px rgba(0, 0, 0, 0.15);
+        inset 0 0 4px rgba(0, 0, 0, 0.4), 0 6px 15px rgba(0, 0, 0, 0.15);
     }
 
     button:active {
-      transform: scale(0.94) translateY(1px);
-      background: rgba(0, 0, 0, 0.05);
-      box-shadow:
-        inset 0 0 4px rgba(0, 0, 0, 0.5),
-        0 2px 5px rgba(0, 0, 0, 0.1);
+      transform: scale(0.94) translateY(1px); background: rgba(0, 0, 0, 0.05);
+      box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5), 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    /* VARIAÇÕES COM CORES DE DESTAQUE LÍQUIDAS */
     button.btn-primary {
-      background: rgba(26, 115, 232, 0.85);
-      color: #ffffff;
+      background: rgba(26, 115, 232, 0.85); color: #ffffff;
       border: 1px double rgba(255, 255, 255, 0.3);
-      box-shadow:
-        inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6),
-        inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6),
-        0 4px 12px rgba(26, 115, 232, 0.35);
+      box-shadow: inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6), inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(26, 115, 232, 0.35);
     }
-    button.btn-primary:hover {
-      background: rgba(21, 87, 176, 0.95);
-      box-shadow:
-        inset 2px -2px 1px -1px rgba(255, 255, 255, 0.8),
-        0 6px 18px rgba(26, 115, 232, 0.5);
-    }
+    button.btn-primary:hover { background: rgba(21, 87, 176, 0.95); }
 
     button.btn-success {
-      background: rgba(24, 128, 56, 0.85);
-      color: #ffffff;
+      background: rgba(24, 128, 56, 0.85); color: #ffffff;
       border: 1px double rgba(255, 255, 255, 0.3);
-      box-shadow:
-        inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6),
-        inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6),
-        0 4px 12px rgba(24, 128, 56, 0.35);
-    }
-    button.btn-success:hover {
-      background: rgba(19, 101, 43, 0.95);
-      box-shadow:
-        inset 2px -2px 1px -1px rgba(255, 255, 255, 0.8),
-        0 6px 18px rgba(24, 128, 56, 0.5);
+      box-shadow: inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6), inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(24, 128, 56, 0.35);
     }
 
     button.btn-danger {
-      background: rgba(217, 48, 37, 0.85);
-      color: #ffffff;
+      background: rgba(217, 48, 37, 0.85); color: #ffffff;
       border: 1px double rgba(255, 255, 255, 0.3);
-      box-shadow:
-        inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6),
-        inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6),
-        0 4px 12px rgba(217, 48, 37, 0.35);
+      box-shadow: inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6), inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(217, 48, 37, 0.35);
     }
-    button.btn-danger:hover {
-      background: rgba(179, 20, 18, 0.95);
-      box-shadow:
-        inset 2px -2px 1px -1px rgba(255, 255, 255, 0.8),
-        0 6px 18px rgba(217, 48, 37, 0.5);
-    }
-    /* ========================================================== */
 
     nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
@@ -159,7 +146,6 @@
     .badge-dono { background-color: #d93025; border: 1px solid #b31412; }
     .badge-bot { background-color: #1a73e8; border: 1px solid #1557b0; }
 
-    /* BORDA COLORIDA E ANIMADA NOS POSTS DO ARNOS */
     @keyframes rainbowBorder {
       0% { border-color: #ff0000; }
       20% { border-color: #ff7f00; }
@@ -186,7 +172,6 @@
     .author-container { display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .author-container:hover .author-name { text-decoration: underline; }
 
-    /* BADGE & CREDITS */
     .badge-container { position: relative; display: inline-block; }
     .badge {
       position: absolute; top: -6px; right: -6px; background-color: #d93025; color: #ffffff;
@@ -211,6 +196,23 @@
     .post-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 1px solid #eee; cursor: pointer; }
     .product-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 1px solid #eee; }
     .product-price { font-size: 18px; font-weight: bold; color: #188038; margin-bottom: 4px; }
+
+    /* MEME STICKER SYSTEM */
+    .meme-sticker {
+      max-width: 150px; max-height: 150px; border-radius: 8px; margin: 6px 0;
+      display: block; object-fit: contain; border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .meme-picker-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+      gap: 8px; padding: 10px; background: rgba(0,0,0,0.04); border-radius: 8px;
+      max-height: 180px; overflow-y: auto; margin-bottom: 8px; border: 1px solid #dadce0;
+    }
+    .meme-picker-item {
+      width: 100%; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer;
+      border: 2px solid transparent; transition: transform 0.15s, border-color 0.15s;
+    }
+    .meme-picker-item:hover { transform: scale(1.08); border-color: #1a73e8; }
 
     /* COMMENTS SECTION */
     .comments-section { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
@@ -349,6 +351,14 @@
       <div class="card">
         <h3 style="font-size: 15px; margin-bottom: 8px;">Criar uma publicação</h3>
         <textarea id="post-input" rows="3" placeholder="No que estás a pensar?" dir="ltr"></textarea>
+        
+        <!-- SELETOR DE MEMES / FIGURINHAS NO POST -->
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+          <button class="btn-primary" type="button" onclick="toggleMemePicker('post')" style="padding:4px 10px; font-size:11px;">🎭 Adicionar Meme</button>
+          <span id="post-selected-meme-tag" style="font-size:11px; color:#1a73e8; font-weight:bold;"></span>
+        </div>
+        <div id="post-meme-picker" class="meme-picker-grid hidden"></div>
+
         <label style="font-size: 12px; font-weight: bold; display: block; margin-top: 6px;">Adicionar Foto ao Post (Opcional)</label>
         <input type="file" id="post-image-file" accept="image/*" style="margin-bottom: 8px;">
         <div id="post-img-preview" style="margin-bottom: 12px;"></div>
@@ -422,8 +432,13 @@
         <button onclick="closeChatView()" style="margin-bottom: 12px;">← Voltar para Conversas</button>
         <h3 id="chat-title" style="margin-bottom: 8px;"></h3>
         <div id="chat-bubbles" class="chat-container"></div>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." dir="ltr" style="margin-bottom:0;">
+        
+        <!-- SELETOR DE MEMES NO CHAT PRIVADO -->
+        <div id="chat-meme-picker" class="meme-picker-grid hidden"></div>
+
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn-primary" type="button" onclick="toggleMemePicker('chat')" style="padding:6px 12px; font-size:12px;">🎭 Meme</button>
+          <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." dir="ltr" style="margin-bottom:0; flex:1;">
           <button class="btn-primary" onclick="sendChatMessage()">Enviar</button>
         </div>
       </div>
@@ -457,7 +472,14 @@
         </div>
 
         <div id="profile-settings-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
-          <h4 style="font-size: 13px; margin-bottom: 8px;">⚙️ Configurações da Conta</h4>
+          <h4 style="font-size: 13px; margin-bottom: 8px;">⚙️ Configurações da Conta & Aparência</h4>
+          
+          <!-- OPÇÃO DE MARCA PARA TEMA DINÂMICO ARNOS -->
+          <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom:10px; background:rgba(26,115,232,0.1); padding:8px 12px; border-radius:8px; border:1px solid rgba(26,115,232,0.3);">
+            <input type="checkbox" id="chk-dynamic-theme" onchange="toggleDynamicThemeSetting(this.checked)">
+            <strong>☀️/🌙 Ativar Fundo Dinâmico Arnos</strong> (Amarelo de dia / Azul e Preto de noite)
+          </label>
+
           <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
             <input type="checkbox" id="chk-hide-following" onchange="toggleHideFollowingSetting(this.checked)">
             Ocultar minhas listas de seguidores e a seguir no meu perfil
@@ -545,8 +567,13 @@
 
         <div class="comments-section" style="margin-top:16px;">
           <h4 style="margin-bottom:8px; font-size:14px;">Comentários</h4>
-          <div style="display:flex; gap:6px; margin-bottom:12px;">
-            <input type="text" id="modal-comment-input" placeholder="Escreva um comentário..." dir="ltr" style="margin-bottom:0;">
+          
+          <!-- SELETOR DE MEMES NOS COMENTÁRIOS -->
+          <div id="modal-comment-meme-picker" class="meme-picker-grid hidden"></div>
+
+          <div style="display:flex; gap:6px; margin-bottom:12px; align-items:center;">
+            <button class="btn-primary" type="button" onclick="toggleMemePicker('comment')" style="padding:4px 8px; font-size:11px;">🎭 Meme</button>
+            <input type="text" id="modal-comment-input" placeholder="Escreva um comentário..." dir="ltr" style="margin-bottom:0; flex:1;">
             <button class="btn-primary" id="modal-btn-send-comment">Enviar</button>
           </div>
           <div id="modal-comments-list"></div>
@@ -615,6 +642,18 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // GALERIA POPULAR DE FIGURINHAS / MEMES
+    const MEMES_LIST = [
+      { id: 'doge', url: 'https://i.imgflip.com/4t0m5.jpg' },
+      { id: 'stonks', url: 'https://i.imgflip.com/30b1gx.jpg' },
+      { id: 'cat_vibing', url: 'https://i.giphy.com/media/GeimqsH0TLDt4tScGw/giphy.webp' },
+      { id: 'pikachu', url: 'https://i.imgflip.com/26am.jpg' },
+      { id: 'fine_dog', url: 'https://i.imgflip.com/261o3j.jpg' },
+      { id: 'drake', url: 'https://i.imgflip.com/1g8my4.jpg' },
+      { id: 'brain', url: 'https://i.imgflip.com/1jwhrq.jpg' },
+      { id: 'chad', url: 'https://i.imgflip.com/589yap.png' }
+    ];
+
     let authUser = null;
     let currentUserData = null;
     let usersMap = {};
@@ -626,8 +665,77 @@
     let selectedPostImageBase64 = null;
     let selectedProductImageBase64 = null;
     let selectedAvatarBase64 = null;
+    let selectedPostMemeUrl = '';
+    let selectedChatMemeUrl = '';
+    let selectedCommentMemeUrl = '';
     let activeChatKey = null;
     let activeMsgSubTab = 'profile';
+
+    // SISTEMA DE TEMA DINÂMICO DIA / NOITE (AMARELO DE DIA / AZUL-PRETO DE NOITE)
+    function applyDynamicTheme() {
+      if (!currentUserData || !currentUserData.useDynamicTheme) {
+        document.body.classList.remove('theme-day', 'theme-night');
+        return;
+      }
+      const hour = new Date().getHours();
+      const isDayTime = hour >= 6 && hour < 18; // 06:00 às 18:00
+      if (isDayTime) {
+        document.body.classList.add('theme-day');
+        document.body.classList.remove('theme-night');
+      } else {
+        document.body.classList.add('theme-night');
+        document.body.classList.remove('theme-day');
+      }
+    }
+
+    window.toggleDynamicThemeSetting = async function(isChecked) {
+      if (!currentUserData) return;
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), {
+          useDynamicTheme: isChecked
+        });
+        currentUserData.useDynamicTheme = isChecked;
+        applyDynamicTheme();
+      } catch(e){}
+    };
+
+    // FIGURINHAS / MEME PICKER INTERATIVO
+    window.toggleMemePicker = function(target) {
+      const pickerId = target === 'post' ? 'post-meme-picker' : (target === 'chat' ? 'chat-meme-picker' : 'modal-comment-meme-picker');
+      const container = document.getElementById(pickerId);
+      if (!container) return;
+
+      if (!container.classList.contains('hidden')) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.innerHTML = '';
+      MEMES_LIST.forEach(meme => {
+        const img = document.createElement('img');
+        img.src = meme.url;
+        img.className = 'meme-picker-item';
+        img.onclick = () => selectMeme(target, meme.url);
+        container.appendChild(img);
+      });
+      container.classList.remove('hidden');
+    };
+
+    function selectMeme(target, url) {
+      if (target === 'post') {
+        selectedPostMemeUrl = url;
+        document.getElementById('post-selected-meme-tag').innerText = "✓ Meme selecionado!";
+        document.getElementById('post-meme-picker').classList.add('hidden');
+      } else if (target === 'chat') {
+        selectedChatMemeUrl = url;
+        sendChatMessageWithMeme(url);
+        document.getElementById('chat-meme-picker').classList.add('hidden');
+      } else if (target === 'comment') {
+        selectedCommentMemeUrl = url;
+        addCommentFromModalWithMeme(activeOpenedPostId, url);
+        document.getElementById('modal-comment-meme-picker').classList.add('hidden');
+      }
+    }
 
     // SISTEMA DE ÁUDIO BIDIRECIONAL (ROLANDO PARA CIMA E PARA BAIXO)
     let audioCtx = null;
@@ -682,7 +790,7 @@
       setTimeout(() => {
         if (icon) icon.className = '';
         if (text) text.innerText = 'Arnos 1.12 (12ª grande atualização!)';
-        alert("O Arnos v1.12 está totalmente atualizado com botões Liquid Glass!");
+        alert("O Arnos v1.12 está totalmente atualizado com Figurinhas e Tema Dinâmico!");
       }, 1500);
     };
 
@@ -736,6 +844,7 @@
             currentUserData = userSnap.data();
             window.currentUserData = currentUserData;
             showMainInterface();
+            applyDynamicTheme();
             return;
           }
         } catch (e) {}
@@ -754,6 +863,7 @@
           currentUserData = usersMap[currentUserData.username.toLowerCase()];
           window.currentUserData = currentUserData;
           updateCreditsUI();
+          applyDynamicTheme();
         }
         markLoadingStep('step-users');
         markLoadingStep('step-credits');
@@ -908,7 +1018,8 @@
           avatarUrl: '',
           following: [],
           blockedUsers: [],
-          hideFollowing: false
+          hideFollowing: false,
+          useDynamicTheme: false
         };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
@@ -988,7 +1099,7 @@
         div.style.cssText = 'padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-size: 13px;';
         div.innerHTML = `
           <div>
-            <strong>@${escapeHtml(p.author)}</strong>: ${escapeHtml(p.content || '[Foto]')}
+            <strong>@${escapeHtml(p.author)}</strong>: ${escapeHtml(p.content || '[Foto/Meme]')}
             <br><span style="font-size:10px; color:#70757a;">${new Date(p.timestamp).toLocaleString()}</span>
           </div>
           <button class="btn-danger" style="padding:2px 6px; font-size:11px;" onclick="deletePost('${p.id}')">Remover</button>
@@ -1177,7 +1288,7 @@
             ${renderAvatar(otherObj, 'small')}
             <p style="font-size: 13px; color: #5f6368; margin:0;">Conversa com: <strong>${escapeHtml(g.otherUser)}</strong> ${renderBadges(g.otherUser)} ${hasUnread ? '<span style="color:#d93025; font-weight:bold; margin-left:6px;">● Nova mensagem</span>' : ''}</p>
           </div>
-          <p style="font-size: 13px; margin-top: 6px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message)}"</p>
+          <p style="font-size: 13px; margin-top: 6px; color: #70757a;">Última mensagem: "${escapeHtml(g.lastMsg.message || '[Meme enviado]')}"</p>
         `;
         convListDiv.appendChild(div);
       });
@@ -1215,7 +1326,8 @@
         bubble.className = `chat-bubble ${isMine ? 'mine' : 'other'}`;
         bubble.innerHTML = `
           ${!isMine ? `<span class="chat-sender-tag">${escapeHtml(senderName)} ${renderBadges(senderName)}</span>` : ''}
-          ${escapeHtml(m.message)}
+          ${m.message ? escapeHtml(m.message) : ''}
+          ${m.memeUrl ? `<img src="${escapeHtml(m.memeUrl)}" class="meme-sticker">` : ''}
         `;
         container.appendChild(bubble);
       });
@@ -1245,6 +1357,26 @@
         input.value = '';
       } catch (e) {}
     };
+
+    async function sendChatMessageWithMeme(memeUrl) {
+      if (!activeChatKey || !currentUserData) return;
+      const parts = activeChatKey.split('___');
+      const prodName = parts[0];
+      const otherUser = parts[1];
+
+      try {
+        await addDoc(publicMessagesColl(), {
+          sender: currentUserData.username,
+          buyer: currentUserData.username,
+          seller: otherUser,
+          productName: prodName,
+          message: '',
+          memeUrl: memeUrl,
+          timestamp: new Date().toISOString(),
+          read: false
+        });
+      } catch(e) {}
+    }
 
     window.openDirectMsgModal = function(targetName) {
       document.getElementById('modal-msg-target-name').innerText = `Mensagem para ${targetName}`;
@@ -1372,11 +1504,10 @@
       document.getElementById('modal-post-content').innerText = post.content || '';
 
       const imgContainer = document.getElementById('modal-post-image-container');
-      if (post.imageUrl) {
-        imgContainer.innerHTML = `<img src="${escapeHtml(post.imageUrl)}" class="post-img">`;
-      } else {
-        imgContainer.innerHTML = '';
-      }
+      let htmlMedia = '';
+      if (post.imageUrl) htmlMedia += `<img src="${escapeHtml(post.imageUrl)}" class="post-img">`;
+      if (post.memeUrl) htmlMedia += `<img src="${escapeHtml(post.memeUrl)}" class="meme-sticker">`;
+      imgContainer.innerHTML = htmlMedia;
 
       const likes = post.likes || [];
       const comments = post.comments || [];
@@ -1409,7 +1540,8 @@
               ${isMyComment ? `<button onclick="deleteComment('${postId}', '${c.id}')" class="btn-danger" style="padding:1px 4px; font-size:10px; margin-left:6px;">Apagar</button>` : ''}
             </div>
           </div>
-          <div>${escapeHtml(c.text)}</div>
+          <div>${c.text ? escapeHtml(c.text) : ''}</div>
+          ${c.memeUrl ? `<img src="${escapeHtml(c.memeUrl)}" class="meme-sticker">` : ''}
         `;
         commentsListDiv.appendChild(div);
       });
@@ -1434,6 +1566,25 @@
       try {
         await updateDoc(publicPostDoc(postId), { comments });
         input.value = '';
+      } catch (e) {}
+    }
+
+    async function addCommentFromModalWithMeme(postId, memeUrl) {
+      if (!currentUserData) return;
+      const post = postsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let comments = post.comments ? [...post.comments] : [];
+      comments.push({
+        id: 'c_' + Date.now(),
+        author: currentUserData.username,
+        text: '',
+        memeUrl: memeUrl,
+        timestamp: new Date().toISOString()
+      });
+
+      try {
+        await updateDoc(publicPostDoc(postId), { comments });
       } catch (e) {}
     }
 
@@ -1478,7 +1629,9 @@
       if (!currentUserData) return;
       const content = document.getElementById('post-input').value.trim();
       const imageUrl = selectedPostImageBase64 || '';
-      if (!content && !imageUrl) return alert("Escreva um texto ou adicione uma foto.");
+      const memeUrl = selectedPostMemeUrl || '';
+
+      if (!content && !imageUrl && !memeUrl) return alert("Escreva um texto, escolha uma foto ou um meme.");
 
       const banner = document.getElementById('post-support-banner');
       if (containsSelfHarmKeywords(content)) {
@@ -1494,6 +1647,7 @@
           author: currentUserData.username,
           content,
           imageUrl,
+          memeUrl,
           timestamp: new Date().toISOString(),
           likes: [],
           comments: [],
@@ -1502,6 +1656,8 @@
         });
         document.getElementById('post-input').value = '';
         selectedPostImageBase64 = null;
+        selectedPostMemeUrl = '';
+        document.getElementById('post-selected-meme-tag').innerText = '';
         document.getElementById('post-image-file').value = '';
         document.getElementById('post-img-preview').innerHTML = '';
       } catch (e) {}
@@ -1620,8 +1776,9 @@
         </div>
         ${post.content ? `<div class="item-content" onclick="openPostModal('${post.id}')">${escapeHtml(post.content)}</div>` : ''}
         ${post.imageUrl ? `<img src="${escapeHtml(post.imageUrl)}" class="post-img" onclick="openPostModal('${post.id}')">` : ''}
-        
-        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        ${post.memeUrl ? `<img src="${escapeHtml(post.memeUrl)}" class="meme-sticker" onclick="openPostModal('${post.id}')">` : ''}
+
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
           <button onclick="toggleLikePost('${post.id}')" class="${hasLiked ? 'btn-primary' : ''}">
             ${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})
           </button>
@@ -1758,6 +1915,7 @@
       document.getElementById('profile-settings-section').classList.toggle('hidden', !isSelf);
       if (isSelf) {
         document.getElementById('chk-hide-following').checked = !!user.hideFollowing;
+        document.getElementById('chk-dynamic-theme').checked = !!user.useDynamicTheme;
       }
 
       document.getElementById('profile-deposit-card').classList.toggle('hidden', !isSelf);
@@ -1909,7 +2067,7 @@
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${escapeHtml(p.content || '[Foto]')}</td>
+          <td>${escapeHtml(p.content || '[Foto/Meme]')}</td>
           <td>❤️ ${validLikes} | 💬 ${validComments} | 👁️ ${validViews} (<strong>${totalEvents}</strong>)</td>
           <td style="color:#137333; font-weight:bold;">R$ ${generatedVal.toFixed(2)}</td>
         `;
