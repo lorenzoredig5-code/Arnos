@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Liquid Glass, Grupos & Bios</title>
+  <title>Arnos v2.0 - Liquid Glass, Grupos & Exclusão</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -408,6 +408,7 @@
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="btn-primary" onclick="openGroupMembersModal()">👥 Ver Membros</button>
             <button id="group-edit-bio-btn" class="btn-primary hidden" onclick="openEditGroupBioModal()">✏️ Editar Bio</button>
+            <button id="group-delete-btn" class="btn-danger hidden" onclick="deleteCurrentGroup()">🗑️ Apagar Grupo</button>
             <button id="group-join-leave-btn" onclick="toggleJoinCurrentGroup()"></button>
           </div>
         </div>
@@ -1090,7 +1091,14 @@
         groupsList = [];
         snap.forEach(d => groupsList.push({ id: d.id, ...d.data() }));
         if (!document.getElementById('view-groups').classList.contains('hidden')) renderGroupsList();
-        if (activeGroupId) renderGroupDetail(activeGroupId);
+        if (activeGroupId) {
+          const exists = groupsList.some(g => g.id === activeGroupId);
+          if (!exists) {
+            navigateTo('groups');
+          } else {
+            renderGroupDetail(activeGroupId);
+          }
+        }
       });
 
       onSnapshot(publicGroupPostsColl(), (snap) => {
@@ -1501,6 +1509,31 @@
       } catch(e) { alert("Erro ao atualizar a bio do grupo."); }
     };
 
+    window.deleteCurrentGroup = async function() {
+      if (!activeGroupId || !currentUserData) return;
+      const group = groupsList.find(g => g.id === activeGroupId);
+      if (!group || group.owner.toLowerCase() !== currentUserData.username.toLowerCase()) {
+        return alert("Apenas o dono pode apagar este grupo.");
+      }
+
+      if (!confirm(`Tem a certeza que deseja apagar o grupo "${group.name}"? Esta ação removerá o grupo e todas as publicações associadas.`)) return;
+
+      try {
+        // Apaga todos os posts associados a este grupo
+        const postsToDelete = groupPostsList.filter(p => p.groupId === activeGroupId);
+        for (const p of postsToDelete) {
+          await deleteDoc(publicGroupPostDoc(p.id));
+        }
+
+        // Apaga o documento do grupo
+        await deleteDoc(publicGroupDoc(activeGroupId));
+        alert("Grupo apagado com sucesso.");
+        navigateTo('groups');
+      } catch(e) {
+        alert("Erro ao apagar o grupo.");
+      }
+    };
+
     function renderGroupsList(filterQuery = '') {
       const list = document.getElementById('groups-list');
       list.innerHTML = '';
@@ -1560,6 +1593,7 @@
 
       const isOwner = currentUserData && group.owner.toLowerCase() === currentUserData.username.toLowerCase();
       document.getElementById('group-edit-bio-btn').classList.toggle('hidden', !isOwner);
+      document.getElementById('group-delete-btn').classList.toggle('hidden', !isOwner);
 
       const isMember = (group.members || []).map(m => m.toLowerCase()).includes(currentUserData.username.toLowerCase());
       const joinBtn = document.getElementById('group-join-leave-btn');
@@ -1582,7 +1616,7 @@
       const isMember = members.map(m => m.toLowerCase()).includes(myUser.toLowerCase());
 
       if (isMember) {
-        if (group.owner.toLowerCase() === myUser.toLowerCase()) return alert("O dono não pode sair do próprio grupo.");
+        if (group.owner.toLowerCase() === myUser.toLowerCase()) return alert("O dono não pode sair do próprio grupo. Se desejar, pode apagar o grupo.");
         members = members.filter(m => m.toLowerCase() !== myUser.toLowerCase());
       } else {
         members.push(myUser);
