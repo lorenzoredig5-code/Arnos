@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -98,6 +99,10 @@
     .tabs { display: flex; border-bottom: 1px solid #dadce0; margin-bottom: 16px; overflow-x: auto; }
     .tab-btn { border: none; background: none; border-radius: 0; padding: 8px 16px; border-bottom: 3px solid transparent; color: #5f6368; font-weight: bold; white-space: nowrap; }
     .tab-btn.active { border-bottom-color: #1a73e8; color: #1a73e8; }
+
+    /* STATS INTERATIVOS NO PERFIL */
+    .profile-stat-item { cursor: pointer; font-size: 13px; color: #1a73e8; }
+    .profile-stat-item:hover { text-decoration: underline; }
 
     /* ANALYTICS TABLE & CALENDAR */
     .stats-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
@@ -251,7 +256,10 @@
             <div id="profile-avatar-container"></div>
             <div>
               <h2 id="profile-name-display"></h2>
-              <p style="font-size: 13px; color: #70757a; margin-top: 2px;" id="profile-stats-summary"></p>
+              <div style="display: flex; gap: 12px; margin-top: 4px;">
+                <span class="profile-stat-item" onclick="switchProfileTab('followers')">Seguidores: <strong id="profile-followers-count">0</strong></span>
+                <span class="profile-stat-item" onclick="switchProfileTab('following')">A seguir: <strong id="profile-following-count">0</strong></span>
+              </div>
             </div>
           </div>
           <div id="profile-action-btn-area" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
@@ -262,7 +270,7 @@
           <h4 style="font-size: 13px; margin-bottom: 8px;">⚙️ Configurações da Conta</h4>
           <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
             <input type="checkbox" id="chk-hide-following" onchange="toggleHideFollowingSetting(this.checked)">
-            Ocultar quem estou a seguir no meu perfil
+            Ocultar seguidores e quem estou a seguir no meu perfil
           </label>
 
           <div style="margin-top: 12px;">
@@ -275,6 +283,7 @@
 
       <div class="tabs">
         <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
+        <button id="profile-tab-followers" class="tab-btn" onclick="switchProfileTab('followers')">Seguidores</button>
         <button id="profile-tab-following" class="tab-btn" onclick="switchProfileTab('following')">A Seguir</button>
         <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
         <button id="profile-tab-analytics" class="tab-btn" onclick="switchProfileTab('analytics')">📊 Desempenho & Virais</button>
@@ -283,6 +292,7 @@
       <div id="profile-blocked-message" class="card hidden" style="color:#d93025; text-align:center; font-weight:bold;"></div>
 
       <div id="profile-posts-list"></div>
+      <div id="profile-followers-list" class="hidden"></div>
       <div id="profile-following-list" class="hidden"></div>
       <div id="profile-vitrine-list" class="hidden"></div>
       
@@ -671,7 +681,6 @@
     // SEGUIR / DEIXAR DE SEGUIR & BLOQUEAR / DESBLOQUEAR
     window.toggleFollowUser = async function(targetUsername) {
       if (!currentUserData) return;
-      const myKey = currentUserData.username.toLowerCase();
       const targetKey = targetUsername.toLowerCase();
       let following = currentUserData.following ? [...currentUserData.following] : [];
 
@@ -1363,15 +1372,25 @@
 
     window.switchProfileTab = function(tab) {
       document.getElementById('profile-posts-list').classList.toggle('hidden', tab !== 'posts');
+      document.getElementById('profile-followers-list').classList.toggle('hidden', tab !== 'followers');
       document.getElementById('profile-following-list').classList.toggle('hidden', tab !== 'following');
       document.getElementById('profile-vitrine-list').classList.toggle('hidden', tab !== 'vitrine');
       document.getElementById('profile-analytics-list').classList.toggle('hidden', tab !== 'analytics');
 
       document.getElementById('profile-tab-posts').classList.toggle('active', tab === 'posts');
+      document.getElementById('profile-tab-followers').classList.toggle('active', tab === 'followers');
       document.getElementById('profile-tab-following').classList.toggle('active', tab === 'following');
       document.getElementById('profile-tab-vitrine').classList.toggle('active', tab === 'vitrine');
       document.getElementById('profile-tab-analytics').classList.toggle('active', tab === 'analytics');
     };
+
+    function getFollowersList(targetUserKey) {
+      return Object.keys(usersMap).filter(uKey => {
+        const uObj = usersMap[uKey];
+        const following = (uObj && uObj.following) ? uObj.following.map(x => x.toLowerCase()) : [];
+        return following.includes(targetUserKey);
+      });
+    }
 
     function renderProfile(name) {
       const userKey = name.toLowerCase();
@@ -1391,7 +1410,10 @@
       document.getElementById('profile-avatar-container').innerHTML = renderAvatar(user, 'large');
 
       const followingArr = user.following || [];
-      document.getElementById('profile-stats-summary').innerText = `A seguir: ${followingArr.length}`;
+      const followersArr = getFollowersList(userKey);
+
+      document.getElementById('profile-following-count').innerText = followingArr.length;
+      document.getElementById('profile-followers-count').innerText = followersArr.length;
 
       document.getElementById('profile-settings-section').classList.toggle('hidden', !isSelf);
       if (isSelf) {
@@ -1426,6 +1448,7 @@
 
       const blockedMsgDiv = document.getElementById('profile-blocked-message');
       const postsDiv = document.getElementById('profile-posts-list');
+      const followersDiv = document.getElementById('profile-followers-list');
       const followingDiv = document.getElementById('profile-following-list');
       const vitrineDiv = document.getElementById('profile-vitrine-list');
 
@@ -1434,6 +1457,7 @@
         blockedMsgDiv.innerText = "Este perfil não está disponível porque este utilizador bloqueou-o.";
         blockedMsgDiv.classList.remove('hidden');
         postsDiv.innerHTML = '';
+        followersDiv.innerHTML = '';
         followingDiv.innerHTML = '';
         vitrineDiv.innerHTML = '';
         return;
@@ -1441,6 +1465,7 @@
         blockedMsgDiv.innerText = `Bloqueou @${user.username}. Desbloqueie para voltar a ver os posts e novidades deste perfil.`;
         blockedMsgDiv.classList.remove('hidden');
         postsDiv.innerHTML = '';
+        followersDiv.innerHTML = '';
         followingDiv.innerHTML = '';
         vitrineDiv.innerHTML = '';
         return;
@@ -1452,6 +1477,32 @@
       const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
       postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum post.</p>' : '';
       userPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
+
+      // LISTA DE SEGUIDORES (COM PROTEÇÃO DE PRIVACIDADE)
+      followersDiv.innerHTML = '';
+      if (!isSelf && user.hideFollowing) {
+        followersDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem segue esta pessoa. Ela ativou esta opção para ninguém ver.</p>`;
+      } else {
+        if (followersArr.length === 0) {
+          followersDiv.innerHTML = '<p style="color:#70757a;">Ainda não tem nenhum seguidor.</p>';
+        } else {
+          followersArr.forEach(followerKey => {
+            const followerObj = usersMap[followerKey];
+            const followerName = followerObj ? followerObj.username : followerKey;
+            const item = document.createElement('div');
+            item.className = 'card';
+            item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;';
+            item.innerHTML = `
+              <div class="author-container" onclick="navigateTo('profile', '${escapeStr(followerName)}')">
+                ${renderAvatar(followerObj, 'small')}
+                <span class="author-name">${escapeHtml(followerName)}</span>
+              </div>
+              <button onclick="navigateTo('profile', '${escapeStr(followerName)}')">Ver Perfil</button>
+            `;
+            followersDiv.appendChild(item);
+          });
+        }
+      }
 
       // LISTA DE QUEM ESTÁ A SEGUIR (COM PROTEÇÃO DE PRIVACIDADE)
       followingDiv.innerHTML = '';
@@ -1535,3 +1586,4 @@
   </script>
 </body>
 </html>
+```
