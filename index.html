@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Liquid Glass & Memes</title>
+  <title>Arnos v2.0 - Liquid Glass, Grupos & Memes</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -168,6 +168,12 @@
     .user-avatar.small { width: 28px; height: 28px; font-size: 11px; }
     .user-avatar.large { width: 80px; height: 80px; font-size: 28px; }
 
+    .group-avatar {
+      width: 50px; height: 50px; border-radius: 12px; object-fit: cover;
+      background-color: #1a73e8; display: inline-flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: bold; font-size: 18px; border: 1px solid #dadce0;
+    }
+
     .author-container { display: flex; align-items: center; gap: 8px; cursor: pointer; }
     .author-container:hover .author-name { text-decoration: underline; }
 
@@ -239,6 +245,15 @@
     .calendar-day { border: 1px solid #dadce0; border-radius: 6px; padding: 6px 2px; font-size: 11px; background-color: #ffffff; }
     .calendar-day.active { background-color: #e6f4ea; border-color: #34a853; font-weight: bold; }
 
+    /* DROPDOWN MENU DE GRUPOS NA LOGO */
+    .logo-dropdown {
+      position: absolute; top: 50px; left: 16px; background: #ffffff; border: 1px solid #dadce0;
+      border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 240px; z-index: 1000; padding: 8px;
+    }
+    body.theme-night .logo-dropdown { background-color: #121c30; border-color: #1e2d4a; }
+    .logo-dropdown-item { padding: 8px 12px; font-size: 13px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
+    .logo-dropdown-item:hover { background: rgba(26,115,232,0.1); color: #1a73e8; }
+
     /* MODAL */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
     .modal-card { background: #fff; border-radius: 12px; border: 1px solid #dadce0; width: 90%; max-width: 580px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -256,17 +271,24 @@
 <body>
 
   <!-- HEADER -->
-  <header id="app-header" class="hidden">
-    <div class="logo" onclick="navigateTo('feed')">
-      Arnos <span class="version-tag">v2.0</span>
+  <header id="app-header" class="hidden" style="position: relative;">
+    <div class="logo" onclick="toggleLogoGroupsMenu(event)">
+      <span id="logo-text-display">Arnos</span> <span class="version-tag">v2.0</span>
     </div>
     
+    <!-- MENU DROPDOWN DOS GRUPOS DO UTILIZADOR -->
+    <div id="logo-groups-dropdown" class="logo-dropdown hidden">
+      <div style="font-size: 11px; font-weight: bold; color: #70757a; padding: 4px 8px;">OS SEUS GRUPOS</div>
+      <div id="logo-dropdown-groups-list"></div>
+    </div>
+
     <div class="search-bar-container">
       <input type="text" id="search-input" placeholder="Pesquisar..." autocomplete="off" dir="ltr">
     </div>
 
     <nav>
       <button onclick="navigateTo('feed')">Home</button>
+      <button onclick="navigateTo('groups')">👥 Grupos</button>
       <button onclick="navigateTo('marketplace')">Marketplace</button>
       
       <div class="badge-container">
@@ -355,6 +377,55 @@
         <button onclick="submitPost()" class="btn-primary">Publicar</button>
       </div>
       <div id="feed-list"></div>
+    </div>
+
+    <!-- GROUPS VIEW -->
+    <div id="view-groups" class="hidden">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2>👥 Comunidades e Grupos</h2>
+        <button class="btn-primary" onclick="openCreateGroupModal()">+ Criar Grupo</button>
+      </div>
+      <div style="margin-bottom: 16px;">
+        <input type="text" id="groups-search-input" placeholder="Pesquisar grupos..." oninput="filterGroups(this.value)" dir="ltr">
+      </div>
+      <div id="groups-list"></div>
+    </div>
+
+    <!-- GROUP DETAIL VIEW -->
+    <div id="view-group-detail" class="hidden">
+      <button onclick="navigateTo('groups')" style="margin-bottom: 12px;">← Voltar para Grupos</button>
+      
+      <div class="card" id="group-header-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div id="group-detail-avatar"></div>
+            <div>
+              <h2 id="group-detail-name"></h2>
+              <p style="font-size: 13px; color: #70757a;" id="group-detail-owner"></p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-primary" onclick="openGroupMembersModal()">👥 Ver Membros</button>
+            <button id="group-join-leave-btn" onclick="toggleJoinCurrentGroup()"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORMULÁRIO DE POST DO GRUPO -->
+      <div class="card" id="group-post-box">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">Publicar no Grupo</h3>
+        <textarea id="group-post-input" rows="3" placeholder="Escreva algo para o grupo..." dir="ltr"></textarea>
+        
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+          <button class="btn-primary" type="button" onclick="toggleMemePicker('grouppost')" style="padding:4px 10px; font-size:11px;">🎭 Meme</button>
+          <span id="grouppost-selected-meme-tag" style="font-size:11px; color:#1a73e8; font-weight:bold;"></span>
+        </div>
+        <div id="grouppost-meme-picker" class="meme-picker-grid hidden"></div>
+        
+        <button onclick="submitGroupPost()" class="btn-primary">Publicar no Grupo</button>
+      </div>
+
+      <div id="group-posts-list"></div>
     </div>
 
     <!-- ADMIN PANEL VIEW (EXCLUSIVO PARA A CONTA "arnos") -->
@@ -524,6 +595,37 @@
 
   </div>
 
+  <!-- MODAL: CRIAR GRUPO (CLOUDINARY GrupoApi) -->
+  <div id="modal-create-group" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Criar Novo Grupo</h3>
+        <button onclick="closeCreateGroupModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label style="font-size: 12px; font-weight: bold;">Nome do Grupo *</label>
+        <input type="text" id="group-create-name" required placeholder="Ex: Memes e Zoeira" dir="ltr">
+        
+        <label style="font-size: 12px; font-weight: bold;">Foto do Grupo (Cloudinary)</label>
+        <input type="file" id="group-create-file" accept="image/*" style="margin-bottom: 8px;">
+        <div id="group-img-preview" style="margin-bottom: 12px;"></div>
+        
+        <button onclick="submitCreateGroup()" class="btn-primary" style="width: 100%;">Criar Grupo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VER MEMBROS DO GRUPO -->
+  <div id="modal-group-members" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Membros do Grupo</h3>
+        <button onclick="closeGroupMembersModal()">✕</button>
+      </div>
+      <div class="modal-body" id="group-members-list-container"></div>
+    </div>
+  </div>
+
   <!-- MODAL: VISUALIZAR POST DEDICADO -->
   <div id="modal-view-post" class="modal-overlay hidden">
     <div class="modal-card">
@@ -642,25 +744,51 @@
     let postsList = [];
     let productsList = [];
     let messagesList = [];
+    let groupsList = [];
+    let groupPostsList = [];
+    let activeGroupId = null;
     let currentProfileUsername = null;
     let activeOpenedPostId = null;
     let selectedPostImageBase64 = null;
     let selectedProductImageBase64 = null;
     let selectedAvatarBase64 = null;
+    let selectedGroupImageFile = null;
     let selectedPostMemeUrl = '';
+    let selectedGroupPostMemeUrl = '';
     let selectedChatMemeUrl = '';
     let selectedCommentMemeUrl = '';
     let activeChatKey = null;
     let activeMsgSubTab = 'profile';
 
-    // SISTEMA DE TEMA DINÂMICO DIA / NOITE (AMARELO DE DIA / AZUL-PRETO DE NOITE)
+    // UPLOAD PARA CLOUDINARY (GrupoApi / 339844723882454)
+    async function uploadToCloudinaryGrupoApi(file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+      try {
+        const res = await fetch('https://api.cloudinary.com/v1_1/GrupoApi/image/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.secure_url) return data.secure_url;
+      } catch(e) {}
+      
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // TEMA DINÂMICO DIA / NOITE
     function applyDynamicTheme() {
       if (!currentUserData || !currentUserData.useDynamicTheme) {
         document.body.classList.remove('theme-day', 'theme-night');
         return;
       }
       const hour = new Date().getHours();
-      const isDayTime = hour >= 6 && hour < 18; // 06:00 às 18:00
+      const isDayTime = hour >= 6 && hour < 18;
       if (isDayTime) {
         document.body.classList.add('theme-day');
         document.body.classList.remove('theme-night');
@@ -681,9 +809,49 @@
       } catch(e){}
     };
 
-    // FIGURINHAS / MEME PICKER INTERATIVO
+    // DROPDOWN MENU DA LOGO
+    window.toggleLogoGroupsMenu = function(e) {
+      e.stopPropagation();
+      const dropdown = document.getElementById('logo-groups-dropdown');
+      if (!dropdown.classList.contains('hidden')) {
+        dropdown.classList.add('hidden');
+        return;
+      }
+      renderLogoGroupsDropdown();
+      dropdown.classList.remove('hidden');
+    };
+
+    window.addEventListener('click', () => {
+      const dropdown = document.getElementById('logo-groups-dropdown');
+      if (dropdown) dropdown.classList.add('hidden');
+    });
+
+    function renderLogoGroupsDropdown() {
+      const container = document.getElementById('logo-dropdown-groups-list');
+      container.innerHTML = '';
+      if (!currentUserData) return;
+
+      const myGroups = groupsList.filter(g => (g.members || []).map(m => m.toLowerCase()).includes(currentUserData.username.toLowerCase()));
+      if (myGroups.length === 0) {
+        container.innerHTML = `<div style="padding: 6px 8px; font-size: 12px; color: #70757a;">Não pertence a nenhum grupo.</div>`;
+        return;
+      }
+
+      myGroups.forEach(g => {
+        const div = document.createElement('div');
+        div.className = 'logo-dropdown-item';
+        div.onclick = () => openGroupDetail(g.id);
+        div.innerHTML = `
+          ${g.imageUrl ? `<img src="${g.imageUrl}" style="width:24px; height:24px; border-radius:6px; object-fit:cover;">` : '👥'}
+          <span style="font-weight:bold; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(g.name)}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // FIGURINHAS / MEME PICKER
     window.toggleMemePicker = function(target) {
-      const pickerId = target === 'post' ? 'post-meme-picker' : (target === 'chat' ? 'chat-meme-picker' : 'modal-comment-meme-picker');
+      const pickerId = target === 'post' ? 'post-meme-picker' : (target === 'grouppost' ? 'grouppost-meme-picker' : (target === 'chat' ? 'chat-meme-picker' : 'modal-comment-meme-picker'));
       const container = document.getElementById(pickerId);
       if (!container) return;
 
@@ -708,6 +876,10 @@
         selectedPostMemeUrl = url;
         document.getElementById('post-selected-meme-tag').innerText = "✓ Meme selecionado!";
         document.getElementById('post-meme-picker').classList.add('hidden');
+      } else if (target === 'grouppost') {
+        selectedGroupPostMemeUrl = url;
+        document.getElementById('grouppost-selected-meme-tag').innerText = "✓ Meme selecionado!";
+        document.getElementById('grouppost-meme-picker').classList.add('hidden');
       } else if (target === 'chat') {
         selectedChatMemeUrl = url;
         sendChatMessageWithMeme(url);
@@ -719,7 +891,7 @@
       }
     }
 
-    // SISTEMA DE ÁUDIO BIDIRECIONAL (ROLANDO PARA CIMA E PARA BAIXO)
+    // ÁUDIO AO ROLAR A PÁGINA
     let audioCtx = null;
     let lastScrollPos = 0;
     let lastTriggeredThreshold = 0;
@@ -771,6 +943,10 @@
     const publicProductDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
     const publicMessagesColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'messages');
     const publicMessageDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'messages', id);
+    const publicGroupsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'groups');
+    const publicGroupDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'groups', id);
+    const publicGroupPostsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'group_posts');
+    const publicGroupPostDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'group_posts', id);
 
     window.currentUserData = currentUserData;
 
@@ -865,6 +1041,20 @@
         markLoadingStep('step-messages');
         refreshCurrentView();
       });
+
+      onSnapshot(publicGroupsColl(), (snap) => {
+        groupsList = [];
+        snap.forEach(d => groupsList.push({ id: d.id, ...d.data() }));
+        if (!document.getElementById('view-groups').classList.contains('hidden')) renderGroupsList();
+        if (activeGroupId) renderGroupDetail(activeGroupId);
+      });
+
+      onSnapshot(publicGroupPostsColl(), (snap) => {
+        groupPostsList = [];
+        snap.forEach(d => groupPostsList.push({ id: d.id, ...d.data() }));
+        groupPostsList.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        if (activeGroupId) renderGroupPosts(activeGroupId);
+      });
     }
 
     function calculatePendingEarnings(item) {
@@ -938,6 +1128,7 @@
     function refreshCurrentView() {
       if (!document.getElementById('view-auth').classList.contains('hidden')) return;
       if (!document.getElementById('view-feed').classList.contains('hidden')) renderFeed();
+      else if (!document.getElementById('view-groups').classList.contains('hidden')) renderGroupsList();
       else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
       else if (!document.getElementById('view-messages').classList.contains('hidden')) renderMessages();
       else if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminPanel();
@@ -1033,6 +1224,8 @@
       document.getElementById('view-loading').classList.add('hidden');
       document.getElementById('view-auth').classList.remove('hidden');
       document.getElementById('view-feed').classList.add('hidden');
+      document.getElementById('view-groups').classList.add('hidden');
+      document.getElementById('view-group-detail').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
       document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
@@ -1167,13 +1360,19 @@
 
     // NAVIGATION
     window.navigateTo = function(view, arg = null) {
+      activeGroupId = null;
+      document.getElementById('logo-text-display').innerText = "Arnos";
+
       document.getElementById('view-feed').classList.add('hidden');
+      document.getElementById('view-groups').classList.add('hidden');
+      document.getElementById('view-group-detail').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
       document.getElementById('view-messages').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
       document.getElementById('view-admin').classList.add('hidden');
 
       if (view === 'feed') { document.getElementById('view-feed').classList.remove('hidden'); renderFeed(); }
+      else if (view === 'groups') { document.getElementById('view-groups').classList.remove('hidden'); renderGroupsList(); }
       else if (view === 'marketplace') { document.getElementById('view-marketplace').classList.remove('hidden'); renderMarketplace(); }
       else if (view === 'messages') { document.getElementById('view-messages').classList.remove('hidden'); renderMessages(); }
       else if (view === 'admin') { document.getElementById('view-admin').classList.remove('hidden'); renderAdminPanel(); }
@@ -1182,6 +1381,254 @@
         currentProfileUsername = arg || currentUserData.username;
         renderProfile(currentProfileUsername);
       }
+    };
+
+    // --- SISTEMA DE GRUPOS ---
+    window.openCreateGroupModal = function() {
+      document.getElementById('group-create-name').value = '';
+      document.getElementById('group-create-file').value = '';
+      document.getElementById('group-img-preview').innerHTML = '';
+      selectedGroupImageFile = null;
+      document.getElementById('modal-create-group').classList.remove('hidden');
+    };
+    window.closeCreateGroupModal = function() {
+      document.getElementById('modal-create-group').classList.add('hidden');
+    };
+
+    document.getElementById('group-create-file').addEventListener('change', (e) => {
+      selectedGroupImageFile = e.target.files[0];
+      if (selectedGroupImageFile) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          document.getElementById('group-img-preview').innerHTML = `<img src="${evt.target.result}" style="max-width:100%; max-height:120px; border-radius:6px;">`;
+        };
+        reader.readAsDataURL(selectedGroupImageFile);
+      }
+    });
+
+    window.submitCreateGroup = async function() {
+      const name = document.getElementById('group-create-name').value.trim();
+      if (!name || !currentUserData) return alert("Insira o nome do grupo.");
+
+      let imageUrl = '';
+      if (selectedGroupImageFile) {
+        imageUrl = await uploadToCloudinaryGrupoApi(selectedGroupImageFile);
+      }
+
+      try {
+        await addDoc(publicGroupsColl(), {
+          name,
+          imageUrl,
+          owner: currentUserData.username,
+          members: [currentUserData.username],
+          timestamp: new Date().toISOString()
+        });
+        closeCreateGroupModal();
+      } catch(e) { alert("Erro ao criar grupo."); }
+    };
+
+    function renderGroupsList(filterQuery = '') {
+      const list = document.getElementById('groups-list');
+      list.innerHTML = '';
+
+      const filtered = groupsList.filter(g => g.name.toLowerCase().includes(filterQuery.toLowerCase()));
+      if (filtered.length === 0) {
+        list.innerHTML = `<p style="color:#70757a;">Nenhum grupo encontrado.</p>`;
+        return;
+      }
+
+      filtered.forEach(g => {
+        const isMember = (g.members || []).map(m => m.toLowerCase()).includes(currentUserData.username.toLowerCase());
+
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; cursor:pointer;';
+        div.onclick = () => openGroupDetail(g.id);
+        div.innerHTML = `
+          <div style="display:flex; align-items:center; gap:12px;">
+            ${g.imageUrl ? `<img src="${g.imageUrl}" class="group-avatar">` : `<div class="group-avatar">👥</div>`}
+            <div>
+              <h3>${escapeHtml(g.name)}</h3>
+              <p style="font-size:12px; color:#70757a;">Criado por @${escapeHtml(g.owner)} • ${(g.members || []).length} membros</p>
+            </div>
+          </div>
+          <div>
+            <button class="${isMember ? '' : 'btn-primary'}">${isMember ? 'Aceder Grupo' : 'Participar'}</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    window.filterGroups = function(val) {
+      renderGroupsList(val);
+    };
+
+    window.openGroupDetail = function(groupId) {
+      activeGroupId = groupId;
+      document.getElementById('view-feed').classList.add('hidden');
+      document.getElementById('view-groups').classList.add('hidden');
+      document.getElementById('view-group-detail').classList.remove('hidden');
+      renderGroupDetail(groupId);
+    };
+
+    function renderGroupDetail(groupId) {
+      const group = groupsList.find(g => g.id === groupId);
+      if (!group) return;
+
+      document.getElementById('logo-text-display').innerText = group.name;
+
+      document.getElementById('group-detail-name').innerText = group.name;
+      document.getElementById('group-detail-owner').innerText = `Criado por @${group.owner} • ${(group.members || []).length} membros`;
+      document.getElementById('group-detail-avatar').innerHTML = group.imageUrl ? `<img src="${group.imageUrl}" class="group-avatar">` : `<div class="group-avatar">👥</div>`;
+
+      const isMember = (group.members || []).map(m => m.toLowerCase()).includes(currentUserData.username.toLowerCase());
+      const joinBtn = document.getElementById('group-join-leave-btn');
+      joinBtn.className = isMember ? 'btn-danger' : 'btn-success';
+      joinBtn.innerText = isMember ? 'Sair do Grupo' : 'Participar do Grupo';
+
+      const postBox = document.getElementById('group-post-box');
+      postBox.classList.toggle('hidden', !isMember);
+
+      renderGroupPosts(groupId);
+    }
+
+    window.toggleJoinCurrentGroup = async function() {
+      if (!activeGroupId || !currentUserData) return;
+      const group = groupsList.find(g => g.id === activeGroupId);
+      if (!group) return;
+
+      let members = group.members ? [...group.members] : [];
+      const myUser = currentUserData.username;
+      const isMember = members.map(m => m.toLowerCase()).includes(myUser.toLowerCase());
+
+      if (isMember) {
+        if (group.owner.toLowerCase() === myUser.toLowerCase()) return alert("O dono não pode sair do próprio grupo.");
+        members = members.filter(m => m.toLowerCase() !== myUser.toLowerCase());
+      } else {
+        members.push(myUser);
+      }
+
+      try {
+        await updateDoc(publicGroupDoc(activeGroupId), { members });
+      } catch(e) {}
+    };
+
+    window.openGroupMembersModal = function() {
+      const group = groupsList.find(g => g.id === activeGroupId);
+      if (!group) return;
+
+      const container = document.getElementById('group-members-list-container');
+      container.innerHTML = '';
+
+      const isOwner = group.owner.toLowerCase() === currentUserData.username.toLowerCase();
+
+      (group.members || []).forEach(member => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #eee;';
+        div.innerHTML = `
+          <span>@${escapeHtml(member)} ${member.toLowerCase() === group.owner.toLowerCase() ? '<span class="badge-square badge-dono">Dono</span>' : ''}</span>
+          ${isOwner && member.toLowerCase() !== group.owner.toLowerCase() ? `<button class="btn-danger" style="padding:2px 8px; font-size:11px;" onclick="removeMemberFromGroup('${member}')">Remover</button>` : ''}
+        `;
+        container.appendChild(div);
+      });
+
+      document.getElementById('modal-group-members').classList.remove('hidden');
+    };
+
+    window.closeGroupMembersModal = function() {
+      document.getElementById('modal-group-members').classList.add('hidden');
+    };
+
+    window.removeMemberFromGroup = async function(memberName) {
+      const group = groupsList.find(g => g.id === activeGroupId);
+      if (!group) return;
+
+      let members = (group.members || []).filter(m => m.toLowerCase() !== memberName.toLowerCase());
+      try {
+        await updateDoc(publicGroupDoc(activeGroupId), { members });
+        openGroupMembersModal();
+      } catch(e) {}
+    };
+
+    window.submitGroupPost = async function() {
+      const content = document.getElementById('group-post-input').value.trim();
+      const memeUrl = selectedGroupPostMemeUrl;
+      if (!content && !memeUrl || !activeGroupId || !currentUserData) return alert("Escreva um texto ou selecione um meme.");
+
+      try {
+        await addDoc(publicGroupPostsColl(), {
+          groupId: activeGroupId,
+          author: currentUserData.username,
+          content,
+          memeUrl,
+          timestamp: new Date().toISOString(),
+          likes: [],
+          comments: []
+        });
+        document.getElementById('group-post-input').value = '';
+        selectedGroupPostMemeUrl = '';
+        document.getElementById('grouppost-selected-meme-tag').innerText = '';
+      } catch(e) {}
+    };
+
+    function renderGroupPosts(groupId) {
+      const list = document.getElementById('group-posts-list');
+      list.innerHTML = '';
+
+      const filtered = groupPostsList.filter(p => p.groupId === groupId);
+      const group = groupsList.find(g => g.id === groupId);
+      const isOwner = group && group.owner.toLowerCase() === currentUserData.username.toLowerCase();
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<p style="color:#70757a;">Ainda não há publicações neste grupo.</p>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const isSelf = p.author.toLowerCase() === currentUserData.username.toLowerCase();
+        const likes = p.likes || [];
+        const hasLiked = currentUserData && likes.includes(currentUserData.username);
+
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <div class="item-header">
+            <strong>@${escapeHtml(p.author)}</strong>
+            <div>
+              <span class="item-date">${new Date(p.timestamp).toLocaleString()}</span>
+              ${isSelf || isOwner ? `<button class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;" onclick="deleteGroupPost('${p.id}')">Apagar</button>` : ''}
+            </div>
+          </div>
+          <div class="item-content">${escapeHtml(p.content || '')}</div>
+          ${p.memeUrl ? `<img src="${p.memeUrl}" class="meme-sticker">` : ''}
+
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button onclick="toggleLikeGroupPost('${p.id}')" class="${hasLiked ? 'btn-primary' : ''}">
+              ❤️ Curtir (${likes.length})
+            </button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    window.deleteGroupPost = async function(postId) {
+      if (!confirm("Apagar publicação?")) return;
+      try { await deleteDoc(publicGroupPostDoc(postId)); } catch(e) {}
+    };
+
+    window.toggleLikeGroupPost = async function(postId) {
+      if (!currentUserData) return;
+      const post = groupPostsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let likes = post.likes ? [...post.likes] : [];
+      const myUser = currentUserData.username;
+      if (likes.includes(myUser)) likes = likes.filter(u => u !== myUser);
+      else likes.push(myUser);
+
+      try { await updateDoc(publicGroupPostDoc(postId), { likes }); } catch(e) {}
     };
 
     // MESSAGES / CHAT LOGIC
@@ -1437,7 +1884,7 @@
       alert(`Depósito concluído com sucesso! R$ ${totalToDeposit.toFixed(2)} foram adicionados à tua conta.`);
     };
 
-    // VISUALIZAÇÃO DEDICADA DO POST (VISUALIZAÇÃO ÚNICA REGISTADA)
+    // VISUALIZAÇÃO DEDICADA DO POST
     window.openPostModal = async function(postId) {
       activeOpenedPostId = postId;
       const post = postsList.find(p => p.id === postId);
@@ -1557,7 +2004,6 @@
       } catch (e) {}
     }
 
-    // APAGAR COMENTÁRIO
     window.deleteComment = async function(postId, commentId) {
       if (!confirm("Apagar o teu comentário?")) return;
       const post = postsList.find(p => p.id === postId);
@@ -1582,7 +2028,6 @@
       }
     });
 
-    // FUNÇÃO DE VERIFICAÇÃO DE CONTEÚDO SENSÍVEL
     function containsSelfHarmKeywords(text) {
       if (!text) return false;
       const lowerText = text.toLowerCase();
