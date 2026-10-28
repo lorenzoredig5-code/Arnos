@@ -502,6 +502,66 @@
     let activeChatKey = null;
     let activeMsgSubTab = 'profile';
 
+    // SISTEMA DE ÁUDIO WEB PARA EFEITO "TURURU" AO ROLAR O FEED
+    let audioCtx = null;
+    let postScrollObserver = null;
+
+    function playTuruSound() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        // Frequência rápida com tom duplo (sensação de "tu" -> "ru")
+        const now = audioCtx.currentTime;
+        osc.frequency.setValueAtTime(440, now); // 'tu'
+        osc.frequency.exponentialRampToValueAtTime(880, now + 0.04); // 'ru'
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.06);
+      } catch (e) {}
+    }
+
+    function setupScrollAudioObserver() {
+      if (postScrollObserver) postScrollObserver.disconnect();
+
+      postScrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            playTuruSound();
+          }
+        });
+      }, {
+        root: null,
+        threshold: 0.5
+      });
+
+      // Observa todos os posts no feed
+      const cards = document.querySelectorAll('#feed-list .card');
+      cards.forEach(card => postScrollObserver.observe(card));
+    }
+
+    // Desbloqueia contexto de áudio na primeira interação
+    window.addEventListener('click', () => {
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }, { once: true });
+
+    window.addEventListener('scroll', () => {
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }, { passive: true });
+
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
     const publicPostsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'posts');
@@ -523,7 +583,6 @@
     }
 
     async function initAuth() {
-      // Timeout de segurança para evitar tela travada se a ligação ao Firebase demorar
       setTimeout(() => {
         const loadingDiv = document.getElementById('view-loading');
         if (loadingDiv && !loadingDiv.classList.contains('hidden')) {
@@ -1517,6 +1576,9 @@
         return;
       }
       visiblePosts.forEach(p => list.appendChild(buildPostCard(p)));
+
+      // Ativa o som sintetizado "tururu" para a rolagem de posts no feed
+      setTimeout(setupScrollAudioObserver, 100);
     }
 
     function renderMarketplace() {
