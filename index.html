@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Liquid Glass, Grupos & Pesquisa Multissetorial</title>
+  <title>Arnos v2.0 - Liquid Glass, Grupos & Pesquisa Corrigida</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1510,7 +1510,7 @@
 
       resultsSection.classList.remove('hidden');
       createPostCard.classList.add('hidden');
-      feedList.classList.add('hidden'); // Esconde o feed normal da home durante a pesquisa global
+      feedList.classList.add('hidden');
 
       document.getElementById('search-query-display').innerText = q;
       renderGlobalSearchResults(q);
@@ -1545,10 +1545,13 @@
         return (p.content || '').toLowerCase().includes(q) || (p.author || '').toLowerCase().includes(q);
       });
 
-      // 2. Filtrar Perfis
+      // 2. Filtrar Perfis (Corrigido para mapear corretamente o array de utilizadores do objeto usersMap)
       const matchedProfiles = Object.values(usersMap).filter(u => {
+        if (!u || !u.username) return false;
         if (myUser && isBlockedBetween(myUser, u.username)) return false;
-        return u.username.toLowerCase().includes(q) || (u.bio || '').toLowerCase().includes(q);
+        const uName = u.username.toLowerCase();
+        const uBio = (u.bio || '').toLowerCase();
+        return uName.includes(q) || uBio.includes(q);
       });
 
       // 3. Filtrar Arnos Shop (Produtos)
@@ -1571,7 +1574,7 @@
         matchedPosts.forEach(p => postsContainer.appendChild(buildPostCard(p)));
       }
 
-      // Renderizar Perfis na aba de Perfis
+      // Renderizar Perfis na aba de Perfis (Corrigido e blindado)
       const profilesContainer = document.getElementById('search-content-profiles');
       profilesContainer.innerHTML = '';
       if (matchedProfiles.length === 0) {
