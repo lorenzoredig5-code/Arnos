@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v1.12 - Liquid Glass & Memes</title>
+  <title>Arnos v2.0 - Liquid Glass & Memes</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -27,8 +27,7 @@
     body.theme-night .card, 
     body.theme-night header, 
     body.theme-night .modal-card, 
-    body.theme-night .auth-box,
-    body.theme-night .update-floating-bar {
+    body.theme-night .auth-box {
       background-color: rgba(18, 28, 48, 0.95) !important;
       color: #f1f3f4 !important;
       border-color: rgba(255, 255, 255, 0.15) !important;
@@ -251,15 +250,6 @@
     .help-banner { background-color: #fce8e6; border: 1px solid #fad2cf; color: #c5221f; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; font-size: 14px; line-height: 1.4; }
     .loading-step-item { font-size: 13px; color: #5f6368; margin-bottom: 6px; text-align: left; display: flex; align-items: center; gap: 8px; }
     .loading-step-item.done { color: #188038; font-weight: bold; }
-
-    /* BARRINHA FLUTUANTE DE ATUALIZAÇÃO */
-    .update-floating-bar {
-      position: fixed; bottom: 16px; right: 16px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 24px; padding: 8px 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      display: flex; align-items: center; gap: 10px; z-index: 999; font-size: 12px; font-weight: bold;
-    }
-    @keyframes spinAnim { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .spinning-icon { display: inline-block; animation: spinAnim 1s linear infinite; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -268,7 +258,7 @@
   <!-- HEADER -->
   <header id="app-header" class="hidden">
     <div class="logo" onclick="navigateTo('feed')">
-      Arnos <span class="version-tag">v1.12</span>
+      Arnos <span class="version-tag">v2.0</span>
     </div>
     
     <div class="search-bar-container">
@@ -297,7 +287,7 @@
 
     <!-- LOADING VIEW COM STATUS DETALHADO -->
     <div id="view-loading" class="card" style="text-align: center; padding: 30px; max-width: 480px; margin: 40px auto;">
-      <h3 style="margin-bottom: 16px; color: #1a73e8;">🔄 A carregar o Arnos v1.12...</h3>
+      <h3 style="margin-bottom: 16px; color: #1a73e8;">🔄 A carregar o Arnos v2.0...</h3>
       <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">Estamos a preparar a tua experiência. Aguarde um momento enquanto sincronizamos a rede:</p>
 
       <div style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
@@ -532,14 +522,6 @@
 
     </div>
 
-  </div>
-
-  <!-- BARRINHA FLUTUANTE DE VERIFICAÇÃO DE ATUALIZAÇÃO -->
-  <div class="update-floating-bar">
-    <span id="update-status-text">Arnos 1.12 (12ª grande atualização!)</span>
-    <button class="btn-primary" onclick="checkAppUpdate()" style="padding:4px 12px; font-size:11px;">
-      <span id="update-icon">🔄</span> Verificar Atualização
-    </button>
   </div>
 
   <!-- MODAL: VISUALIZAR POST DEDICADO -->
@@ -780,19 +762,6 @@
       }
       lastScrollPos = currentScroll;
     }, { passive: true });
-
-    window.checkAppUpdate = function() {
-      const icon = document.getElementById('update-icon');
-      const text = document.getElementById('update-status-text');
-      if (icon) icon.className = 'spinning-icon';
-      if (text) text.innerText = 'A verificar servidor...';
-
-      setTimeout(() => {
-        if (icon) icon.className = '';
-        if (text) text.innerText = 'Arnos 1.12 (12ª grande atualização!)';
-        alert("O Arnos v1.12 está totalmente atualizado com Figurinhas e Tema Dinâmico!");
-      }, 1500);
-    };
 
     const publicUsersColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'users');
     const publicUserDoc = (username) => doc(db, 'artifacts', appId, 'public', 'data', 'users', username.toLowerCase());
