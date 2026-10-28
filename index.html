@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Liquid Glass, Grupos & Exclusão</title>
+  <title>Arnos v2.0 - Liquid Glass, Grupos & Pesquisa Corrigida</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -282,8 +282,9 @@
       <div id="logo-dropdown-groups-list"></div>
     </div>
 
+    <!-- BARRA DE PESQUISA CORRIGIDA -->
     <div class="search-bar-container">
-      <input type="text" id="search-input" placeholder="Pesquisar..." autocomplete="off" dir="ltr">
+      <input type="text" id="search-input" placeholder="Pesquisar posts ou utilizadores..." oninput="handleGlobalSearch(this.value)" autocomplete="off" dir="ltr">
     </div>
 
     <nav>
@@ -407,7 +408,8 @@
           </div>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="btn-primary" onclick="openGroupMembersModal()">👥 Ver Membros</button>
-            <button id="group-edit-bio-btn" class="btn-primary hidden" onclick="openEditGroupBioModal()">✏️ Editar Bio</button>
+            <button id="group-requests-btn" class="btn-success hidden" onclick="openGroupRequestsModal()">📥 Solicitações (<span id="group-requests-count">0</span>)</button>
+            <button id="group-edit-bio-btn" class="btn-primary hidden" onclick="openEditGroupBioModal()">✏️ Editar Grupo</button>
             <button id="group-delete-btn" class="btn-danger hidden" onclick="deleteCurrentGroup()">🗑️ Apagar Grupo</button>
             <button id="group-join-leave-btn" onclick="toggleJoinCurrentGroup()"></button>
           </div>
@@ -620,6 +622,11 @@
         <label style="font-size: 12px; font-weight: bold;">Bio / Descrição do Grupo</label>
         <textarea id="group-create-bio" rows="2" placeholder="O que se fala neste grupo?" dir="ltr"></textarea>
 
+        <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 12px 0; background: rgba(26,115,232,0.05); padding: 8px; border-radius: 6px; border: 1px solid rgba(26,115,232,0.2);">
+          <input type="checkbox" id="group-create-private">
+          <strong>🔒 Grupo Privado (Exigir permissão do dono para entrar)</strong>
+        </label>
+
         <label style="font-size: 12px; font-weight: bold;">Foto do Grupo (Cloudinary)</label>
         <input type="file" id="group-create-file" accept="image/*" style="margin-bottom: 8px;">
         <div id="group-img-preview" style="margin-bottom: 12px;"></div>
@@ -629,17 +636,23 @@
     </div>
   </div>
 
-  <!-- MODAL: EDITAR BIO DO GRUPO (EXCLUSIVO PARA O DONO) -->
+  <!-- MODAL: EDITAR GRUPO (EXCLUSIVO PARA O DONO) -->
   <div id="modal-edit-group-bio" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Editar Bio do Grupo</h3>
+        <h3>Editar Grupo</h3>
         <button onclick="closeEditGroupBioModal()">✕</button>
       </div>
       <div class="modal-body">
         <label style="font-size: 12px; font-weight: bold;">Nova Bio do Grupo</label>
         <textarea id="group-edit-bio-input" rows="3" placeholder="Atualize a descrição do grupo..." dir="ltr"></textarea>
-        <button onclick="saveGroupBio()" class="btn-primary" style="width: 100%; margin-top: 8px;">Guardar Bio</button>
+        
+        <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 12px 0; background: rgba(26,115,232,0.05); padding: 8px; border-radius: 6px; border: 1px solid rgba(26,115,232,0.2);">
+          <input type="checkbox" id="group-edit-private">
+          <strong>🔒 Grupo Privado (Exigir permissão do dono para entrar)</strong>
+        </label>
+
+        <button onclick="saveGroupBio()" class="btn-primary" style="width: 100%; margin-top: 8px;">Guardar Alterações</button>
       </div>
     </div>
   </div>
@@ -652,6 +665,17 @@
         <button onclick="closeGroupMembersModal()">✕</button>
       </div>
       <div class="modal-body" id="group-members-list-container"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: SOLICITAÇÕES DE ENTRADA PENDENTES (DONO) -->
+  <div id="modal-group-requests" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Solicitações de Entrada</h3>
+        <button onclick="closeGroupRequestsModal()">✕</button>
+      </div>
+      <div class="modal-body" id="group-requests-list-container"></div>
     </div>
   </div>
 
@@ -1179,7 +1203,10 @@
 
     function refreshCurrentView() {
       if (!document.getElementById('view-auth').classList.contains('hidden')) return;
-      if (!document.getElementById('view-feed').classList.contains('hidden')) renderFeed();
+      if (!document.getElementById('view-feed').classList.contains('hidden')) {
+        const query = document.getElementById('search-input').value;
+        renderFeed(query);
+      }
       else if (!document.getElementById('view-groups').classList.contains('hidden')) renderGroupsList();
       else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
       else if (!document.getElementById('view-messages').classList.contains('hidden')) renderMessages();
@@ -1437,10 +1464,20 @@
       }
     };
 
-    // --- SISTEMA DE GRUPOS ---
+    // --- SISTEMA DE PESQUISA GLOBAL NO HEADER ---
+    window.handleGlobalSearch = function(query) {
+      // Se não estivermos no feed, redireciona para o feed para mostrar os resultados da pesquisa
+      if (document.getElementById('view-feed').classList.contains('hidden')) {
+        navigateTo('feed');
+      }
+      renderFeed(query);
+    };
+
+    // --- SISTEMA DE GRUPOS & APROVAÇÃO ---
     window.openCreateGroupModal = function() {
       document.getElementById('group-create-name').value = '';
       document.getElementById('group-create-bio').value = '';
+      document.getElementById('group-create-private').checked = false;
       document.getElementById('group-create-file').value = '';
       document.getElementById('group-img-preview').innerHTML = '';
       selectedGroupImageFile = null;
@@ -1464,6 +1501,7 @@
     window.submitCreateGroup = async function() {
       const name = document.getElementById('group-create-name').value.trim();
       const bio = document.getElementById('group-create-bio').value.trim();
+      const isPrivate = document.getElementById('group-create-private').checked;
       if (!name || !currentUserData) return alert("Insira o nome do grupo.");
 
       let imageUrl = '';
@@ -1475,9 +1513,11 @@
         await addDoc(publicGroupsColl(), {
           name,
           bio,
+          isPrivate,
           imageUrl,
           owner: currentUserData.username,
           members: [currentUserData.username],
+          pendingRequests: [],
           timestamp: new Date().toISOString()
         });
         closeCreateGroupModal();
@@ -1488,6 +1528,7 @@
       const group = groupsList.find(g => g.id === activeGroupId);
       if (!group) return;
       document.getElementById('group-edit-bio-input').value = group.bio || '';
+      document.getElementById('group-edit-private').checked = !!group.isPrivate;
       document.getElementById('modal-edit-group-bio').classList.remove('hidden');
     };
 
@@ -1499,14 +1540,16 @@
       if (!activeGroupId || !currentUserData) return;
       const group = groupsList.find(g => g.id === activeGroupId);
       if (!group || group.owner.toLowerCase() !== currentUserData.username.toLowerCase()) {
-        return alert("Apenas o dono pode editar a bio do grupo.");
+        return alert("Apenas o dono pode editar o grupo.");
       }
       const newBio = document.getElementById('group-edit-bio-input').value.trim();
+      const isPrivate = document.getElementById('group-edit-private').checked;
+
       try {
-        await updateDoc(publicGroupDoc(activeGroupId), { bio: newBio });
+        await updateDoc(publicGroupDoc(activeGroupId), { bio: newBio, isPrivate });
         closeEditGroupBioModal();
-        alert("Bio do grupo atualizada com sucesso!");
-      } catch(e) { alert("Erro ao atualizar a bio do grupo."); }
+        alert("Configurações do grupo atualizadas com sucesso!");
+      } catch(e) { alert("Erro ao atualizar o grupo."); }
     };
 
     window.deleteCurrentGroup = async function() {
@@ -1519,13 +1562,11 @@
       if (!confirm(`Tem a certeza que deseja apagar o grupo "${group.name}"? Esta ação removerá o grupo e todas as publicações associadas.`)) return;
 
       try {
-        // Apaga todos os posts associados a este grupo
         const postsToDelete = groupPostsList.filter(p => p.groupId === activeGroupId);
         for (const p of postsToDelete) {
           await deleteDoc(publicGroupPostDoc(p.id));
         }
 
-        // Apaga o documento do grupo
         await deleteDoc(publicGroupDoc(activeGroupId));
         alert("Grupo apagado com sucesso.");
         navigateTo('groups');
@@ -1545,7 +1586,19 @@
       }
 
       filtered.forEach(g => {
-        const isMember = (g.members || []).map(m => m.toLowerCase()).includes(currentUserData.username.toLowerCase());
+        const myName = currentUserData ? currentUserData.username.toLowerCase() : '';
+        const isMember = (g.members || []).map(m => m.toLowerCase()).includes(myName);
+        const hasRequested = (g.pendingRequests || []).map(m => m.toLowerCase()).includes(myName);
+
+        let btnText = 'Participar';
+        let btnClass = 'btn-primary';
+        if (isMember) {
+          btnText = 'Aceder Grupo';
+          btnClass = '';
+        } else if (hasRequested) {
+          btnText = 'Solicitação Pendente';
+          btnClass = '';
+        }
 
         const div = document.createElement('div');
         div.className = 'card';
@@ -1555,13 +1608,13 @@
           <div style="display:flex; align-items:center; gap:12px;">
             ${g.imageUrl ? `<img src="${g.imageUrl}" class="group-avatar">` : `<div class="group-avatar">👥</div>`}
             <div>
-              <h3>${escapeHtml(g.name)}</h3>
+              <h3>${escapeHtml(g.name)} ${g.isPrivate ? '<span style="font-size:11px; background:#fce8e6; color:#d93025; padding:2px 6px; border-radius:4px;">🔒 Privado</span>' : '<span style="font-size:11px; background:#e6f4ea; color:#137333; padding:2px 6px; border-radius:4px;">🌐 Público</span>'}</h3>
               <p style="font-size:12px; color:#70757a;">Criado por @${escapeHtml(g.owner)} • ${(g.members || []).length} membros</p>
               ${g.bio ? `<p style="font-size:12px; color:#444; margin-top:2px;">${escapeHtml(g.bio)}</p>` : ''}
             </div>
           </div>
           <div>
-            <button class="${isMember ? '' : 'btn-primary'}">${isMember ? 'Aceder Grupo' : 'Participar'}</button>
+            <button class="${btnClass}">${btnText}</button>
           </div>
         `;
         list.appendChild(div);
@@ -1586,7 +1639,7 @@
 
       document.getElementById('logo-text-display').innerText = group.name;
 
-      document.getElementById('group-detail-name').innerText = group.name;
+      document.getElementById('group-detail-name').innerHTML = escapeHtml(group.name) + (group.isPrivate ? ' 🔒' : ' 🌐');
       document.getElementById('group-detail-owner').innerText = `Criado por @${group.owner} • ${(group.members || []).length} membros`;
       document.getElementById('group-detail-bio').innerText = group.bio || 'Sem bio definida.';
       document.getElementById('group-detail-avatar').innerHTML = group.imageUrl ? `<img src="${group.imageUrl}" class="group-avatar">` : `<div class="group-avatar">👥</div>`;
@@ -1595,10 +1648,30 @@
       document.getElementById('group-edit-bio-btn').classList.toggle('hidden', !isOwner);
       document.getElementById('group-delete-btn').classList.toggle('hidden', !isOwner);
 
-      const isMember = (group.members || []).map(m => m.toLowerCase()).includes(currentUserData.username.toLowerCase());
+      const pendingReqs = group.pendingRequests || [];
+      const requestsBtn = document.getElementById('group-requests-btn');
+      if (isOwner && group.isPrivate) {
+        requestsBtn.classList.remove('hidden');
+        document.getElementById('group-requests-count').innerText = pendingReqs.length;
+      } else {
+        requestsBtn.classList.add('hidden');
+      }
+
+      const myName = currentUserData ? currentUserData.username.toLowerCase() : '';
+      const isMember = (group.members || []).map(m => m.toLowerCase()).includes(myName);
+      const hasRequested = pendingReqs.map(m => m.toLowerCase()).includes(myName);
+
       const joinBtn = document.getElementById('group-join-leave-btn');
-      joinBtn.className = isMember ? 'btn-danger' : 'btn-success';
-      joinBtn.innerText = isMember ? 'Sair do Grupo' : 'Participar do Grupo';
+      if (isMember) {
+        joinBtn.className = 'btn-danger';
+        joinBtn.innerText = 'Sair do Grupo';
+      } else if (hasRequested) {
+        joinBtn.className = '';
+        joinBtn.innerText = 'Cancelar Solicitação';
+      } else {
+        joinBtn.className = group.isPrivate ? 'btn-primary' : 'btn-success';
+        joinBtn.innerText = group.isPrivate ? '🔒 Pedir Permissão para Entrar' : 'Participar do Grupo';
+      }
 
       const postBox = document.getElementById('group-post-box');
       postBox.classList.toggle('hidden', !isMember);
@@ -1612,18 +1685,94 @@
       if (!group) return;
 
       let members = group.members ? [...group.members] : [];
+      let pendingRequests = group.pendingRequests ? [...group.pendingRequests] : [];
       const myUser = currentUserData.username;
-      const isMember = members.map(m => m.toLowerCase()).includes(myUser.toLowerCase());
+      const myKey = myUser.toLowerCase();
+
+      const isMember = members.map(m => m.toLowerCase()).includes(myKey);
+      const hasRequested = pendingRequests.map(m => m.toLowerCase()).includes(myKey);
 
       if (isMember) {
-        if (group.owner.toLowerCase() === myUser.toLowerCase()) return alert("O dono não pode sair do próprio grupo. Se desejar, pode apagar o grupo.");
-        members = members.filter(m => m.toLowerCase() !== myUser.toLowerCase());
+        if (group.owner.toLowerCase() === myKey) return alert("O dono não pode sair do próprio grupo. Se desejar, pode apagar o grupo.");
+        members = members.filter(m => m.toLowerCase() !== myKey);
+        try {
+          await updateDoc(publicGroupDoc(activeGroupId), { members });
+        } catch(e) {}
+      } else if (hasRequested) {
+        pendingRequests = pendingRequests.filter(m => m.toLowerCase() !== myKey);
+        try {
+          await updateDoc(publicGroupDoc(activeGroupId), { pendingRequests });
+          alert("Solicitação cancelada.");
+        } catch(e) {}
       } else {
-        members.push(myUser);
+        if (group.isPrivate) {
+          pendingRequests.push(myUser);
+          try {
+            await updateDoc(publicGroupDoc(activeGroupId), { pendingRequests });
+            alert("Solicitação enviada! Aguarde a aprovação do dono do grupo.");
+          } catch(e) {}
+        } else {
+          members.push(myUser);
+          try {
+            await updateDoc(publicGroupDoc(activeGroupId), { members });
+          } catch(e) {}
+        }
+      }
+    };
+
+    // MODAL DE SOLICITAÇÕES PENDENTES (DONO)
+    window.openGroupRequestsModal = function() {
+      const group = groupsList.find(g => g.id === activeGroupId);
+      if (!group) return;
+
+      const container = document.getElementById('group-requests-list-container');
+      container.innerHTML = '';
+
+      const pending = group.pendingRequests || [];
+      if (pending.length === 0) {
+        container.innerHTML = `<p style="color:#70757a; font-size:13px;">Não há solicitações pendentes no momento.</p>`;
+      } else {
+        pending.forEach(username => {
+          const userObj = usersMap[username.toLowerCase()];
+          const div = document.createElement('div');
+          div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee;';
+          div.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${renderAvatar(userObj, 'small')}
+              <strong>@${escapeHtml(username)}</strong>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-success" style="padding:4px 10px; font-size:12px;" onclick="approveGroupRequest('${username}', true)">Aceitar</button>
+              <button class="btn-danger" style="padding:4px 10px; font-size:12px;" onclick="approveGroupRequest('${username}', false)">Recusar</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
+
+      document.getElementById('modal-group-requests').classList.remove('hidden');
+    };
+
+    window.closeGroupRequestsModal = function() {
+      document.getElementById('modal-group-requests').classList.add('hidden');
+    };
+
+    window.approveGroupRequest = async function(username, accept) {
+      const group = groupsList.find(g => g.id === activeGroupId);
+      if (!group) return;
+
+      let pending = (group.pendingRequests || []).filter(m => m.toLowerCase() !== username.toLowerCase());
+      let members = group.members ? [...group.members] : [];
+
+      if (accept) {
+        if (!members.map(m => m.toLowerCase()).includes(username.toLowerCase())) {
+          members.push(username);
+        }
       }
 
       try {
-        await updateDoc(publicGroupDoc(activeGroupId), { members });
+        await updateDoc(publicGroupDoc(activeGroupId), { pendingRequests: pending, members });
+        openGroupRequestsModal();
       } catch(e) {}
     };
 
@@ -2479,15 +2628,25 @@
       return b1.includes(u2.toLowerCase()) || b2.includes(u1.toLowerCase());
     }
 
-    function renderFeed() {
+    function renderFeed(searchQuery = '') {
       const list = document.getElementById('feed-list');
       list.innerHTML = '';
       
       const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
-      const visiblePosts = postsList.filter(p => !isBlockedBetween(myUser, p.author));
+      let visiblePosts = postsList.filter(p => !isBlockedBetween(myUser, p.author));
+
+      // Aplicação do filtro da barra de pesquisa global
+      if (searchQuery && searchQuery.trim() !== '') {
+        const q = searchQuery.toLowerCase().trim();
+        visiblePosts = visiblePosts.filter(p => {
+          const contentMatch = (p.content || '').toLowerCase().includes(q);
+          const authorMatch = (p.author || '').toLowerCase().includes(q);
+          return contentMatch || authorMatch;
+        });
+      }
 
       if (visiblePosts.length === 0) {
-        list.innerHTML = '<p style="color:#70757a;">Sem posts no feed.</p>';
+        list.innerHTML = '<p style="color:#70757a;">Nenhum post encontrado com essa pesquisa.</p>';
         return;
       }
       visiblePosts.forEach(p => list.appendChild(buildPostCard(p)));
