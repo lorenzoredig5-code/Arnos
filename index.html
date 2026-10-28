@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Liquid Glass, Grupos & Pesquisa Corrigida</title>
+  <title>Arnos v2.0 - Perfil Corrigido & Layout Responsivo</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -166,7 +166,7 @@
       color: #ffffff; font-weight: bold; font-size: 14px; flex-shrink: 0; border: 1px solid #dadce0;
     }
     .user-avatar.small { width: 28px; height: 28px; font-size: 11px; }
-    .user-avatar.large { width: 80px; height: 80px; font-size: 28px; }
+    .user-avatar.large { width: 70px; height: 70px; font-size: 24px; }
 
     .group-avatar {
       width: 50px; height: 50px; border-radius: 12px; object-fit: cover;
@@ -232,8 +232,8 @@
     .chat-sender-tag { font-size: 10px; font-weight: bold; margin-bottom: 2px; color: #5f6368; display: block; }
 
     /* TABS */
-    .tabs { display: flex; border-bottom: 1px solid #dadce0; margin-bottom: 16px; overflow-x: auto; }
-    .tab-btn { border: none; background: none; border-radius: 0; padding: 8px 16px; border-bottom: 3px solid transparent; color: #5f6368; font-weight: bold; white-space: nowrap; box-shadow: none; backdrop-filter: none; filter: none; }
+    .tabs { display: flex; border-bottom: 1px solid #dadce0; margin-bottom: 16px; overflow-x: auto; width: 100%; }
+    .tab-btn { border: none; background: none; border-radius: 0; padding: 8px 14px; border-bottom: 3px solid transparent; color: #5f6368; font-weight: bold; white-space: nowrap; box-shadow: none; backdrop-filter: none; filter: none; flex-shrink: 0; }
     .tab-btn.active { border-bottom-color: #1a73e8; color: #1a73e8; background: transparent; }
 
     /* ANALYTICS TABLE & CALENDAR */
@@ -545,23 +545,22 @@
         </p>
       </div>
 
-      <div class="card profile-header">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-          <div style="display: flex; align-items: center; gap: 16px;">
+      <div class="card profile-header" style="display: block; width: 100%;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 240px;">
             <div id="profile-avatar-container"></div>
             <div>
-              <h2 id="profile-name-display" style="display: inline-flex; align-items: center; gap: 4px;"></h2>
+              <h2 id="profile-name-display" style="display: flex; align-items: center; gap: 4px; font-size: 18px; flex-wrap: wrap;"></h2>
               <p style="font-size: 13px; color: #70757a; margin-top: 2px;" id="profile-stats-summary"></p>
-              <p style="font-size: 13px; margin-top: 6px; color: #202124;" id="profile-bio-display"></p>
+              <p style="font-size: 13px; margin-top: 6px; color: #202124; word-break: break-word;" id="profile-bio-display"></p>
             </div>
           </div>
-          <div id="profile-action-btn-area" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+          <div id="profile-action-btn-area" style="display: flex; gap: 6px; flex-wrap: wrap; width: 100%;"></div>
         </div>
 
         <div id="profile-settings-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
           <h4 style="font-size: 13px; margin-bottom: 8px;">⚙️ Configurações da Conta & Aparência</h4>
           
-          <!-- OPÇÃO DE MARCA PARA TEMA DINÂMICO ARNOS -->
           <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom:10px; background:rgba(26,115,232,0.1); padding:8px 12px; border-radius:8px; border:1px solid rgba(26,115,232,0.3);">
             <input type="checkbox" id="chk-dynamic-theme" onchange="toggleDynamicThemeSetting(this.checked)">
             <strong>☀️/🌙 Ativar Fundo Dinâmico Arnos</strong> (Amarelo de dia / Azul e Preto de noite)
@@ -572,7 +571,6 @@
             Ocultar minhas listas de seguidores e a seguir no meu perfil
           </label>
 
-          <!-- EDITAR BIO DO PERFIL -->
           <div style="margin-bottom: 12px;">
             <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Editar Minha Bio</label>
             <textarea id="profile-bio-input" rows="2" placeholder="Escreva algo sobre si..." dir="ltr" style="margin-bottom:6px;"></textarea>
@@ -587,7 +585,7 @@
         </div>
       </div>
 
-      <div class="tabs">
+      <div class="tabs" style="display: flex; overflow-x: auto; white-space: nowrap; margin-bottom: 16px;">
         <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
         <button id="profile-tab-followers" class="tab-btn" onclick="switchProfileTab('followers')">Seguidores</button>
         <button id="profile-tab-following" class="tab-btn" onclick="switchProfileTab('following')">A Seguir</button>
@@ -628,7 +626,7 @@
 
   </div>
 
-  <!-- MODAL: CRIAR GRUPO (CLOUDINARY GrupoApi) -->
+  <!-- MODAL: CRIAR GRUPO -->
   <div id="modal-create-group" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -656,7 +654,7 @@
     </div>
   </div>
 
-  <!-- MODAL: EDITAR GRUPO (EXCLUSIVO PARA O DONO) -->
+  <!-- MODAL: EDITAR GRUPO -->
   <div id="modal-edit-group-bio" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -688,7 +686,7 @@
     </div>
   </div>
 
-  <!-- MODAL: SOLICITAÇÕES DE ENTRADA PENDENTES (DONO) -->
+  <!-- MODAL: SOLICITAÇÕES DE ENTRADA PENDENTES -->
   <div id="modal-group-requests" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -725,7 +723,6 @@
         <div class="comments-section" style="margin-top:16px;">
           <h4 style="margin-bottom:8px; font-size:14px;">Comentários</h4>
           
-          <!-- SELETOR DE MEMES NOS COMENTÁRIOS -->
           <div id="modal-comment-meme-picker" class="meme-picker-grid hidden"></div>
 
           <div style="display:flex; gap:6px; margin-bottom:12px; align-items:center;">
@@ -761,7 +758,7 @@
     </div>
   </div>
 
-  <!-- MODAL: ENVIAR MENSAGEM DIRETA DE PERFIL -->
+  <!-- MODAL: ENVIAR MENSAGEM DIRETA -->
   <div id="modal-direct-msg" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -799,7 +796,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // GALERIA POPULAR DE FIGURINHAS / MEMES
     const MEMES_LIST = [
       { id: 'doge', url: 'https://i.imgflip.com/4t0m5.jpg' },
       { id: 'stonks', url: 'https://i.imgflip.com/30b1gx.jpg' },
@@ -833,9 +829,8 @@
     let selectedCommentMemeUrl = '';
     let activeChatKey = null;
     let activeMsgSubTab = 'profile';
-    let currentSearchTab = 'posts'; // 'posts', 'profiles', 'shop'
+    let currentSearchTab = 'posts';
 
-    // UPLOAD PARA CLOUDINARY (GrupoApi / 339844723882454)
     async function uploadToCloudinaryGrupoApi(file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -856,7 +851,6 @@
       });
     }
 
-    // TEMA DINÂMICO DIA / NOITE
     function applyDynamicTheme() {
       if (!currentUserData || !currentUserData.useDynamicTheme) {
         document.body.classList.remove('theme-day', 'theme-night');
@@ -876,15 +870,12 @@
     window.toggleDynamicThemeSetting = async function(isChecked) {
       if (!currentUserData) return;
       try {
-        await updateDoc(publicUserDoc(currentUserData.username), {
-          useDynamicTheme: isChecked
-        });
+        await updateDoc(publicUserDoc(currentUserData.username), { useDynamicTheme: isChecked });
         currentUserData.useDynamicTheme = isChecked;
         applyDynamicTheme();
       } catch(e){}
     };
 
-    // EDITAR BIO DO PERFIL
     window.saveProfileBio = async function() {
       if (!currentUserData) return;
       const newBio = document.getElementById('profile-bio-input').value.trim();
@@ -896,7 +887,6 @@
       } catch(e) { alert("Erro ao atualizar a bio."); }
     };
 
-    // DROPDOWN MENU DA LOGO
     window.toggleLogoGroupsMenu = function(e) {
       e.stopPropagation();
       const dropdown = document.getElementById('logo-groups-dropdown');
@@ -936,7 +926,6 @@
       });
     }
 
-    // FIGURINHAS / MEME PICKER
     window.toggleMemePicker = function(target) {
       const pickerId = target === 'post' ? 'post-meme-picker' : (target === 'grouppost' ? 'grouppost-meme-picker' : (target === 'groupcomment' ? 'groupcomment-meme-picker' : (target === 'chat' ? 'chat-meme-picker' : 'modal-comment-meme-picker')));
       const container = document.getElementById(pickerId);
@@ -981,33 +970,24 @@
       }
     }
 
-    // ÁUDIO AO ROLAR A PÁGINA
     let audioCtx = null;
     let lastScrollPos = 0;
     let lastTriggeredThreshold = 0;
 
     function playTuruSound() {
       try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-
         osc.type = 'sine';
         const now = audioCtx.currentTime;
         osc.frequency.setValueAtTime(440, now);
         osc.frequency.exponentialRampToValueAtTime(880, now + 0.04);
-
         gain.gain.setValueAtTime(0.08, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-
         osc.start(now);
         osc.stop(now + 0.06);
       } catch (e) {}
@@ -1017,7 +997,6 @@
       const currentScroll = window.scrollY;
       const step = 200;
       const currentThreshold = Math.floor(currentScroll / step);
-
       if (currentThreshold !== lastTriggeredThreshold) {
         playTuruSound();
         lastTriggeredThreshold = currentThreshold;
@@ -1138,11 +1117,8 @@
         if (!document.getElementById('view-groups').classList.contains('hidden')) renderGroupsList();
         if (activeGroupId) {
           const exists = groupsList.some(g => g.id === activeGroupId);
-          if (!exists) {
-            navigateTo('groups');
-          } else {
-            renderGroupDetail(activeGroupId);
-          }
+          if (!exists) navigateTo('groups');
+          else renderGroupDetail(activeGroupId);
         }
       });
 
@@ -1156,7 +1132,6 @@
 
     function calculatePendingEarnings(item) {
       const owner = (item.author || item.seller || '').toLowerCase();
-
       const validLikes = (item.likes || []).filter(u => u.toLowerCase() !== owner);
       const validComments = (item.comments || []).filter(c => (c.author || '').toLowerCase() !== owner);
       const validViews = (item.views || []).filter(u => u.toLowerCase() !== owner);
@@ -1164,15 +1139,12 @@
       const likesCount = validLikes.length;
       const commentsCount = validComments.length;
       const viewsCount = validViews.length;
-
       const cashedOutCount = item.cashedOutEventsCount || 0;
 
       const uncashedLikes = Math.max(0, likesCount - Math.min(likesCount, cashedOutCount));
       const remainingAfterLikes = Math.max(0, cashedOutCount - likesCount);
-
       const uncashedComments = Math.max(0, commentsCount - Math.min(commentsCount, remainingAfterLikes));
       const remainingAfterComments = Math.max(0, remainingAfterLikes - commentsCount);
-
       const uncashedViews = Math.max(0, viewsCount - remainingAfterComments);
 
       return (uncashedLikes * 0.01) + (uncashedComments * 0.05) + (uncashedViews * 0.50);
@@ -1226,11 +1198,8 @@
       if (!document.getElementById('view-auth').classList.contains('hidden')) return;
       if (!document.getElementById('view-feed').classList.contains('hidden')) {
         const query = document.getElementById('search-input').value;
-        if (query && query.trim() !== '') {
-          renderGlobalSearchResults(query);
-        } else {
-          renderFeed();
-        }
+        if (query && query.trim() !== '') renderGlobalSearchResults(query);
+        else renderFeed();
       }
       else if (!document.getElementById('view-groups').classList.contains('hidden')) renderGroupsList();
       else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
@@ -1257,7 +1226,6 @@
       return `<div class="user-avatar ${sizeClass}">${initial}</div>`;
     }
 
-    // AUTH
     window.toggleAuth = function(mode) {
       document.getElementById('auth-error').classList.add('hidden');
       document.getElementById('auth-title').innerText = mode === 'login' ? "Arnos Entrar" : "Arnos Criar Conta";
@@ -1348,7 +1316,6 @@
       navigateTo('feed');
     }
 
-    // ADMIN FUNCTIONS
     function renderAdminPanel() {
       if (!currentUserData || currentUserData.username.toLowerCase() !== 'arnos') {
         navigateTo('feed');
@@ -1379,14 +1346,12 @@
     window.adminAddCredits = async function() {
       const username = document.getElementById('adm-target-user').value.trim();
       const amount = parseFloat(document.getElementById('adm-credit-amount').value);
-
       if (!username || isNaN(amount)) return alert("Preencha o utilizador e o valor.");
       const userDoc = publicUserDoc(username);
 
       try {
         const snap = await getDoc(userDoc);
         if (!snap.exists()) return alert("Utilizador não encontrado.");
-        
         const currentCredits = snap.data().credits || 0;
         await updateDoc(userDoc, { credits: currentCredits + amount });
         alert(`Adicionados R$ ${amount.toFixed(2)} ao utilizador @${username}!`);
@@ -1395,17 +1360,12 @@
       } catch (e) { alert("Erro ao adicionar créditos."); }
     };
 
-    // SEGUIR / DEIXAR DE SEGUIR & BLOQUEAR / DESBLOQUEAR
     window.toggleFollowUser = async function(targetUsername) {
       if (!currentUserData) return;
       const targetKey = targetUsername.toLowerCase();
       let following = currentUserData.following ? [...currentUserData.following] : [];
-
-      if (following.includes(targetKey)) {
-        following = following.filter(u => u !== targetKey);
-      } else {
-        following.push(targetKey);
-      }
+      if (following.includes(targetKey)) following = following.filter(u => u !== targetKey);
+      else following.push(targetKey);
 
       try {
         await updateDoc(publicUserDoc(currentUserData.username), { following });
@@ -1420,9 +1380,8 @@
       let blocked = currentUserData.blockedUsers ? [...currentUserData.blockedUsers] : [];
       const isBlocked = blocked.includes(targetKey);
 
-      if (isBlocked) {
-        blocked = blocked.filter(u => u !== targetKey);
-      } else {
+      if (isBlocked) blocked = blocked.filter(u => u !== targetKey);
+      else {
         if (!confirm(`Tem a certeza que deseja bloquear @${targetUsername}?`)) return;
         blocked.push(targetKey);
       }
@@ -1442,7 +1401,6 @@
       } catch (e) {}
     };
 
-    // AVATAR UPLOAD
     document.getElementById('profile-avatar-file').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -1464,7 +1422,6 @@
       } catch (e) { alert("Erro ao atualizar foto."); }
     };
 
-    // NAVIGATION
     window.navigateTo = function(view, arg = null) {
       activeGroupId = null;
       document.getElementById('logo-text-display').innerText = "Arnos";
@@ -1489,12 +1446,8 @@
       }
     };
 
-    // --- SISTEMA DE PESQUISA MULTISSETORIAL NO HEADER ---
     window.handleGlobalSearch = function(query) {
-      if (document.getElementById('view-feed').classList.contains('hidden')) {
-        navigateTo('feed');
-      }
-      
+      if (document.getElementById('view-feed').classList.contains('hidden')) navigateTo('feed');
       const q = query.trim();
       const resultsSection = document.getElementById('search-results-section');
       const createPostCard = document.getElementById('create-post-card');
@@ -1511,7 +1464,6 @@
       resultsSection.classList.remove('hidden');
       createPostCard.classList.add('hidden');
       feedList.classList.add('hidden');
-
       document.getElementById('search-query-display').innerText = q;
       renderGlobalSearchResults(q);
     };
@@ -1539,51 +1491,39 @@
       const q = query.toLowerCase().trim();
       const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
 
-      // 1. Filtrar Posts
       const matchedPosts = postsList.filter(p => {
         if (isBlockedBetween(myUser, p.author)) return false;
         return (p.content || '').toLowerCase().includes(q) || (p.author || '').toLowerCase().includes(q);
       });
 
-      // 2. Filtrar Perfis (Corrigido para mapear corretamente o array de utilizadores do objeto usersMap)
       const matchedProfiles = Object.values(usersMap).filter(u => {
         if (!u || !u.username) return false;
         if (myUser && isBlockedBetween(myUser, u.username)) return false;
-        const uName = u.username.toLowerCase();
-        const uBio = (u.bio || '').toLowerCase();
-        return uName.includes(q) || uBio.includes(q);
+        return u.username.toLowerCase().includes(q) || (u.bio || '').toLowerCase().includes(q);
       });
 
-      // 3. Filtrar Arnos Shop (Produtos)
       const matchedShop = productsList.filter(prod => {
         if (isBlockedBetween(myUser, prod.seller)) return false;
         return (prod.name || '').toLowerCase().includes(q) || (prod.description || '').toLowerCase().includes(q) || (prod.seller || '').toLowerCase().includes(q);
       });
 
-      // Atualizar contadores nos botões/abas
       document.getElementById('count-search-posts').innerText = matchedPosts.length;
       document.getElementById('count-search-profiles').innerText = matchedProfiles.length;
       document.getElementById('count-search-shop').innerText = matchedShop.length;
 
-      // Renderizar Posts na aba de Posts
       const postsContainer = document.getElementById('search-content-posts');
       postsContainer.innerHTML = '';
-      if (matchedPosts.length === 0) {
-        postsContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhuma publicação encontrada para esta pesquisa.</p>';
-      } else {
-        matchedPosts.forEach(p => postsContainer.appendChild(buildPostCard(p)));
-      }
+      if (matchedPosts.length === 0) postsContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhuma publicação encontrada.</p>';
+      else matchedPosts.forEach(p => postsContainer.appendChild(buildPostCard(p)));
 
-      // Renderizar Perfis na aba de Perfis (Corrigido e blindado)
       const profilesContainer = document.getElementById('search-content-profiles');
       profilesContainer.innerHTML = '';
-      if (matchedProfiles.length === 0) {
-        profilesContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhum perfil encontrado para esta pesquisa.</p>';
-      } else {
+      if (matchedProfiles.length === 0) profilesContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhum perfil encontrado.</p>';
+      else {
         matchedProfiles.forEach(user => {
           const item = document.createElement('div');
           item.className = 'card';
-          item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;';
+          item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:8px;';
           item.innerHTML = `
             <div class="author-container" onclick="navigateTo('profile', '${escapeStr(user.username)}')">
               ${renderAvatar(user, 'small')}
@@ -1598,17 +1538,12 @@
         });
       }
 
-      // Renderizar Arnos Shop na aba de Shop
       const shopContainer = document.getElementById('search-content-shop');
       shopContainer.innerHTML = '';
-      if (matchedShop.length === 0) {
-        shopContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhum produto encontrado no Arnos Shop para esta pesquisa.</p>';
-      } else {
-        matchedShop.forEach(prod => shopContainer.appendChild(buildProductCard(prod)));
-      }
+      if (matchedShop.length === 0) shopContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhum produto encontrado no Arnos Shop.</p>';
+      else matchedShop.forEach(prod => shopContainer.appendChild(buildProductCard(prod)));
     }
 
-    // --- SISTEMA DE GRUPOS & APROVAÇÃO ---
     window.openCreateGroupModal = function() {
       document.getElementById('group-create-name').value = '';
       document.getElementById('group-create-bio').value = '';
@@ -1618,9 +1553,7 @@
       selectedGroupImageFile = null;
       document.getElementById('modal-create-group').classList.remove('hidden');
     };
-    window.closeCreateGroupModal = function() {
-      document.getElementById('modal-create-group').classList.add('hidden');
-    };
+    window.closeCreateGroupModal = function() { document.getElementById('modal-create-group').classList.add('hidden'); };
 
     document.getElementById('group-create-file').addEventListener('change', (e) => {
       selectedGroupImageFile = e.target.files[0];
@@ -1640,16 +1573,11 @@
       if (!name || !currentUserData) return alert("Insira o nome do grupo.");
 
       let imageUrl = '';
-      if (selectedGroupImageFile) {
-        imageUrl = await uploadToCloudinaryGrupoApi(selectedGroupImageFile);
-      }
+      if (selectedGroupImageFile) imageUrl = await uploadToCloudinaryGrupoApi(selectedGroupImageFile);
 
       try {
         await addDoc(publicGroupsColl(), {
-          name,
-          bio,
-          isPrivate,
-          imageUrl,
+          name, bio, isPrivate, imageUrl,
           owner: currentUserData.username,
           members: [currentUserData.username],
           pendingRequests: [],
@@ -1666,54 +1594,40 @@
       document.getElementById('group-edit-private').checked = !!group.isPrivate;
       document.getElementById('modal-edit-group-bio').classList.remove('hidden');
     };
-
-    window.closeEditGroupBioModal = function() {
-      document.getElementById('modal-edit-group-bio').classList.add('hidden');
-    };
+    window.closeEditGroupBioModal = function() { document.getElementById('modal-edit-group-bio').classList.add('hidden'); };
 
     window.saveGroupBio = async function() {
       if (!activeGroupId || !currentUserData) return;
       const group = groupsList.find(g => g.id === activeGroupId);
-      if (!group || group.owner.toLowerCase() !== currentUserData.username.toLowerCase()) {
-        return alert("Apenas o dono pode editar o grupo.");
-      }
+      if (!group || group.owner.toLowerCase() !== currentUserData.username.toLowerCase()) return alert("Apenas o dono pode editar o grupo.");
       const newBio = document.getElementById('group-edit-bio-input').value.trim();
       const isPrivate = document.getElementById('group-edit-private').checked;
 
       try {
         await updateDoc(publicGroupDoc(activeGroupId), { bio: newBio, isPrivate });
         closeEditGroupBioModal();
-        alert("Configurações do grupo atualizadas com sucesso!");
+        alert("Configurações do grupo atualizadas!");
       } catch(e) { alert("Erro ao atualizar o grupo."); }
     };
 
     window.deleteCurrentGroup = async function() {
       if (!activeGroupId || !currentUserData) return;
       const group = groupsList.find(g => g.id === activeGroupId);
-      if (!group || group.owner.toLowerCase() !== currentUserData.username.toLowerCase()) {
-        return alert("Apenas o dono pode apagar este grupo.");
-      }
-
-      if (!confirm(`Tem a certeza que deseja apagar o grupo "${group.name}"? Esta ação removerá o grupo e todas as publicações associadas.`)) return;
+      if (!group || group.owner.toLowerCase() !== currentUserData.username.toLowerCase()) return alert("Apenas o dono pode apagar este grupo.");
+      if (!confirm(`Tem a certeza que deseja apagar o grupo "${group.name}"?`)) return;
 
       try {
         const postsToDelete = groupPostsList.filter(p => p.groupId === activeGroupId);
-        for (const p of postsToDelete) {
-          await deleteDoc(publicGroupPostDoc(p.id));
-        }
-
+        for (const p of postsToDelete) await deleteDoc(publicGroupPostDoc(p.id));
         await deleteDoc(publicGroupDoc(activeGroupId));
         alert("Grupo apagado com sucesso.");
         navigateTo('groups');
-      } catch(e) {
-        alert("Erro ao apagar o grupo.");
-      }
+      } catch(e) { alert("Erro ao apagar o grupo."); }
     };
 
     function renderGroupsList(filterQuery = '') {
       const list = document.getElementById('groups-list');
       list.innerHTML = '';
-
       const filtered = groupsList.filter(g => g.name.toLowerCase().includes(filterQuery.toLowerCase()));
       if (filtered.length === 0) {
         list.innerHTML = `<p style="color:#70757a;">Nenhum grupo encontrado.</p>`;
@@ -1727,20 +1641,15 @@
 
         let btnText = 'Participar';
         let btnClass = 'btn-primary';
-        if (isMember) {
-          btnText = 'Aceder Grupo';
-          btnClass = '';
-        } else if (hasRequested) {
-          btnText = 'Solicitação Pendente';
-          btnClass = '';
-        }
+        if (isMember) { btnText = 'Aceder Grupo'; btnClass = ''; }
+        else if (hasRequested) { btnText = 'Solicitação Pendente'; btnClass = ''; }
 
         const div = document.createElement('div');
         div.className = 'card';
-        div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; cursor:pointer;';
+        div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; cursor:pointer; flex-wrap:wrap; gap:8px;';
         div.onclick = () => openGroupDetail(g.id);
         div.innerHTML = `
-          <div style="display:flex; align-items:center; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:220px;">
             ${g.imageUrl ? `<img src="${g.imageUrl}" class="group-avatar">` : `<div class="group-avatar">👥</div>`}
             <div>
               <h3>${escapeHtml(g.name)} ${g.isPrivate ? '<span style="font-size:11px; background:#fce8e6; color:#d93025; padding:2px 6px; border-radius:4px;">🔒 Privado</span>' : '<span style="font-size:11px; background:#e6f4ea; color:#137333; padding:2px 6px; border-radius:4px;">🌐 Público</span>'}</h3>
@@ -1748,17 +1657,13 @@
               ${g.bio ? `<p style="font-size:12px; color:#444; margin-top:2px;">${escapeHtml(g.bio)}</p>` : ''}
             </div>
           </div>
-          <div>
-            <button class="${btnClass}">${btnText}</button>
-          </div>
+          <div><button class="${btnClass}">${btnText}</button></div>
         `;
         list.appendChild(div);
       });
     }
 
-    window.filterGroups = function(val) {
-      renderGroupsList(val);
-    };
+    window.filterGroups = function(val) { renderGroupsList(val); };
 
     window.openGroupDetail = function(groupId) {
       activeGroupId = groupId;
@@ -1773,7 +1678,6 @@
       if (!group) return;
 
       document.getElementById('logo-text-display').innerText = group.name;
-
       document.getElementById('group-detail-name').innerHTML = escapeHtml(group.name) + (group.isPrivate ? ' 🔒' : ' 🌐');
       document.getElementById('group-detail-owner').innerText = `Criado por @${group.owner} • ${(group.members || []).length} membros`;
       document.getElementById('group-detail-bio').innerText = group.bio || 'Sem bio definida.';
@@ -1808,9 +1712,7 @@
         joinBtn.innerText = group.isPrivate ? '🔒 Pedir Permissão para Entrar' : 'Participar do Grupo';
       }
 
-      const postBox = document.getElementById('group-post-box');
-      postBox.classList.toggle('hidden', !isMember);
-
+      document.getElementById('group-post-box').classList.toggle('hidden', !isMember);
       renderGroupPosts(groupId);
     }
 
@@ -1828,54 +1730,38 @@
       const hasRequested = pendingRequests.map(m => m.toLowerCase()).includes(myKey);
 
       if (isMember) {
-        if (group.owner.toLowerCase() === myKey) return alert("O dono não pode sair do próprio grupo. Se desejar, pode apagar o grupo.");
+        if (group.owner.toLowerCase() === myKey) return alert("O dono não pode sair do próprio grupo.");
         members = members.filter(m => m.toLowerCase() !== myKey);
-        try {
-          await updateDoc(publicGroupDoc(activeGroupId), { members });
-        } catch(e) {}
+        try { await updateDoc(publicGroupDoc(activeGroupId), { members }); } catch(e) {}
       } else if (hasRequested) {
         pendingRequests = pendingRequests.filter(m => m.toLowerCase() !== myKey);
-        try {
-          await updateDoc(publicGroupDoc(activeGroupId), { pendingRequests });
-          alert("Solicitação cancelada.");
-        } catch(e) {}
+        try { await updateDoc(publicGroupDoc(activeGroupId), { pendingRequests }); alert("Solicitação cancelada."); } catch(e) {}
       } else {
         if (group.isPrivate) {
           pendingRequests.push(myUser);
-          try {
-            await updateDoc(publicGroupDoc(activeGroupId), { pendingRequests });
-            alert("Solicitação enviada! Aguarde a aprovação do dono do grupo.");
-          } catch(e) {}
+          try { await updateDoc(publicGroupDoc(activeGroupId), { pendingRequests }); alert("Solicitação enviada!"); } catch(e) {}
         } else {
           members.push(myUser);
-          try {
-            await updateDoc(publicGroupDoc(activeGroupId), { members });
-          } catch(e) {}
+          try { await updateDoc(publicGroupDoc(activeGroupId), { members }); } catch(e) {}
         }
       }
     };
 
-    // MODAL DE SOLICITAÇÕES PENDENTES (DONO)
     window.openGroupRequestsModal = function() {
       const group = groupsList.find(g => g.id === activeGroupId);
       if (!group) return;
-
       const container = document.getElementById('group-requests-list-container');
       container.innerHTML = '';
-
       const pending = group.pendingRequests || [];
-      if (pending.length === 0) {
-        container.innerHTML = `<p style="color:#70757a; font-size:13px;">Não há solicitações pendentes no momento.</p>`;
-      } else {
+
+      if (pending.length === 0) container.innerHTML = `<p style="color:#70757a; font-size:13px;">Não há solicitações pendentes.</p>`;
+      else {
         pending.forEach(username => {
           const userObj = usersMap[username.toLowerCase()];
           const div = document.createElement('div');
           div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee;';
           div.innerHTML = `
-            <div style="display:flex; align-items:center; gap:8px;">
-              ${renderAvatar(userObj, 'small')}
-              <strong>@${escapeHtml(username)}</strong>
-            </div>
+            <div style="display:flex; align-items:center; gap:8px;">${renderAvatar(userObj, 'small')} <strong>@${escapeHtml(username)}</strong></div>
             <div style="display:flex; gap:6px;">
               <button class="btn-success" style="padding:4px 10px; font-size:12px;" onclick="approveGroupRequest('${username}', true)">Aceitar</button>
               <button class="btn-danger" style="padding:4px 10px; font-size:12px;" onclick="approveGroupRequest('${username}', false)">Recusar</button>
@@ -1884,26 +1770,17 @@
           container.appendChild(div);
         });
       }
-
       document.getElementById('modal-group-requests').classList.remove('hidden');
     };
 
-    window.closeGroupRequestsModal = function() {
-      document.getElementById('modal-group-requests').classList.add('hidden');
-    };
+    window.closeGroupRequestsModal = function() { document.getElementById('modal-group-requests').classList.add('hidden'); };
 
     window.approveGroupRequest = async function(username, accept) {
       const group = groupsList.find(g => g.id === activeGroupId);
       if (!group) return;
-
       let pending = (group.pendingRequests || []).filter(m => m.toLowerCase() !== username.toLowerCase());
       let members = group.members ? [...group.members] : [];
-
-      if (accept) {
-        if (!members.map(m => m.toLowerCase()).includes(username.toLowerCase())) {
-          members.push(username);
-        }
-      }
+      if (accept && !members.map(m => m.toLowerCase()).includes(username.toLowerCase())) members.push(username);
 
       try {
         await updateDoc(publicGroupDoc(activeGroupId), { pendingRequests: pending, members });
@@ -1914,10 +1791,8 @@
     window.openGroupMembersModal = function() {
       const group = groupsList.find(g => g.id === activeGroupId);
       if (!group) return;
-
       const container = document.getElementById('group-members-list-container');
       container.innerHTML = '';
-
       const isOwner = group.owner.toLowerCase() === currentUserData.username.toLowerCase();
 
       (group.members || []).forEach(member => {
@@ -1929,18 +1804,14 @@
         `;
         container.appendChild(div);
       });
-
       document.getElementById('modal-group-members').classList.remove('hidden');
     };
 
-    window.closeGroupMembersModal = function() {
-      document.getElementById('modal-group-members').classList.add('hidden');
-    };
+    window.closeGroupMembersModal = function() { document.getElementById('modal-group-members').classList.add('hidden'); };
 
     window.removeMemberFromGroup = async function(memberName) {
       const group = groupsList.find(g => g.id === activeGroupId);
       if (!group) return;
-
       let members = (group.members || []).filter(m => m.toLowerCase() !== memberName.toLowerCase());
       try {
         await updateDoc(publicGroupDoc(activeGroupId), { members });
@@ -1955,13 +1826,8 @@
 
       try {
         await addDoc(publicGroupPostsColl(), {
-          groupId: activeGroupId,
-          author: currentUserData.username,
-          content,
-          memeUrl,
-          timestamp: new Date().toISOString(),
-          likes: [],
-          comments: []
+          groupId: activeGroupId, author: currentUserData.username, content, memeUrl,
+          timestamp: new Date().toISOString(), likes: [], comments: []
         });
         document.getElementById('group-post-input').value = '';
         selectedGroupPostMemeUrl = '';
@@ -1972,7 +1838,6 @@
     function renderGroupPosts(groupId) {
       const list = document.getElementById('group-posts-list');
       list.innerHTML = '';
-
       const filtered = groupPostsList.filter(p => p.groupId === groupId);
       const group = groupsList.find(g => g.id === groupId);
       const isOwner = group && group.owner.toLowerCase() === currentUserData.username.toLowerCase();
@@ -1995,29 +1860,24 @@
             <strong>@${escapeHtml(p.author)}</strong>
             <div>
               <span class="item-date">${new Date(p.timestamp).toLocaleString()}</span>
-              ${isSelf || isOwner ? `<button class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;" onclick="deleteGroupPost('${p.id}')">Apagar Post</button>` : ''}
+              ${isSelf || isOwner ? `<button class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;" onclick="deleteGroupPost('${p.id}')">Apagar</button>` : ''}
             </div>
           </div>
           <div class="item-content">${escapeHtml(p.content || '')}</div>
           ${p.memeUrl ? `<img src="${p.memeUrl}" class="meme-sticker">` : ''}
 
           <div style="display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap;">
-            <button onclick="toggleLikeGroupPost('${p.id}')" class="${hasLiked ? 'btn-primary' : ''}">
-              ❤️ Curtir (${likes.length})
-            </button>
+            <button onclick="toggleLikeGroupPost('${p.id}')" class="${hasLiked ? 'btn-primary' : ''}">❤️ Curtir (${likes.length})</button>
             <span style="font-size:12px; color:#5f6368;">💬 ${comments.length} Comentários</span>
           </div>
 
-          <!-- SEÇÃO DE COMENTÁRIOS DO GRUPO -->
           <div class="comments-section" style="margin-top:12px;">
             <div style="display:flex; gap:6px; margin-bottom:8px; align-items:center;">
               <button class="btn-primary" type="button" onclick="toggleMemePickerForGroupComment('${p.id}')" style="padding:4px 8px; font-size:11px;">🎭 Meme</button>
-              <input type="text" id="group-comment-input-${p.id}" placeholder="Escreva um comentário no grupo..." dir="ltr" style="margin-bottom:0; flex:1;">
+              <input type="text" id="group-comment-input-${p.id}" placeholder="Escreva um comentário..." dir="ltr" style="margin-bottom:0; flex:1;">
               <button class="btn-primary" onclick="submitGroupComment('${p.id}')" style="padding:6px 12px; font-size:12px;">Enviar</button>
             </div>
-            
             <div id="groupcomment-picker-${p.id}" class="meme-picker-grid hidden"></div>
-
             <div id="group-comments-list-${p.id}">
               ${comments.length === 0 ? '<p style="font-size:11px; color:#70757a;">Nenhum comentário ainda.</p>' : ''}
               ${comments.map(c => {
@@ -2047,12 +1907,7 @@
     window.toggleMemePickerForGroupComment = function(postId) {
       const container = document.getElementById(`groupcomment-picker-${postId}`);
       if (!container) return;
-
-      if (!container.classList.contains('hidden')) {
-        container.classList.add('hidden');
-        return;
-      }
-
+      if (!container.classList.contains('hidden')) { container.classList.add('hidden'); return; }
       container.innerHTML = '';
       MEMES_LIST.forEach(meme => {
         const img = document.createElement('img');
@@ -2068,38 +1923,20 @@
       const input = document.getElementById(`group-comment-input-${postId}`);
       const text = input.value.trim();
       if (!text || !currentUserData) return;
-
       const post = groupPostsList.find(p => p.id === postId);
       if (!post) return;
 
       let comments = post.comments ? [...post.comments] : [];
-      comments.push({
-        id: 'gc_' + Date.now(),
-        author: currentUserData.username,
-        text,
-        timestamp: new Date().toISOString()
-      });
-
-      try {
-        await updateDoc(publicGroupPostDoc(postId), { comments });
-        input.value = '';
-      } catch(e) {}
+      comments.push({ id: 'gc_' + Date.now(), author: currentUserData.username, text, timestamp: new Date().toISOString() });
+      try { await updateDoc(publicGroupPostDoc(postId), { comments }); input.value = ''; } catch(e) {}
     };
 
     async function submitGroupCommentWithMeme(postId, memeUrl) {
       if (!currentUserData) return;
       const post = groupPostsList.find(p => p.id === postId);
       if (!post) return;
-
       let comments = post.comments ? [...post.comments] : [];
-      comments.push({
-        id: 'gc_' + Date.now(),
-        author: currentUserData.username,
-        text: '',
-        memeUrl: memeUrl,
-        timestamp: new Date().toISOString()
-      });
-
+      comments.push({ id: 'gc_' + Date.now(), author: currentUserData.username, text: '', memeUrl, timestamp: new Date().toISOString() });
       try {
         await updateDoc(publicGroupPostDoc(postId), { comments });
         document.getElementById(`groupcomment-picker-${postId}`).classList.add('hidden');
@@ -2110,11 +1947,8 @@
       if (!confirm("Apagar este comentário?")) return;
       const post = groupPostsList.find(p => p.id === postId);
       if (!post) return;
-
       const comments = (post.comments || []).filter(c => c.id !== commentId);
-      try {
-        await updateDoc(publicGroupPostDoc(postId), { comments });
-      } catch(e) {}
+      try { await updateDoc(publicGroupPostDoc(postId), { comments }); } catch(e) {}
     };
 
     window.deleteGroupPost = async function(postId) {
@@ -2126,16 +1960,13 @@
       if (!currentUserData) return;
       const post = groupPostsList.find(p => p.id === postId);
       if (!post) return;
-
       let likes = post.likes ? [...post.likes] : [];
       const myUser = currentUserData.username;
       if (likes.includes(myUser)) likes = likes.filter(u => u !== myUser);
       else likes.push(myUser);
-
       try { await updateDoc(publicGroupPostDoc(postId), { likes }); } catch(e) {}
     };
 
-    // MESSAGES / CHAT LOGIC
     window.switchMsgTab = function(tab) {
       activeMsgSubTab = tab;
       document.getElementById('msg-tab-profile').classList.toggle('active', tab === 'profile');
@@ -2157,7 +1988,6 @@
       convListDiv.classList.remove('hidden');
       chatViewDiv.classList.add('hidden');
       convListDiv.innerHTML = '';
-
       if (!currentUserData) return;
 
       const userMsgs = messagesList.filter(m => 
@@ -2174,7 +2004,7 @@
       filteredMsgs.forEach(m => {
         const otherUser = m.seller.toLowerCase() === currentUserData.username.toLowerCase() ? m.buyer : m.seller;
         const key = `${m.productName}___${otherUser.toLowerCase()}`;
-        if (!groups[key]) groups[key] = { productName: m.productName, otherUser: otherUser, lastMsg: m, msgs: [] };
+        if (!groups[key]) groups[key] = { productName: m.productName, otherUser, lastMsg: m, msgs: [] };
         groups[key].msgs.push(m);
         groups[key].lastMsg = m;
       });
@@ -2189,7 +2019,6 @@
         const g = groups[k];
         const myUser = currentUserData.username.toLowerCase();
         const otherObj = usersMap[g.otherUser.toLowerCase()];
-        
         const hasUnread = g.msgs.some(m => {
           const sender = (m.sender || m.buyer || '').toLowerCase();
           return sender !== myUser && !m.read;
@@ -2238,9 +2067,7 @@
         const senderName = m.sender || (m.buyer.toLowerCase() === myUser ? currentUserData.username : otherUser);
         const isMine = senderName.toLowerCase() === myUser;
 
-        if (!isMine && !m.read) {
-          updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
-        }
+        if (!isMine && !m.read) updateDoc(publicMessageDoc(m.id), { read: true }).catch(() => {});
 
         const bubble = document.createElement('div');
         bubble.className = `chat-bubble ${isMine ? 'mine' : 'other'}`;
@@ -2251,7 +2078,6 @@
         `;
         container.appendChild(bubble);
       });
-
       container.scrollTop = container.scrollHeight;
     }
 
@@ -2259,20 +2085,14 @@
       const input = document.getElementById('chat-input');
       const msg = input.value.trim();
       if (!msg || !activeChatKey) return;
-
       const parts = activeChatKey.split('___');
       const prodName = parts[0];
       const otherUser = parts[1];
 
       try {
         await addDoc(publicMessagesColl(), {
-          sender: currentUserData.username,
-          buyer: currentUserData.username, 
-          seller: otherUser,
-          productName: prodName, 
-          message: msg,
-          timestamp: new Date().toISOString(), 
-          read: false
+          sender: currentUserData.username, buyer: currentUserData.username, seller: otherUser,
+          productName: prodName, message: msg, timestamp: new Date().toISOString(), read: false
         });
         input.value = '';
       } catch (e) {}
@@ -2286,14 +2106,8 @@
 
       try {
         await addDoc(publicMessagesColl(), {
-          sender: currentUserData.username,
-          buyer: currentUserData.username,
-          seller: otherUser,
-          productName: prodName,
-          message: '',
-          memeUrl: memeUrl,
-          timestamp: new Date().toISOString(),
-          read: false
+          sender: currentUserData.username, buyer: currentUserData.username, seller: otherUser,
+          productName: prodName, message: '', memeUrl, timestamp: new Date().toISOString(), read: false
         });
       } catch(e) {}
     }
@@ -2304,10 +2118,7 @@
       document.getElementById('direct-msg-text').value = '';
       document.getElementById('modal-direct-msg').classList.remove('hidden');
     };
-
-    window.closeDirectMsgModal = function() {
-      document.getElementById('modal-direct-msg').classList.add('hidden');
-    };
+    window.closeDirectMsgModal = function() { document.getElementById('modal-direct-msg').classList.add('hidden'); };
 
     window.sendDirectMessageFromProfile = async function() {
       const targetUser = document.getElementById('direct-msg-target-username').value;
@@ -2316,13 +2127,8 @@
 
       try {
         await addDoc(publicMessagesColl(), {
-          sender: currentUserData.username,
-          buyer: currentUserData.username,
-          seller: targetUser,
-          productName: '[Perfil]',
-          message: text,
-          timestamp: new Date().toISOString(),
-          read: false
+          sender: currentUserData.username, buyer: currentUserData.username, seller: targetUser,
+          productName: '[Perfil]', message: text, timestamp: new Date().toISOString(), read: false
         });
         closeDirectMsgModal();
         alert(`Mensagem enviada para ${targetUser}!`);
@@ -2334,25 +2140,19 @@
       if (!currentUserData || sellerName.toLowerCase() === currentUserData.username.toLowerCase()) return;
       try {
         await addDoc(publicMessagesColl(), {
-          sender: currentUserData.username,
-          buyer: currentUserData.username,
-          seller: sellerName,
-          productName: productName,
-          message: `Olá! Tenho interesse no seu produto ${productName}.`,
-          timestamp: new Date().toISOString(),
-          read: false
+          sender: currentUserData.username, buyer: currentUserData.username, seller: sellerName,
+          productName: productName, message: `Olá! Tenho interesse no seu produto ${productName}.`,
+          timestamp: new Date().toISOString(), read: false
         });
         navigateTo('messages');
       } catch (e) { alert("Erro ao iniciar chat."); }
     };
 
-    // DEPÓSITO UNIFICADO
     window.depositAllPendingCredits = async function() {
       if (!currentUserData) return;
       const myKey = currentUserData.username.toLowerCase();
       const myPosts = postsList.filter(p => p.author.toLowerCase() === myKey);
       const myProducts = productsList.filter(p => p.seller.toLowerCase() === myKey);
-
       let totalToDeposit = 0;
 
       for (const p of myPosts) {
@@ -2362,8 +2162,7 @@
           const validLikes = (p.likes || []).filter(u => u.toLowerCase() !== myKey);
           const validComments = (p.comments || []).filter(c => (c.author || '').toLowerCase() !== myKey);
           const validViews = (p.views || []).filter(u => u.toLowerCase() !== myKey);
-          const totalValidEvents = validLikes.length + validComments.length + validViews.length;
-          await updateDoc(publicPostDoc(p.id), { cashedOutEventsCount: totalValidEvents });
+          await updateDoc(publicPostDoc(p.id), { cashedOutEventsCount: validLikes.length + validComments.length + validViews.length });
         }
       }
 
@@ -2374,8 +2173,7 @@
           const validLikes = (prod.likes || []).filter(u => u.toLowerCase() !== myKey);
           const validComments = (prod.comments || []).filter(c => (c.author || '').toLowerCase() !== myKey);
           const validViews = (prod.views || []).filter(u => u.toLowerCase() !== myKey);
-          const totalValidEvents = validLikes.length + validComments.length + validViews.length;
-          await updateDoc(publicProductDoc(prod.id), { cashedOutEventsCount: totalValidEvents });
+          await updateDoc(publicProductDoc(prod.id), { cashedOutEventsCount: validLikes.length + validComments.length + validViews.length });
         }
       }
 
@@ -2385,10 +2183,9 @@
       await updateDoc(publicUserDoc(currentUserData.username), { credits: newBalance });
       currentUserData.credits = newBalance;
       updateCreditsUI();
-      alert(`Depósito concluído com sucesso! R$ ${totalToDeposit.toFixed(2)} foram adicionados à tua conta.`);
+      alert(`Depósito concluído! R$ ${totalToDeposit.toFixed(2)} adicionados.`);
     };
 
-    // VISUALIZAÇÃO DEDICADA DO POST
     window.openPostModal = async function(postId) {
       activeOpenedPostId = postId;
       const post = postsList.find(p => p.id === postId);
@@ -2396,12 +2193,9 @@
 
       let views = post.views ? [...post.views] : [];
       const myUser = currentUserData.username;
-
       if (!views.includes(myUser)) {
         views.push(myUser);
-        try {
-          await updateDoc(publicPostDoc(postId), { views });
-        } catch (e) {}
+        try { await updateDoc(publicPostDoc(postId), { views }); } catch (e) {}
       }
 
       renderOpenedPostModal(postId);
@@ -2452,9 +2246,7 @@
         div.className = 'comment-item';
         div.innerHTML = `
           <div class="comment-header">
-            <div>
-              <strong>${escapeHtml(c.author)}</strong> ${renderBadges(c.author)}
-            </div>
+            <div><strong>${escapeHtml(c.author)}</strong> ${renderBadges(c.author)}</div>
             <div>
               <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
               ${isMyComment ? `<button onclick="deleteComment('${postId}', '${c.id}')" class="btn-danger" style="padding:1px 4px; font-size:10px; margin-left:6px;">Apagar</button>` : ''}
@@ -2471,55 +2263,31 @@
       const input = document.getElementById('modal-comment-input');
       const text = input.value.trim();
       if (!text || !currentUserData) return;
-
       const post = postsList.find(p => p.id === postId);
       if (!post) return;
 
       let comments = post.comments ? [...post.comments] : [];
-      comments.push({
-        id: 'c_' + Date.now(),
-        author: currentUserData.username,
-        text,
-        timestamp: new Date().toISOString()
-      });
-
-      try {
-        await updateDoc(publicPostDoc(postId), { comments });
-        input.value = '';
-      } catch (e) {}
+      comments.push({ id: 'c_' + Date.now(), author: currentUserData.username, text, timestamp: new Date().toISOString() });
+      try { await updateDoc(publicPostDoc(postId), { comments }); input.value = ''; } catch (e) {}
     }
 
     async function addCommentFromModalWithMeme(postId, memeUrl) {
       if (!currentUserData) return;
       const post = postsList.find(p => p.id === postId);
       if (!post) return;
-
       let comments = post.comments ? [...post.comments] : [];
-      comments.push({
-        id: 'c_' + Date.now(),
-        author: currentUserData.username,
-        text: '',
-        memeUrl: memeUrl,
-        timestamp: new Date().toISOString()
-      });
-
-      try {
-        await updateDoc(publicPostDoc(postId), { comments });
-      } catch (e) {}
+      comments.push({ id: 'c_' + Date.now(), author: currentUserData.username, text: '', memeUrl, timestamp: new Date().toISOString() });
+      try { await updateDoc(publicPostDoc(postId), { comments }); } catch (e) {}
     }
 
     window.deleteComment = async function(postId, commentId) {
       if (!confirm("Apagar o teu comentário?")) return;
       const post = postsList.find(p => p.id === postId);
       if (!post) return;
-
       const comments = (post.comments || []).filter(c => c.id !== commentId);
-      try {
-        await updateDoc(publicPostDoc(postId), { comments });
-      } catch (e) {}
+      try { await updateDoc(publicPostDoc(postId), { comments }); } catch (e) {}
     };
 
-    // POSTS
     document.getElementById('post-image-file').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -2548,7 +2316,6 @@
       const content = document.getElementById('post-input').value.trim();
       const imageUrl = selectedPostImageBase64 || '';
       const memeUrl = selectedPostMemeUrl || '';
-
       if (!content && !imageUrl && !memeUrl) return alert("Escreva um texto, escolha uma foto ou um meme.");
 
       const banner = document.getElementById('post-support-banner');
@@ -2556,21 +2323,12 @@
         banner.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
-      } else {
-        banner.classList.add('hidden');
-      }
+      } else banner.classList.add('hidden');
 
       try {
         await addDoc(publicPostsColl(), {
-          author: currentUserData.username,
-          content,
-          imageUrl,
-          memeUrl,
-          timestamp: new Date().toISOString(),
-          likes: [],
-          comments: [],
-          views: [],
-          cashedOutEventsCount: 0
+          author: currentUserData.username, content, imageUrl, memeUrl,
+          timestamp: new Date().toISOString(), likes: [], comments: [], views: [], cashedOutEventsCount: 0
         });
         document.getElementById('post-input').value = '';
         selectedPostImageBase64 = null;
@@ -2590,18 +2348,13 @@
       if (!currentUserData) return;
       const post = postsList.find(p => p.id === postId);
       if (!post) return;
-
       let likes = post.likes ? [...post.likes] : [];
       const myUser = currentUserData.username;
-      const hasLiked = likes.includes(myUser);
-
-      if (hasLiked) likes = likes.filter(u => u !== myUser);
+      if (likes.includes(myUser)) likes = likes.filter(u => u !== myUser);
       else likes.push(myUser);
-
       try { await updateDoc(publicPostDoc(postId), { likes }); } catch (e) {}
     };
 
-    // ARNOS SHOP
     document.getElementById('prod-image-file').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -2623,7 +2376,6 @@
       selectedProductImageBase64 = null;
       document.getElementById('modal-product').classList.remove('hidden');
     };
-
     window.closeProductModal = function() { document.getElementById('modal-product').classList.add('hidden'); };
 
     window.saveProduct = async function() {
@@ -2634,14 +2386,9 @@
 
       try {
         await addDoc(publicProductsColl(), {
-          seller: currentUserData.username,
-          name, price, description: desc,
-          imageUrl: selectedProductImageBase64 || '',
-          timestamp: new Date().toISOString(),
-          likes: [],
-          comments: [],
-          views: [],
-          cashedOutEventsCount: 0
+          seller: currentUserData.username, name, price, description: desc,
+          imageUrl: selectedProductImageBase64 || '', timestamp: new Date().toISOString(),
+          likes: [], comments: [], views: [], cashedOutEventsCount: 0
         });
         closeProductModal();
       } catch (e) {}
@@ -2656,14 +2403,10 @@
       if (!currentUserData) return;
       const prod = productsList.find(p => p.id === prodId);
       if (!prod) return;
-
       let likes = prod.likes ? [...prod.likes] : [];
       const myUser = currentUserData.username;
-      const hasLiked = likes.includes(myUser);
-
-      if (hasLiked) likes = likes.filter(u => u !== myUser);
+      if (likes.includes(myUser)) likes = likes.filter(u => u !== myUser);
       else likes.push(myUser);
-
       try { await updateDoc(publicProductDoc(prodId), { likes }); } catch (e) {}
     };
 
@@ -2671,7 +2414,6 @@
       const authorObj = usersMap[post.author.toLowerCase()];
       const isSelf = currentUserData && post.author.toLowerCase() === currentUserData.username.toLowerCase();
       const isArnos = post.author.toLowerCase() === 'arnos';
-
       const likes = post.likes || [];
       const comments = post.comments || [];
       const views = post.views || [];
@@ -2697,18 +2439,10 @@
         ${post.memeUrl ? `<img src="${escapeHtml(post.memeUrl)}" class="meme-sticker" onclick="openPostModal('${post.id}')">` : ''}
 
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
-          <button onclick="toggleLikePost('${post.id}')" class="${hasLiked ? 'btn-primary' : ''}">
-            ${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})
-          </button>
-          
-          <button onclick="openPostModal('${post.id}')">
-            💬 Comentários (${comments.length})
-          </button>
-
+          <button onclick="toggleLikePost('${post.id}')" class="${hasLiked ? 'btn-primary' : ''}">${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})</button>
+          <button onclick="openPostModal('${post.id}')">💬 Comentários (${comments.length})</button>
           <span style="font-size:12px; color:#1a73e8; cursor:pointer;" onclick="openPostModal('${post.id}')">👁️ ${views.length} viz</span>
-
           ${!isSelf ? `<button onclick="openDirectMsgModal('${escapeStr(post.author)}')" style="font-size:11px;">💬 Mensagem</button>` : ''}
-
           ${isSelf ? `<span style="font-size:12px; color:#137333; font-weight:bold; margin-left:auto;">Pendente: R$ ${pendingVal.toFixed(2)}</span>` : ''}
         </div>
       `;
@@ -2742,12 +2476,8 @@
         <p class="item-content" style="margin-top:6px;">${escapeHtml(prod.description)}</p>
         
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <button onclick="toggleLikeProduct('${prod.id}')" class="${hasLiked ? 'btn-primary' : ''}">
-            ${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})
-          </button>
-          
+          <button onclick="toggleLikeProduct('${prod.id}')" class="${hasLiked ? 'btn-primary' : ''}">${hasLiked ? '❤️ Curtido' : '♡ Curtir'} (${likes.length})</button>
           ${!isSelf ? `<button class="btn-success" onclick="contactSellerAboutProduct('${escapeStr(prod.seller)}', '${escapeStr(prod.name)}')">💬 Negociar / Comprar</button>` : ''}
-
           ${isSelf ? `<span style="font-size:12px; color:#137333; font-weight:bold; margin-left:auto;">Pendente: R$ ${pendingVal.toFixed(2)}</span>` : ''}
         </div>
       `;
@@ -2766,7 +2496,6 @@
     function renderFeed() {
       const list = document.getElementById('feed-list');
       list.innerHTML = '';
-      
       const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
       let visiblePosts = postsList.filter(p => !isBlockedBetween(myUser, p.author));
 
@@ -2780,7 +2509,6 @@
     function renderMarketplace() {
       const list = document.getElementById('marketplace-list');
       list.innerHTML = '';
-      
       const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
       const visibleProducts = productsList.filter(p => !isBlockedBetween(myUser, p.seller));
 
@@ -2812,7 +2540,6 @@
 
       const myUserKey = currentUserData ? currentUserData.username.toLowerCase() : '';
       const isSelf = myUserKey === userKey;
-
       const myBlockedList = (currentUserData && currentUserData.blockedUsers) ? currentUserData.blockedUsers.map(u=>u.toLowerCase()) : [];
       const targetBlockedList = (user.blockedUsers) ? user.blockedUsers.map(u=>u.toLowerCase()) : [];
 
@@ -2870,44 +2597,34 @@
       const followingDiv = document.getElementById('profile-following-list');
       const vitrineDiv = document.getElementById('profile-vitrine-list');
 
-      // VERIFICAÇÃO DE BLOQUEIO
       if (TheyBlockedMe) {
         blockedMsgDiv.innerText = "Este perfil não está disponível porque este utilizador bloqueou-o.";
         blockedMsgDiv.classList.remove('hidden');
-        postsDiv.innerHTML = '';
-        followersDiv.innerHTML = '';
-        followingDiv.innerHTML = '';
-        vitrineDiv.innerHTML = '';
+        postsDiv.innerHTML = ''; followersDiv.innerHTML = ''; followingDiv.innerHTML = ''; vitrineDiv.innerHTML = '';
         return;
       } else if (IBlockedThem) {
-        blockedMsgDiv.innerText = `Bloqueou @${user.username}. Desbloqueie para voltar a ver os posts e novidades deste perfil.`;
+        blockedMsgDiv.innerText = `Bloqueou @${user.username}. Desbloqueie para voltar a ver os posts.`;
         blockedMsgDiv.classList.remove('hidden');
-        postsDiv.innerHTML = '';
-        followersDiv.innerHTML = '';
-        followingDiv.innerHTML = '';
-        vitrineDiv.innerHTML = '';
+        postsDiv.innerHTML = ''; followersDiv.innerHTML = ''; followingDiv.innerHTML = ''; vitrineDiv.innerHTML = '';
         return;
       } else {
         blockedMsgDiv.classList.add('hidden');
       }
 
-      // POSTS DO PERFIL
       const userPosts = postsList.filter(p => p.author.toLowerCase() === userKey);
       postsDiv.innerHTML = userPosts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum post.</p>' : '';
       userPosts.forEach(p => postsDiv.appendChild(buildPostCard(p)));
 
-      // SEGUIDORES
       followersDiv.innerHTML = '';
       if (!isSelf && user.hideFollowing) {
-        followersDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem esta pessoa está a seguir ou os seus seguidores. Ela ativou esta opção para ninguém ver.</p>`;
+        followersDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem esta pessoa está a seguir ou os seus seguidores.</p>`;
       } else {
-        if (followersArr.length === 0) {
-          followersDiv.innerHTML = '<p style="color:#70757a;">Ninguém está a seguir este perfil ainda.</p>';
-        } else {
+        if (followersArr.length === 0) followersDiv.innerHTML = '<p style="color:#70757a;">Ninguém está a seguir este perfil ainda.</p>';
+        else {
           followersArr.forEach(followerObj => {
             const item = document.createElement('div');
             item.className = 'card';
-            item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;';
+            item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:8px;';
             item.innerHTML = `
               <div class="author-container" onclick="navigateTo('profile', '${escapeStr(followerObj.username)}')">
                 ${renderAvatar(followerObj, 'small')}
@@ -2921,19 +2638,17 @@
         }
       }
 
-      // A SEGUIR
       followingDiv.innerHTML = '';
       if (!isSelf && user.hideFollowing) {
-        followingDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem esta pessoa está a seguir. Ela ativou esta opção para ninguém ver.</p>`;
+        followingDiv.innerHTML = `<p style="color:#d93025; font-weight:bold;">Você não pode ver quem esta pessoa está a seguir.</p>`;
       } else {
-        if (followingArr.length === 0) {
-          followingDiv.innerHTML = '<p style="color:#70757a;">Não está a seguir ninguém.</p>';
-        } else {
+        if (followingArr.length === 0) followingDiv.innerHTML = '<p style="color:#70757a;">Não está a seguir ninguém.</p>';
+        else {
           followingArr.forEach(targetU => {
             const targetObj = usersMap[targetU.toLowerCase()];
             const item = document.createElement('div');
             item.className = 'card';
-            item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;';
+            item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:8px;';
             item.innerHTML = `
               <div class="author-container" onclick="navigateTo('profile', '${escapeStr(targetU)}')">
                 ${renderAvatar(targetObj, 'small')}
@@ -2947,7 +2662,6 @@
         }
       }
 
-      // VITRINE DO PERFIL
       const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
       vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum produto no Arnos Shop.</p>' : '';
       userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
@@ -2981,7 +2695,6 @@
         const validLikes = (p.likes || []).filter(u => u.toLowerCase() !== owner).length;
         const validComments = (p.comments || []).filter(c => (c.author || '').toLowerCase() !== owner).length;
         const validViews = (p.views || []).filter(u => u.toLowerCase() !== owner).length;
-
         const totalEvents = validLikes + validComments + validViews;
         const generatedVal = (validLikes * 0.01) + (validComments * 0.05) + (validViews * 0.50);
 
@@ -2998,9 +2711,7 @@
     function escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function escapeStr(str) { return String(str || '').replace(/'/g, "\\'").replace(/"/g, '\\"'); }
 
-    window.onload = function() {
-      initAuth();
-    };
+    window.onload = function() { initAuth(); };
   </script>
 </body>
 </html>
