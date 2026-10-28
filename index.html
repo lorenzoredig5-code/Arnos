@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Liquid Glass, Grupos & Pesquisa Corrigida</title>
+  <title>Arnos v2.0 - Liquid Glass, Grupos & Pesquisa Multissetorial</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -282,15 +282,15 @@
       <div id="logo-dropdown-groups-list"></div>
     </div>
 
-    <!-- BARRA DE PESQUISA CORRIGIDA -->
+    <!-- BARRA DE PESQUISA MULTISSETORIAL -->
     <div class="search-bar-container">
-      <input type="text" id="search-input" placeholder="Pesquisar posts ou utilizadores..." oninput="handleGlobalSearch(this.value)" autocomplete="off" dir="ltr">
+      <input type="text" id="search-input" placeholder="Pesquisar no Arnos..." oninput="handleGlobalSearch(this.value)" autocomplete="off" dir="ltr">
     </div>
 
     <nav>
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('groups')">👥 Grupos</button>
-      <button onclick="navigateTo('marketplace')">Marketplace</button>
+      <button onclick="navigateTo('marketplace')">🛍️ Arnos Shop</button>
       
       <div class="badge-container">
         <button onclick="navigateTo('messages')">Mensagens</button>
@@ -316,7 +316,7 @@
       <div style="background: #f8f9fa; border: 1px solid #dadce0; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
         <div id="step-users" class="loading-step-item"><span>⏳</span> 👤 <strong>Contas e Perfis:</strong> A carregar utilizadores...</div>
         <div id="step-posts" class="loading-step-item"><span>⏳</span> 📝 <strong>Feed de Publicações:</strong> A obter posts recentes...</div>
-        <div id="step-market" class="loading-step-item"><span>⏳</span> 🛍️ <strong>Marketplace:</strong> A organizar a vitrine...</div>
+        <div id="step-market" class="loading-step-item"><span>⏳</span> 🛍️ <strong>Arnos Shop:</strong> A organizar a vitrine...</div>
         <div id="step-messages" class="loading-step-item"><span>⏳</span> 💬 <strong>Mensagens & Chat:</strong> A sincronizar conversas...</div>
         <div id="step-credits" class="loading-step-item"><span>⏳</span> 💳 <strong>Saldos & Permissões:</strong> A verificar créditos e conta arnos...</div>
         <div id="step-security" class="loading-step-item"><span>⏳</span> 🛡️ <strong>Segurança & Moderação:</strong> A ativar filtro CVV 188...</div>
@@ -361,7 +361,27 @@
         Se está a passar por um momento difícil ou precisa de falar com alguém, ligue para o <strong>188</strong> (Centro de Valorização da Vida - CVV). O atendimento é gratuito, sigiloso e disponível 24 horas por dia.
       </div>
 
-      <div class="card">
+      <!-- PAINEL DE RESULTADOS DA PESQUISA COM OS 3 BOTÕES -->
+      <div id="search-results-section" class="card hidden" style="border: 2px dashed #1a73e8; background: rgba(26,115,232,0.02);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="font-size: 16px; color: #1a73e8;">🔍 Resultados da Pesquisa para: "<span id="search-query-display"></span>"</h3>
+          <button onclick="clearGlobalSearch()" style="padding:4px 10px; font-size:11px;">✕ Limpar Pesquisa</button>
+        </div>
+
+        <!-- ABAS/BOTÕES DE FILTRAGEM DA PESQUISA -->
+        <div class="tabs" style="margin-bottom:12px;">
+          <button id="search-tab-posts" class="tab-btn active" onclick="switchSearchTab('posts')">📝 Publicações (<span id="count-search-posts">0</span>)</button>
+          <button id="search-tab-profiles" class="tab-btn" onclick="switchSearchTab('profiles')">👤 Perfis (<span id="count-search-profiles">0</span>)</button>
+          <button id="search-tab-shop" class="tab-btn" onclick="switchSearchTab('shop')">🛍️ Arnos Shop (<span id="count-search-shop">0</span>)</button>
+        </div>
+
+        <!-- CONTEÚDO DAS ABAS DE PESQUISA -->
+        <div id="search-content-posts"></div>
+        <div id="search-content-profiles" class="hidden"></div>
+        <div id="search-content-shop" class="hidden"></div>
+      </div>
+
+      <div class="card" id="create-post-card">
         <h3 style="font-size: 15px; margin-bottom: 8px;">Criar uma publicação</h3>
         <textarea id="post-input" rows="3" placeholder="No que estás a pensar?" dir="ltr"></textarea>
         
@@ -474,10 +494,10 @@
       </div>
     </div>
 
-    <!-- MARKETPLACE VIEW -->
+    <!-- ARNOS SHOP VIEW -->
     <div id="view-marketplace" class="hidden">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h2>Marketplace</h2>
+        <h2>🛍️ Arnos Shop</h2>
         <button class="btn-primary" onclick="openCreateProductModal()">+ Criar Produto</button>
       </div>
       <div id="marketplace-list"></div>
@@ -485,11 +505,11 @@
 
     <!-- MESSAGES VIEW -->
     <div id="view-messages" class="hidden">
-      <h2 style="margin-bottom: 12px;">Mensagens / Marketplace</h2>
+      <h2 style="margin-bottom: 12px;">Mensagens / Arnos Shop</h2>
       
       <div class="tabs">
         <button id="msg-tab-profile" class="tab-btn active" onclick="switchMsgTab('profile')">Mensagens de Perfis</button>
-        <button id="msg-tab-marketplace" class="tab-btn" onclick="switchMsgTab('marketplace')">Mensagens do Marketplace</button>
+        <button id="msg-tab-marketplace" class="tab-btn" onclick="switchMsgTab('marketplace')">Mensagens do Arnos Shop</button>
       </div>
 
       <div id="messages-conversations-list"></div>
@@ -518,7 +538,7 @@
         </div>
         <br>
         <button class="btn-success" onclick="depositAllPendingCredits()" style="padding: 10px 20px; font-size: 14px; width: 100%; max-width: 320px;">
-          Depositar Créditos dos Posts e Marketplace
+          Depositar Créditos dos Posts e Arnos Shop
         </button>
         <p style="font-size: 13px; color: #5f6368; margin-top: 8px;">
           total pendente: <strong>R$ <span id="profile-pending-total">0.00</span></strong>
@@ -571,7 +591,7 @@
         <button id="profile-tab-posts" class="tab-btn active" onclick="switchProfileTab('posts')">Publicações</button>
         <button id="profile-tab-followers" class="tab-btn" onclick="switchProfileTab('followers')">Seguidores</button>
         <button id="profile-tab-following" class="tab-btn" onclick="switchProfileTab('following')">A Seguir</button>
-        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Vitrine (Marketplace)</button>
+        <button id="profile-tab-vitrine" class="tab-btn" onclick="switchProfileTab('vitrine')">Arnos Shop (Vitrine)</button>
         <button id="profile-tab-analytics" class="tab-btn" onclick="switchProfileTab('analytics')">📊 Desempenho & Virais</button>
       </div>
 
@@ -723,7 +743,7 @@
   <div id="modal-product" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Publicar no Marketplace</h3>
+        <h3>Publicar no Arnos Shop</h3>
         <button onclick="closeProductModal()">✕</button>
       </div>
       <div class="modal-body">
@@ -813,6 +833,7 @@
     let selectedCommentMemeUrl = '';
     let activeChatKey = null;
     let activeMsgSubTab = 'profile';
+    let currentSearchTab = 'posts'; // 'posts', 'profiles', 'shop'
 
     // UPLOAD PARA CLOUDINARY (GrupoApi / 339844723882454)
     async function uploadToCloudinaryGrupoApi(file) {
@@ -1205,7 +1226,11 @@
       if (!document.getElementById('view-auth').classList.contains('hidden')) return;
       if (!document.getElementById('view-feed').classList.contains('hidden')) {
         const query = document.getElementById('search-input').value;
-        renderFeed(query);
+        if (query && query.trim() !== '') {
+          renderGlobalSearchResults(query);
+        } else {
+          renderFeed();
+        }
       }
       else if (!document.getElementById('view-groups').classList.contains('hidden')) renderGroupsList();
       else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
@@ -1464,14 +1489,121 @@
       }
     };
 
-    // --- SISTEMA DE PESQUISA GLOBAL NO HEADER ---
+    // --- SISTEMA DE PESQUISA MULTISSETORIAL NO HEADER ---
     window.handleGlobalSearch = function(query) {
-      // Se não estivermos no feed, redireciona para o feed para mostrar os resultados da pesquisa
       if (document.getElementById('view-feed').classList.contains('hidden')) {
         navigateTo('feed');
       }
-      renderFeed(query);
+      
+      const q = query.trim();
+      const resultsSection = document.getElementById('search-results-section');
+      const createPostCard = document.getElementById('create-post-card');
+      const feedList = document.getElementById('feed-list');
+
+      if (!q) {
+        resultsSection.classList.add('hidden');
+        createPostCard.classList.remove('hidden');
+        feedList.classList.remove('hidden');
+        renderFeed();
+        return;
+      }
+
+      resultsSection.classList.remove('hidden');
+      createPostCard.classList.add('hidden');
+      feedList.classList.add('hidden'); // Esconde o feed normal da home durante a pesquisa global
+
+      document.getElementById('search-query-display').innerText = q;
+      renderGlobalSearchResults(q);
     };
+
+    window.clearGlobalSearch = function() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('search-results-section').classList.add('hidden');
+      document.getElementById('create-post-card').classList.remove('hidden');
+      document.getElementById('feed-list').classList.remove('hidden');
+      renderFeed();
+    };
+
+    window.switchSearchTab = function(tab) {
+      currentSearchTab = tab;
+      document.getElementById('search-tab-posts').classList.toggle('active', tab === 'posts');
+      document.getElementById('search-tab-profiles').classList.toggle('active', tab === 'profiles');
+      document.getElementById('search-tab-shop').classList.toggle('active', tab === 'shop');
+
+      document.getElementById('search-content-posts').classList.toggle('hidden', tab !== 'posts');
+      document.getElementById('search-content-profiles').classList.toggle('hidden', tab !== 'profiles');
+      document.getElementById('search-content-shop').classList.toggle('hidden', tab !== 'shop');
+    };
+
+    function renderGlobalSearchResults(query) {
+      const q = query.toLowerCase().trim();
+      const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
+
+      // 1. Filtrar Posts
+      const matchedPosts = postsList.filter(p => {
+        if (isBlockedBetween(myUser, p.author)) return false;
+        return (p.content || '').toLowerCase().includes(q) || (p.author || '').toLowerCase().includes(q);
+      });
+
+      // 2. Filtrar Perfis
+      const matchedProfiles = Object.values(usersMap).filter(u => {
+        if (myUser && isBlockedBetween(myUser, u.username)) return false;
+        return u.username.toLowerCase().includes(q) || (u.bio || '').toLowerCase().includes(q);
+      });
+
+      // 3. Filtrar Arnos Shop (Produtos)
+      const matchedShop = productsList.filter(prod => {
+        if (isBlockedBetween(myUser, prod.seller)) return false;
+        return (prod.name || '').toLowerCase().includes(q) || (prod.description || '').toLowerCase().includes(q) || (prod.seller || '').toLowerCase().includes(q);
+      });
+
+      // Atualizar contadores nos botões/abas
+      document.getElementById('count-search-posts').innerText = matchedPosts.length;
+      document.getElementById('count-search-profiles').innerText = matchedProfiles.length;
+      document.getElementById('count-search-shop').innerText = matchedShop.length;
+
+      // Renderizar Posts na aba de Posts
+      const postsContainer = document.getElementById('search-content-posts');
+      postsContainer.innerHTML = '';
+      if (matchedPosts.length === 0) {
+        postsContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhuma publicação encontrada para esta pesquisa.</p>';
+      } else {
+        matchedPosts.forEach(p => postsContainer.appendChild(buildPostCard(p)));
+      }
+
+      // Renderizar Perfis na aba de Perfis
+      const profilesContainer = document.getElementById('search-content-profiles');
+      profilesContainer.innerHTML = '';
+      if (matchedProfiles.length === 0) {
+        profilesContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhum perfil encontrado para esta pesquisa.</p>';
+      } else {
+        matchedProfiles.forEach(user => {
+          const item = document.createElement('div');
+          item.className = 'card';
+          item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;';
+          item.innerHTML = `
+            <div class="author-container" onclick="navigateTo('profile', '${escapeStr(user.username)}')">
+              ${renderAvatar(user, 'small')}
+              <div>
+                <span class="author-name">${escapeHtml(user.username)}</span> ${renderBadges(user.username)}
+                <p style="font-size:12px; color:#70757a; margin-top:2px;">${escapeHtml(user.bio || 'Sem bio')}</p>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="navigateTo('profile', '${escapeStr(user.username)}')">Ver Perfil</button>
+          `;
+          profilesContainer.appendChild(item);
+        });
+      }
+
+      // Renderizar Arnos Shop na aba de Shop
+      const shopContainer = document.getElementById('search-content-shop');
+      shopContainer.innerHTML = '';
+      if (matchedShop.length === 0) {
+        shopContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhum produto encontrado no Arnos Shop para esta pesquisa.</p>';
+      } else {
+        matchedShop.forEach(prod => shopContainer.appendChild(buildProductCard(prod)));
+      }
+    }
 
     // --- SISTEMA DE GRUPOS & APROVAÇÃO ---
     window.openCreateGroupModal = function() {
@@ -2066,7 +2198,7 @@
         div.onclick = () => openChatView(k);
         div.innerHTML = `
           <div class="item-header">
-            <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : `📦 Produto: ${escapeHtml(g.productName)}`}</h3>
+            <h3>${g.productName === '[Perfil]' ? `👤 Mensagem Direta` : `🛍️ Arnos Shop: ${escapeHtml(g.productName)}`}</h3>
             <span class="item-date">${new Date(g.lastMsg.timestamp).toLocaleTimeString()}</span>
           </div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
@@ -2466,7 +2598,7 @@
       try { await updateDoc(publicPostDoc(postId), { likes }); } catch (e) {}
     };
 
-    // MARKETPLACE
+    // ARNOS SHOP
     document.getElementById('prod-image-file').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (file) {
@@ -2628,25 +2760,15 @@
       return b1.includes(u2.toLowerCase()) || b2.includes(u1.toLowerCase());
     }
 
-    function renderFeed(searchQuery = '') {
+    function renderFeed() {
       const list = document.getElementById('feed-list');
       list.innerHTML = '';
       
       const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
       let visiblePosts = postsList.filter(p => !isBlockedBetween(myUser, p.author));
 
-      // Aplicação do filtro da barra de pesquisa global
-      if (searchQuery && searchQuery.trim() !== '') {
-        const q = searchQuery.toLowerCase().trim();
-        visiblePosts = visiblePosts.filter(p => {
-          const contentMatch = (p.content || '').toLowerCase().includes(q);
-          const authorMatch = (p.author || '').toLowerCase().includes(q);
-          return contentMatch || authorMatch;
-        });
-      }
-
       if (visiblePosts.length === 0) {
-        list.innerHTML = '<p style="color:#70757a;">Nenhum post encontrado com essa pesquisa.</p>';
+        list.innerHTML = '<p style="color:#70757a;">Nenhum post publicado ainda.</p>';
         return;
       }
       visiblePosts.forEach(p => list.appendChild(buildPostCard(p)));
@@ -2660,7 +2782,7 @@
       const visibleProducts = productsList.filter(p => !isBlockedBetween(myUser, p.seller));
 
       if (visibleProducts.length === 0) {
-        list.innerHTML = '<p style="color:#70757a;">Nenhum produto no Marketplace.</p>';
+        list.innerHTML = '<p style="color:#70757a;">Nenhum produto no Arnos Shop.</p>';
         return;
       }
       visibleProducts.forEach(p => list.appendChild(buildProductCard(p)));
@@ -2824,7 +2946,7 @@
 
       // VITRINE DO PERFIL
       const userProducts = productsList.filter(p => p.seller.toLowerCase() === userKey);
-      vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum produto na vitrine.</p>' : '';
+      vitrineDiv.innerHTML = userProducts.length === 0 ? '<p style="color:#70757a;">Ainda não publicaste nenhum produto no Arnos Shop.</p>' : '';
       userProducts.forEach(p => vitrineDiv.appendChild(buildProductCard(p)));
 
       renderAnalytics(userPosts);
