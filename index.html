@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Liquid Glass, Grupos & Memes</title>
+  <title>Arnos v2.0 - Liquid Glass, Grupos & Bios</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -402,10 +402,12 @@
             <div>
               <h2 id="group-detail-name"></h2>
               <p style="font-size: 13px; color: #70757a;" id="group-detail-owner"></p>
+              <p style="font-size: 13px; margin-top: 4px; color: #202124;" id="group-detail-bio"></p>
             </div>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="btn-primary" onclick="openGroupMembersModal()">👥 Ver Membros</button>
+            <button id="group-edit-bio-btn" class="btn-primary hidden" onclick="openEditGroupBioModal()">✏️ Editar Bio</button>
             <button id="group-join-leave-btn" onclick="toggleJoinCurrentGroup()"></button>
           </div>
         </div>
@@ -527,6 +529,7 @@
             <div>
               <h2 id="profile-name-display" style="display: inline-flex; align-items: center; gap: 4px;"></h2>
               <p style="font-size: 13px; color: #70757a; margin-top: 2px;" id="profile-stats-summary"></p>
+              <p style="font-size: 13px; margin-top: 6px; color: #202124;" id="profile-bio-display"></p>
             </div>
           </div>
           <div id="profile-action-btn-area" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
@@ -541,10 +544,17 @@
             <strong>☀️/🌙 Ativar Fundo Dinâmico Arnos</strong> (Amarelo de dia / Azul e Preto de noite)
           </label>
 
-          <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
             <input type="checkbox" id="chk-hide-following" onchange="toggleHideFollowingSetting(this.checked)">
             Ocultar minhas listas de seguidores e a seguir no meu perfil
           </label>
+
+          <!-- EDITAR BIO DO PERFIL -->
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Editar Minha Bio</label>
+            <textarea id="profile-bio-input" rows="2" placeholder="Escreva algo sobre si..." dir="ltr" style="margin-bottom:6px;"></textarea>
+            <button class="btn-primary" onclick="saveProfileBio()">Guardar Bio</button>
+          </div>
 
           <div style="margin-top: 12px;">
             <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Alterar Foto de Perfil</label>
@@ -606,11 +616,29 @@
         <label style="font-size: 12px; font-weight: bold;">Nome do Grupo *</label>
         <input type="text" id="group-create-name" required placeholder="Ex: Memes e Zoeira" dir="ltr">
         
+        <label style="font-size: 12px; font-weight: bold;">Bio / Descrição do Grupo</label>
+        <textarea id="group-create-bio" rows="2" placeholder="O que se fala neste grupo?" dir="ltr"></textarea>
+
         <label style="font-size: 12px; font-weight: bold;">Foto do Grupo (Cloudinary)</label>
         <input type="file" id="group-create-file" accept="image/*" style="margin-bottom: 8px;">
         <div id="group-img-preview" style="margin-bottom: 12px;"></div>
         
         <button onclick="submitCreateGroup()" class="btn-primary" style="width: 100%;">Criar Grupo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR BIO DO GRUPO (EXCLUSIVO PARA O DONO) -->
+  <div id="modal-edit-group-bio" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Editar Bio do Grupo</h3>
+        <button onclick="closeEditGroupBioModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label style="font-size: 12px; font-weight: bold;">Nova Bio do Grupo</label>
+        <textarea id="group-edit-bio-input" rows="3" placeholder="Atualize a descrição do grupo..." dir="ltr"></textarea>
+        <button onclick="saveGroupBio()" class="btn-primary" style="width: 100%; margin-top: 8px;">Guardar Bio</button>
       </div>
     </div>
   </div>
@@ -755,6 +783,7 @@
     let selectedGroupImageFile = null;
     let selectedPostMemeUrl = '';
     let selectedGroupPostMemeUrl = '';
+    let selectedGroupCommentMemeUrl = '';
     let selectedChatMemeUrl = '';
     let selectedCommentMemeUrl = '';
     let activeChatKey = null;
@@ -809,6 +838,18 @@
       } catch(e){}
     };
 
+    // EDITAR BIO DO PERFIL
+    window.saveProfileBio = async function() {
+      if (!currentUserData) return;
+      const newBio = document.getElementById('profile-bio-input').value.trim();
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { bio: newBio });
+        currentUserData.bio = newBio;
+        alert("Bio do perfil atualizada com sucesso!");
+        renderProfile(currentUserData.username);
+      } catch(e) { alert("Erro ao atualizar a bio."); }
+    };
+
     // DROPDOWN MENU DA LOGO
     window.toggleLogoGroupsMenu = function(e) {
       e.stopPropagation();
@@ -851,7 +892,7 @@
 
     // FIGURINHAS / MEME PICKER
     window.toggleMemePicker = function(target) {
-      const pickerId = target === 'post' ? 'post-meme-picker' : (target === 'grouppost' ? 'grouppost-meme-picker' : (target === 'chat' ? 'chat-meme-picker' : 'modal-comment-meme-picker'));
+      const pickerId = target === 'post' ? 'post-meme-picker' : (target === 'grouppost' ? 'grouppost-meme-picker' : (target === 'groupcomment' ? 'groupcomment-meme-picker' : (target === 'chat' ? 'chat-meme-picker' : 'modal-comment-meme-picker')));
       const container = document.getElementById(pickerId);
       if (!container) return;
 
@@ -880,6 +921,9 @@
         selectedGroupPostMemeUrl = url;
         document.getElementById('grouppost-selected-meme-tag').innerText = "✓ Meme selecionado!";
         document.getElementById('grouppost-meme-picker').classList.add('hidden');
+      } else if (target === 'groupcomment') {
+        selectedGroupCommentMemeUrl = url;
+        document.getElementById('groupcomment-meme-picker').classList.add('hidden');
       } else if (target === 'chat') {
         selectedChatMemeUrl = url;
         sendChatMessageWithMeme(url);
@@ -1176,6 +1220,7 @@
           password: pwd, 
           credits: 0, 
           avatarUrl: '',
+          bio: '',
           following: [],
           blockedUsers: [],
           hideFollowing: false,
@@ -1200,6 +1245,7 @@
         if (!userSnap.exists() || userSnap.data().password !== pwd) return showAuthErr("Credenciais incorretas.");
         currentUserData = userSnap.data();
         if (currentUserData.credits === undefined) currentUserData.credits = 0;
+        if (!currentUserData.bio) currentUserData.bio = '';
         if (!currentUserData.following) currentUserData.following = [];
         if (!currentUserData.blockedUsers) currentUserData.blockedUsers = [];
         window.currentUserData = currentUserData;
@@ -1386,6 +1432,7 @@
     // --- SISTEMA DE GRUPOS ---
     window.openCreateGroupModal = function() {
       document.getElementById('group-create-name').value = '';
+      document.getElementById('group-create-bio').value = '';
       document.getElementById('group-create-file').value = '';
       document.getElementById('group-img-preview').innerHTML = '';
       selectedGroupImageFile = null;
@@ -1408,6 +1455,7 @@
 
     window.submitCreateGroup = async function() {
       const name = document.getElementById('group-create-name').value.trim();
+      const bio = document.getElementById('group-create-bio').value.trim();
       if (!name || !currentUserData) return alert("Insira o nome do grupo.");
 
       let imageUrl = '';
@@ -1418,6 +1466,7 @@
       try {
         await addDoc(publicGroupsColl(), {
           name,
+          bio,
           imageUrl,
           owner: currentUserData.username,
           members: [currentUserData.username],
@@ -1425,6 +1474,31 @@
         });
         closeCreateGroupModal();
       } catch(e) { alert("Erro ao criar grupo."); }
+    };
+
+    window.openEditGroupBioModal = function() {
+      const group = groupsList.find(g => g.id === activeGroupId);
+      if (!group) return;
+      document.getElementById('group-edit-bio-input').value = group.bio || '';
+      document.getElementById('modal-edit-group-bio').classList.remove('hidden');
+    };
+
+    window.closeEditGroupBioModal = function() {
+      document.getElementById('modal-edit-group-bio').classList.add('hidden');
+    };
+
+    window.saveGroupBio = async function() {
+      if (!activeGroupId || !currentUserData) return;
+      const group = groupsList.find(g => g.id === activeGroupId);
+      if (!group || group.owner.toLowerCase() !== currentUserData.username.toLowerCase()) {
+        return alert("Apenas o dono pode editar a bio do grupo.");
+      }
+      const newBio = document.getElementById('group-edit-bio-input').value.trim();
+      try {
+        await updateDoc(publicGroupDoc(activeGroupId), { bio: newBio });
+        closeEditGroupBioModal();
+        alert("Bio do grupo atualizada com sucesso!");
+      } catch(e) { alert("Erro ao atualizar a bio do grupo."); }
     };
 
     function renderGroupsList(filterQuery = '') {
@@ -1450,6 +1524,7 @@
             <div>
               <h3>${escapeHtml(g.name)}</h3>
               <p style="font-size:12px; color:#70757a;">Criado por @${escapeHtml(g.owner)} • ${(g.members || []).length} membros</p>
+              ${g.bio ? `<p style="font-size:12px; color:#444; margin-top:2px;">${escapeHtml(g.bio)}</p>` : ''}
             </div>
           </div>
           <div>
@@ -1480,7 +1555,11 @@
 
       document.getElementById('group-detail-name').innerText = group.name;
       document.getElementById('group-detail-owner').innerText = `Criado por @${group.owner} • ${(group.members || []).length} membros`;
+      document.getElementById('group-detail-bio').innerText = group.bio || 'Sem bio definida.';
       document.getElementById('group-detail-avatar').innerHTML = group.imageUrl ? `<img src="${group.imageUrl}" class="group-avatar">` : `<div class="group-avatar">👥</div>`;
+
+      const isOwner = currentUserData && group.owner.toLowerCase() === currentUserData.username.toLowerCase();
+      document.getElementById('group-edit-bio-btn').classList.toggle('hidden', !isOwner);
 
       const isMember = (group.members || []).map(m => m.toLowerCase()).includes(currentUserData.username.toLowerCase());
       const joinBtn = document.getElementById('group-join-leave-btn');
@@ -1588,6 +1667,7 @@
       filtered.forEach(p => {
         const isSelf = p.author.toLowerCase() === currentUserData.username.toLowerCase();
         const likes = p.likes || [];
+        const comments = p.comments || [];
         const hasLiked = currentUserData && likes.includes(currentUserData.username);
 
         const div = document.createElement('div');
@@ -1597,21 +1677,127 @@
             <strong>@${escapeHtml(p.author)}</strong>
             <div>
               <span class="item-date">${new Date(p.timestamp).toLocaleString()}</span>
-              ${isSelf || isOwner ? `<button class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;" onclick="deleteGroupPost('${p.id}')">Apagar</button>` : ''}
+              ${isSelf || isOwner ? `<button class="btn-danger" style="margin-left:8px; padding:2px 6px; font-size:11px;" onclick="deleteGroupPost('${p.id}')">Apagar Post</button>` : ''}
             </div>
           </div>
           <div class="item-content">${escapeHtml(p.content || '')}</div>
           ${p.memeUrl ? `<img src="${p.memeUrl}" class="meme-sticker">` : ''}
 
-          <div style="display:flex; gap:8px; margin-top:8px;">
+          <div style="display:flex; gap:8px; margin-top:8px; align-items:center; flex-wrap:wrap;">
             <button onclick="toggleLikeGroupPost('${p.id}')" class="${hasLiked ? 'btn-primary' : ''}">
               ❤️ Curtir (${likes.length})
             </button>
+            <span style="font-size:12px; color:#5f6368;">💬 ${comments.length} Comentários</span>
+          </div>
+
+          <!-- SEÇÃO DE COMENTÁRIOS DO GRUPO -->
+          <div class="comments-section" style="margin-top:12px;">
+            <div style="display:flex; gap:6px; margin-bottom:8px; align-items:center;">
+              <button class="btn-primary" type="button" onclick="toggleMemePickerForGroupComment('${p.id}')" style="padding:4px 8px; font-size:11px;">🎭 Meme</button>
+              <input type="text" id="group-comment-input-${p.id}" placeholder="Escreva um comentário no grupo..." dir="ltr" style="margin-bottom:0; flex:1;">
+              <button class="btn-primary" onclick="submitGroupComment('${p.id}')" style="padding:6px 12px; font-size:12px;">Enviar</button>
+            </div>
+            
+            <div id="groupcomment-picker-${p.id}" class="meme-picker-grid hidden"></div>
+
+            <div id="group-comments-list-${p.id}">
+              ${comments.length === 0 ? '<p style="font-size:11px; color:#70757a;">Nenhum comentário ainda.</p>' : ''}
+              ${comments.map(c => {
+                const isMyComment = currentUserData && c.author.toLowerCase() === currentUserData.username.toLowerCase();
+                const canDeleteComment = isMyComment || isOwner;
+                return `
+                  <div class="comment-item">
+                    <div class="comment-header">
+                      <strong>@${escapeHtml(c.author)}</strong> ${renderBadges(c.author)}
+                      <div>
+                        <span style="font-size:10px; color:#70757a;">${new Date(c.timestamp).toLocaleTimeString()}</span>
+                        ${canDeleteComment ? `<button onclick="deleteGroupComment('${p.id}', '${c.id}')" class="btn-danger" style="padding:1px 4px; font-size:10px; margin-left:6px;">Apagar</button>` : ''}
+                      </div>
+                    </div>
+                    <div>${c.text ? escapeHtml(c.text) : ''}</div>
+                    ${c.memeUrl ? `<img src="${c.memeUrl}" class="meme-sticker">` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
           </div>
         `;
         list.appendChild(div);
       });
     }
+
+    window.toggleMemePickerForGroupComment = function(postId) {
+      const container = document.getElementById(`groupcomment-picker-${postId}`);
+      if (!container) return;
+
+      if (!container.classList.contains('hidden')) {
+        container.classList.add('hidden');
+        return;
+      }
+
+      container.innerHTML = '';
+      MEMES_LIST.forEach(meme => {
+        const img = document.createElement('img');
+        img.src = meme.url;
+        img.className = 'meme-picker-item';
+        img.onclick = () => submitGroupCommentWithMeme(postId, meme.url);
+        container.appendChild(img);
+      });
+      container.classList.remove('hidden');
+    };
+
+    window.submitGroupComment = async function(postId) {
+      const input = document.getElementById(`group-comment-input-${postId}`);
+      const text = input.value.trim();
+      if (!text || !currentUserData) return;
+
+      const post = groupPostsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let comments = post.comments ? [...post.comments] : [];
+      comments.push({
+        id: 'gc_' + Date.now(),
+        author: currentUserData.username,
+        text,
+        timestamp: new Date().toISOString()
+      });
+
+      try {
+        await updateDoc(publicGroupPostDoc(postId), { comments });
+        input.value = '';
+      } catch(e) {}
+    };
+
+    async function submitGroupCommentWithMeme(postId, memeUrl) {
+      if (!currentUserData) return;
+      const post = groupPostsList.find(p => p.id === postId);
+      if (!post) return;
+
+      let comments = post.comments ? [...post.comments] : [];
+      comments.push({
+        id: 'gc_' + Date.now(),
+        author: currentUserData.username,
+        text: '',
+        memeUrl: memeUrl,
+        timestamp: new Date().toISOString()
+      });
+
+      try {
+        await updateDoc(publicGroupPostDoc(postId), { comments });
+        document.getElementById(`groupcomment-picker-${postId}`).classList.add('hidden');
+      } catch(e) {}
+    }
+
+    window.deleteGroupComment = async function(postId, commentId) {
+      if (!confirm("Apagar este comentário?")) return;
+      const post = groupPostsList.find(p => p.id === postId);
+      if (!post) return;
+
+      const comments = (post.comments || []).filter(c => c.id !== commentId);
+      try {
+        await updateDoc(publicGroupPostDoc(postId), { comments });
+      } catch(e) {}
+    };
 
     window.deleteGroupPost = async function(postId) {
       if (!confirm("Apagar publicação?")) return;
@@ -2317,6 +2503,7 @@
 
       document.getElementById('profile-name-display').innerHTML = escapeHtml(user.username) + ' ' + renderBadges(user.username);
       document.getElementById('profile-avatar-container').innerHTML = renderAvatar(user, 'large');
+      document.getElementById('profile-bio-display').innerText = user.bio || 'Sem biografia.';
 
       const followingArr = user.following || [];
       const followersArr = Object.values(usersMap).filter(u => (u.following || []).map(x => x.toLowerCase()).includes(userKey));
@@ -2330,6 +2517,7 @@
       if (isSelf) {
         document.getElementById('chk-hide-following').checked = !!user.hideFollowing;
         document.getElementById('chk-dynamic-theme').checked = !!user.useDynamicTheme;
+        document.getElementById('profile-bio-input').value = user.bio || '';
       }
 
       document.getElementById('profile-deposit-card').classList.toggle('hidden', !isSelf);
