@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Edição de Mods em Blocos (40+ Blocos + Criador de Animações)</title>
+  <title>Arnos v2.0 - Edição de Mods em Blocos (40+ Blocos + Bloco de Cena)</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -292,6 +292,7 @@
     .scratch-block-item.audio-block { background: #0f9d58; box-shadow: 0 4px 0 #0b7842; border-color: #0b7842; }
     .scratch-block-item.anim-block { background: #e91e63; box-shadow: 0 4px 0 #c2185b; border-color: #c2185b; }
     .scratch-block-item.action-block { background: #e65100; box-shadow: 0 4px 0 #b23c00; border-color: #b23c00; }
+    .scratch-block-item.scene-block { background: #00897b; box-shadow: 0 4px 0 #004d40; border-color: #004d40; }
 
     .scratch-block-item input[type="color"] {
       width: 36px !important; height: 28px !important; padding: 0 !important; cursor: pointer; margin-bottom: 0 !important;
@@ -750,26 +751,29 @@
     </div>
   </div>
 
-  <!-- MODAL: CRIAR / EDITAR MOD EM BLOCOS (40+ BLOCOS) -->
+  <!-- MODAL: CRIAR / EDITAR MOD EM BLOCOS (40+ BLOCOS + BLOCO DE CENA) -->
   <div id="modal-create-mod" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="mod-modal-title">🧩 Criador de Mod Avançado (40+ Blocos Scratch v2.0)</h3>
+        <h3 id="mod-modal-title">🧩 Criador de Mod Avançado (Bloco Cena + 40+ Blocos)</h3>
         <button onclick="closeCreateModModal()">✕</button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="mod-editing-id" value="">
 
         <label style="font-size: 12px; font-weight: bold;">Código / ID do Mod (Único) *</label>
-        <input type="text" id="mod-create-code" placeholder="Ex: mod_supremo_arnos" dir="ltr">
+        <input type="text" id="mod-create-code" placeholder="Ex: mod_logo_custom" dir="ltr">
 
         <label style="font-size: 12px; font-weight: bold;">Nome do Mod *</label>
-        <input type="text" id="mod-create-name" placeholder="Ex: Meus Botões & Ações Personalizadas" dir="ltr">
+        <input type="text" id="mod-create-name" placeholder="Ex: Meu Mod com Logo Personalizada" dir="ltr">
 
-        <h4 style="margin: 12px 0 6px 0; font-size: 13px; color: #1a73e8;">🧩 Adicionar Blocos Scratch ao Mod (40+ Blocos):</h4>
+        <h4 style="margin: 12px 0 6px 0; font-size: 13px; color: #1a73e8;">🧩 Adicionar Blocos Scratch ao Mod:</h4>
         
         <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
-          <!-- BLOCOS SOLICITADOS DE BOTÕES E EVENTOS -->
+          <!-- BLOCO NOVO SOLICITADO: QUANDO COMEÇAR A CENA / EDITAR LOGO -->
+          <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px; background:#00897b;" onclick="addScratchBlock('whenSceneStarts')">🟢 Quando começar a cena [Editar Logo]</button>
+
+          <!-- BLOCOS DE BOTÕES E EVENTOS -->
           <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('createButton')">🔘 Criar Botão [ID] [Texto]</button>
           <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('clickButtonEvent')">⚡ Ao apertar botão [ID], então:</button>
           <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('actionGoogleToast')">💬 Mostrar Aviso Google [Msg]</button>
@@ -800,28 +804,6 @@
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('headerBg')">🔝 Cor Fundo Header</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('logoColor')">🏷️ Cor do Logo Arnos</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('inputBg')">✏️ Cor dos Caixas Input</button>
-
-          <!-- + 20 BLOCOS NOVOS -->
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock1')">1. Caixa de Texto ID/Dica</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock2')">2. Rótulo Texto ID/Valor</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock3')">3. Imagem URL ID</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock4')">4. Mudar Cor Fundo ID</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock5')">5. Visibilidade Elemento ID</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock6')">6. Verificar Internet</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock7')">7. HTTP GET API</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock8')">8. Partilhar Texto</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock9')">9. Abrir Discador Tel</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock10')">10. Enviar WhatsApp</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock11')">11. Vibrar Telemóvel</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock12')">12. Obter Nível Bateria</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock13')">13. Som Clique Padrão</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock14')">14. Copiar p/ Transferência</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock15')">15. Obter Modelo Hardware</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock16')">16. Guardar SharedPreferences</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock17')">17. Ler SharedPreferences</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock18')">18. Gerar Num Aleatório</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock19')">19. Converter Maiúsculas</button>
-          <button type="button" class="btn-action" style="font-size:11px; padding:4px 8px; background:#00796b;" onclick="addScratchBlock('newBlock20')">20. Aguardar Segundos</button>
         </div>
 
         <!-- CONTAINER DOS BLOCOS -->
@@ -1123,19 +1105,28 @@
       if (header) header.style.backgroundColor = '';
 
       const logo = document.getElementById('logo-text-display');
-      if (logo) logo.style.color = '';
+      if (logo) {
+        logo.style.color = '';
+        logo.innerText = 'Arnos'; // Restaura o texto original da logo
+      }
 
       const customBtnsContainer = document.getElementById('mod-custom-header-buttons-container');
       if (customBtnsContainer) customBtnsContainer.innerHTML = '';
     }
 
-    /* APLICAR MOD ATIVO COMPLETO E RENDERIZAR BOTÕES NO HEADER */
+    /* APLICAR MOD ATIVO COMPLETO E RENDERIZAR LOGO/BOTÕES */
     function applyActiveMod() {
       resetModEffects();
 
       if (!currentUserData || !currentUserData.activeModCode) return;
       const mod = modsList.find(m => m.code.toLowerCase() === currentUserData.activeModCode.toLowerCase());
       if (!mod) return;
+
+      // EXECUTAR O BLOCO "QUANDO COMEÇAR A CENA" / EDITAR LOGO
+      if (mod.sceneLogoText) {
+        const logo = document.getElementById('logo-text-display');
+        if (logo) logo.innerText = mod.sceneLogoText;
+      }
 
       if (mod.textColor) document.body.style.color = mod.textColor;
       if (mod.neonGlow) document.body.classList.add('mod-neon-glow');
@@ -1355,7 +1346,7 @@
     function runButtonFramesAnimation(btnElement, framesData) {
       if (!btnElement || !framesData || framesData.length === 0) return;
       let currentFrame = 0;
-      const frameDuration = 100; // 100ms por quadro
+      const frameDuration = 100;
 
       const interval = setInterval(() => {
         if (currentFrame >= framesData.length) {
@@ -2083,6 +2074,10 @@
         currentProfileUsername = arg || currentUserData.username;
         renderProfile(currentProfileUsername);
       }
+      // Reaplicar mod se estiver ativo para garantir que o bloco "Quando começar a cena" atualize a logo
+      if (currentUserData && currentUserData.activeModCode) {
+        applyActiveMod();
+      }
     };
 
     window.handleGlobalSearch = function(query) {
@@ -2281,7 +2276,7 @@
       } catch(e) {}
     };
 
-    /* SISTEMA DE BLOCOS SCRATCH NO CRIADOR DE MODS (40+ BLOCOS) */
+    /* SISTEMA DE BLOCOS SCRATCH NO CRIADOR DE MODS */
     window.addScratchBlock = function(type, initialData = {}) {
       const container = document.getElementById('scratch-blocks-container');
       const id = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
@@ -2289,7 +2284,15 @@
       const div = document.createElement('div');
       div.id = id;
 
-      if (type === 'createButton') {
+      if (type === 'whenSceneStarts') {
+        div.className = 'scratch-block-item scene-block';
+        div.setAttribute('data-type', 'whenSceneStarts');
+        const logoText = initialData.logoText || 'Arnos Custom';
+        div.innerHTML = `
+          <span>🟢 Quando começar a cena, alterar texto da logo para: <input type="text" class="block-scenelogotext-val" value="${escapeHtml(logoText)}" style="width:140px !important;"></span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'createButton') {
         div.className = 'scratch-block-item action-block';
         div.setAttribute('data-type', 'createButton');
         const btnId = initialData.btnId || 'btn_exemplo';
@@ -2311,7 +2314,7 @@
         div.setAttribute('data-type', 'actionGoogleToast');
         const msgVal = initialData.msgVal || 'Olá do Google / Arnos!';
         div.innerHTML = `
-          <span>💬 Mostrar Aviso / Toast do Google com o texto: <input type="text" class="block-toastmsg-val" value="${escapeHtml(msgVal)}" style="width:160px !important;"></span>
+          <span>💬 Mostrar Aviso / Toast com o texto: <input type="text" class="block-toastmsg-val" value="${escapeHtml(msgVal)}" style="width:160px !important;"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'actionOpenUrl') {
@@ -2319,7 +2322,7 @@
         div.setAttribute('data-type', 'actionOpenUrl');
         const urlVal = initialData.urlVal || 'https://google.com';
         div.innerHTML = `
-          <span>🌐 Abrir página web personalizada com link: <input type="text" class="block-urlval-val" value="${escapeHtml(urlVal)}" style="width:160px !important;"></span>
+          <span>🌐 Abrir página web com link: <input type="text" class="block-urlval-val" value="${escapeHtml(urlVal)}" style="width:160px !important;"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'time') {
@@ -2408,34 +2411,10 @@
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'inputBg');
         div.innerHTML = `<span>✏️ Cor Caixas Input: <input type="color" class="block-inputbg-val" value="#ffffff"></span><button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>`;
-      }
-      // 20 BLOCOS NOVOS ADICIONAIS
-      else {
+      } else {
         div.className = 'scratch-block-item';
         div.setAttribute('data-type', type);
-        const titles = {
-          'newBlock1': 'Adicionar Caixa de Texto (EditText) com ID e Dica',
-          'newBlock2': 'Adicionar Rótulo de Texto (TextView) com ID e Conteúdo',
-          'newBlock3': 'Adicionar Imagem por URL com ID e Link',
-          'newBlock4': 'Mudar cor de fundo do elemento pelo ID',
-          'newBlock5': 'Definir visibilidade do elemento pelo ID',
-          'newBlock6': 'Verificar se o dispositivo está conectado à Internet',
-          'newBlock7': 'Fazer requisição HTTP GET para URL externa',
-          'newBlock8': 'Partilhar texto através de aplicativos instalados',
-          'newBlock9': 'Abrir discador de chamadas com o número',
-          'newBlock10': 'Enviar mensagem via WhatsApp para número',
-          'newBlock11': 'Vibrar o telemóvel por milissegundos',
-          'newBlock12': 'Obter nível atual da bateria do dispositivo (%)',
-          'newBlock13': 'Tocar som de clique padrão do sistema',
-          'newBlock14': 'Copiar texto para a área de transferência',
-          'newBlock15': 'Obter o nome do modelo do smartphone',
-          'newBlock16': 'Guardar dado local (SharedPreferences)',
-          'newBlock17': 'Ler dado salvo no SharedPreferences',
-          'newBlock18': 'Gerar número aleatório entre Min e Max',
-          'newBlock19': 'Converter texto para letras maiúsculas',
-          'newBlock20': 'Aguardar segundos antes da próxima ação'
-        };
-        div.innerHTML = `<span>📌 [Bloco Novo] ${titles[type] || type}</span><button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>`;
+        div.innerHTML = `<span>📌 [Bloco de Ação] ${type}</span><button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>`;
       }
 
       container.appendChild(div);
@@ -2562,16 +2541,15 @@
     };
 
     window.openCreateModModal = function() {
-      document.getElementById('mod-modal-title').innerText = "🧩 Criador de Mod Avançado (40+ Blocos Scratch v2.0)";
+      document.getElementById('mod-modal-title').innerText = "🧩 Criador de Mod Avançado (Bloco Cena + 40+ Blocos)";
       document.getElementById('mod-editing-id').value = '';
       document.getElementById('mod-create-code').value = '';
       document.getElementById('mod-create-code').disabled = false;
       document.getElementById('mod-create-name').value = '';
       document.getElementById('scratch-blocks-container').innerHTML = '';
       
+      addScratchBlock('whenSceneStarts');
       addScratchBlock('createButton');
-      addScratchBlock('clickButtonEvent');
-      addScratchBlock('actionGoogleToast');
 
       document.getElementById('modal-create-mod').classList.remove('hidden');
     };
@@ -2590,15 +2568,11 @@
       const container = document.getElementById('scratch-blocks-container');
       container.innerHTML = '';
 
+      if (mod.sceneLogoText) {
+        addScratchBlock('whenSceneStarts', { logoText: mod.sceneLogoText });
+      }
       if (mod.customButtons) {
         mod.customButtons.forEach(b => addScratchBlock('createButton', { btnId: b.id, btnText: b.text }));
-      }
-      if (mod.buttonActions) {
-        mod.buttonActions.forEach(a => {
-          addScratchBlock('clickButtonEvent', { targetId: a.buttonId });
-          if (a.actionType === 'toast') addScratchBlock('actionGoogleToast', { msgVal: a.value });
-          if (a.actionType === 'url') addScratchBlock('actionOpenUrl', { urlVal: a.value });
-        });
       }
 
       document.getElementById('modal-create-mod').classList.remove('hidden');
@@ -2618,11 +2592,15 @@
       const blockEls = document.querySelectorAll('#scratch-blocks-container .scratch-block-item');
       let customButtons = [];
       let buttonActions = [];
+      let sceneLogoText = '';
       let lastTargetId = '';
 
       blockEls.forEach(el => {
         const type = el.getAttribute('data-type');
-        if (type === 'createButton') {
+        if (type === 'whenSceneStarts') {
+          const val = el.querySelector('.block-scenelogotext-val');
+          if (val) sceneLogoText = val.value.trim();
+        } else if (type === 'createButton') {
           const id = el.querySelector('.block-btnid-val').value.trim();
           const text = el.querySelector('.block-btntext-val').value.trim();
           if (id && text) customButtons.push({ id, text });
@@ -2638,7 +2616,7 @@
       });
 
       const modPayload = {
-        code, name, customButtons, buttonActions,
+        code, name, sceneLogoText, customButtons, buttonActions,
         author: currentUserData.username,
         timestamp: new Date().toISOString()
       };
@@ -2797,7 +2775,6 @@
       const group = groupsList.find(g => g.id === groupId);
       if (!group) return;
 
-      document.getElementById('logo-text-display').innerText = group.name;
       document.getElementById('group-detail-name').innerHTML = escapeHtml(group.name) + (group.isPrivate ? ' 🔒' : ' 🌐');
       document.getElementById('group-detail-owner').innerText = `Criado por @${group.owner} • ${(group.members || []).length} membros`;
       document.getElementById('group-detail-bio').innerText = group.bio || 'Sem bio definida.';
