@@ -51,7 +51,7 @@
     .search-bar-container { flex: 1 1 200px; max-width: 350px; display: flex; align-items: center; }
 
     /* INPUTS */
-    input[type="text"], input[type="password"], input[type="date"], input[type="number"], select, textarea {
+    input[type="text"], input[type="password"], input[type="date"], input[type="number"], input[type="color"], select, textarea {
       width: 100%; padding: 8px 12px; border: 1px solid #dadce0; border-radius: 6px;
       font-family: Arial, sans-serif; font-size: 14px; background-color: #ffffff; color: #222222;
       direction: ltr !important; text-align: left !important; box-sizing: border-box; margin-bottom: 8px;
@@ -134,16 +134,23 @@
       box-shadow: inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6), inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(217, 48, 37, 0.35);
     }
 
+    button.btn-purple {
+      background: rgba(142, 36, 170, 0.85); color: #ffffff;
+      border: 1px double rgba(255, 255, 255, 0.3);
+      box-shadow: inset 2px -2px 1px -1px rgba(255, 255, 255, 0.6), inset -2px 2px 1px -1px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(142, 36, 170, 0.35);
+    }
+
     nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
 
-    /* BADGES DA CONTA ARNOS (DONO & BOT) */
+    /* BADGES DA CONTA ARNOS (DONO, BOT & DEV) */
     .badge-square {
       display: inline-block; padding: 2px 6px; font-size: 10px; font-weight: bold;
       border-radius: 4px; margin-left: 4px; vertical-align: middle; color: #ffffff; text-transform: uppercase;
     }
     .badge-dono { background-color: #d93025; border: 1px solid #b31412; }
     .badge-bot { background-color: #1a73e8; border: 1px solid #1557b0; }
+    .badge-dev { background-color: #8e24aa; border: 1px solid #6a1b9a; }
 
     @keyframes rainbowBorder {
       0% { border-color: #ff0000; }
@@ -254,6 +261,16 @@
     .logo-dropdown-item { padding: 8px 12px; font-size: 13px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
     .logo-dropdown-item:hover { background: rgba(26,115,232,0.1); color: #1a73e8; }
 
+    /* BLOCOS DE PROGRAMAÇÃO DE MODS (ESTILO SCRATCH) */
+    .scratch-block {
+      background: #4a90e2; color: white; padding: 12px 16px; border-radius: 8px;
+      margin-bottom: 10px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 4px 0 #357abd; border: 1px solid #357abd;
+    }
+    .scratch-block input[type="color"] {
+      width: 40px !important; height: 30px !important; padding: 0 !important; cursor: pointer; margin-bottom: 0 !important;
+    }
+
     /* MODAL */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
     .modal-card { background: #fff; border-radius: 12px; border: 1px solid #dadce0; width: 90%; max-width: 580px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -291,6 +308,7 @@
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('groups')">👥 Grupos</button>
       <button onclick="navigateTo('marketplace')">🛍️ Arnos Shop</button>
+      <button onclick="navigateTo('mods')">🧩 Mods</button>
       
       <div class="badge-container">
         <button onclick="navigateTo('messages')">Mensagens</button>
@@ -453,7 +471,33 @@
       <div id="group-posts-list"></div>
     </div>
 
-    <!-- ADMIN PANEL VIEW (EXCLUSIVO PARA A CONTA "arnos") -->
+    <!-- MODS VIEW (MEUS MODS & SISTEMA DE MODDING) -->
+    <div id="view-mods" class="hidden">
+      <div class="card">
+        <h2>🧩 Central de Mods & Personalização</h2>
+        <p style="font-size: 13px; color: #5f6368; margin-bottom: 12px;">Insira o código do mod para carregar ou ative os mods salvos da sua conta.</p>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          <input type="text" id="mod-code-search-input" placeholder="Digite o código do mod (ex: mod_fundo_azul)" dir="ltr" style="margin-bottom:0; flex:1;">
+          <button class="btn-primary" onclick="loadModByCode()">Carregar Mod por Código</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Meus Mods (Instalados)</h3>
+        <div id="installed-mods-container" style="margin-top: 10px;"></div>
+      </div>
+
+      <div id="my-created-mods-card" class="card hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3>🎨 Meus Mods Criados (Desenvolvedor)</h3>
+          <button class="btn-purple" onclick="openCreateModModal()">+ Criar Mod (Em Blocos)</button>
+        </div>
+        <div id="created-mods-container"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL VIEW (EXCLUSIVO PARA "arnos" / "lorenzo") -->
     <div id="view-admin" class="hidden">
       <div class="card" style="border: 2px solid #d93025; background: #fff5f5;">
         <h2 style="color: #d93025; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
@@ -461,7 +505,7 @@
           <span class="badge-square badge-dono">Dono</span>
           <span class="badge-square badge-bot">Bot</span>
         </h2>
-        <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">Gestão exclusiva para a conta principal <strong>arnos</strong>.</p>
+        <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">Gestão exclusiva para as contas de administração <strong>arnos / lorenzo</strong>.</p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
           <div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #dadce0;">
@@ -476,6 +520,11 @@
             <span style="font-size: 11px; color: #70757a;">Total de Produtos</span>
             <h3 id="adm-total-products">0</h3>
           </div>
+        </div>
+
+        <div style="background: #fff; padding: 16px; border-radius: 6px; border: 1px solid #dadce0; margin-bottom: 16px;">
+          <h3 style="font-size: 14px; margin-bottom: 8px;">👨‍💻 Solicitações de Desenvolvedores Pendentes</h3>
+          <div id="adm-dev-requests-list"></div>
         </div>
 
         <div style="background: #fff; padding: 16px; border-radius: 6px; border: 1px solid #dadce0; margin-bottom: 16px;">
@@ -555,33 +604,7 @@
               <p style="font-size: 13px; margin-top: 6px; color: #202124; word-break: break-word;" id="profile-bio-display"></p>
             </div>
           </div>
-          <div id="profile-action-btn-area" style="display: flex; gap: 6px; flex-wrap: wrap; width: 100%;"></div>
-        </div>
-
-        <div id="profile-settings-section" class="hidden" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 12px;">
-          <h4 style="font-size: 13px; margin-bottom: 8px;">⚙️ Configurações da Conta & Aparência</h4>
-          
-          <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom:10px; background:rgba(26,115,232,0.1); padding:8px 12px; border-radius:8px; border:1px solid rgba(26,115,232,0.3);">
-            <input type="checkbox" id="chk-dynamic-theme" onchange="toggleDynamicThemeSetting(this.checked)">
-            <strong>☀️/🌙 Ativar Fundo Dinâmico Arnos</strong> (Amarelo de dia / Azul e Preto de noite)
-          </label>
-
-          <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
-            <input type="checkbox" id="chk-hide-following" onchange="toggleHideFollowingSetting(this.checked)">
-            Ocultar minhas listas de seguidores e a seguir no meu perfil
-          </label>
-
-          <div style="margin-bottom: 12px;">
-            <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Editar Minha Bio</label>
-            <textarea id="profile-bio-input" rows="2" placeholder="Escreva algo sobre si..." dir="ltr" style="margin-bottom:6px;"></textarea>
-            <button class="btn-primary" onclick="saveProfileBio()">Guardar Bio</button>
-          </div>
-
-          <div style="margin-top: 12px;">
-            <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Alterar Foto de Perfil</label>
-            <input type="file" id="profile-avatar-file" accept="image/*" style="margin-bottom: 6px;">
-            <button class="btn-primary" onclick="saveProfileAvatar()">Guardar Foto de Perfil</button>
-          </div>
+          <div id="profile-action-btn-area" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
         </div>
       </div>
 
@@ -624,6 +647,95 @@
 
     </div>
 
+  </div>
+
+  <!-- MODAL DE CONFIGURAÇÕES DO PERFIL -->
+  <div id="modal-settings" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>⚙️ Configurações do Perfil</h3>
+        <button onclick="closeSettingsModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom:10px; background:rgba(26,115,232,0.1); padding:8px 12px; border-radius:8px; border:1px solid rgba(26,115,232,0.3);">
+          <input type="checkbox" id="chk-dynamic-theme" onchange="toggleDynamicThemeSetting(this.checked)">
+          <strong>☀️/🌙 Ativar Fundo Dinâmico Arnos</strong> (Amarelo de dia / Azul e Preto de noite)
+        </label>
+
+        <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+          <input type="checkbox" id="chk-hide-following" onchange="toggleHideFollowingSetting(this.checked)">
+          Ocultar minhas listas de seguidores e a seguir no meu perfil
+        </label>
+
+        <div style="margin-bottom: 12px;">
+          <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Editar Minha Bio</label>
+          <textarea id="profile-bio-input" rows="2" placeholder="Escreva algo sobre si..." dir="ltr" style="margin-bottom:6px;"></textarea>
+          <button class="btn-primary" onclick="saveProfileBio()">Guardar Bio</button>
+        </div>
+
+        <div style="margin-top: 12px; margin-bottom: 16px;">
+          <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Alterar Foto de Perfil</label>
+          <input type="file" id="profile-avatar-file" accept="image/*" style="margin-bottom: 6px;">
+          <button class="btn-primary" onclick="saveProfileAvatar()">Guardar Foto de Perfil</button>
+        </div>
+
+        <hr style="margin: 16px 0; border: none; border-top: 1px solid #eee;">
+
+        <button class="btn-purple" onclick="openAdvancedSettingsModal()" style="width: 100%;">⚙️ Configurações Avançadas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIGURAÇÕES AVANÇADAS -->
+  <div id="modal-advanced-settings" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🛠️ Configurações Avançadas</h3>
+        <button onclick="closeAdvancedSettingsModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Carregar Mod por ID</label>
+          <input type="text" id="adv-mod-id-input" placeholder="Bote o ID do mod que você quer..." dir="ltr">
+          <button class="btn-primary" onclick="loadModFromAdvancedSettings()" style="width: 100%;">Carregar Mod</button>
+        </div>
+
+        <hr style="margin: 16px 0; border: none; border-top: 1px solid #eee;">
+
+        <div style="text-align: center;">
+          <h4 style="margin-bottom: 8px; font-size: 14px;">🛠️ Programa de Desenvolvedores Arnos</h4>
+          <p style="font-size: 12px; color: #5f6368; margin-bottom: 12px;">Solicite acesso para poder criar seus próprios mods visualmente usando códigos em blocos.</p>
+          <button class="btn-purple" onclick="requestDevAccess()" style="width: 100%;">Criar Mod / Entrar na Lista de Devs</button>
+          <div id="dev-status-notice" style="margin-top: 10px; font-size: 12px; color: #137333; font-weight: bold;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CRIAR MOD EM BLOCOS -->
+  <div id="modal-create-mod" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🧩 Criador de Mods (Programação em Blocos)</h3>
+        <button onclick="closeCreateModModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label style="font-size: 12px; font-weight: bold;">Código / ID do Mod (Único) *</label>
+        <input type="text" id="mod-create-code" placeholder="Ex: mod_fundo_azul" dir="ltr">
+
+        <label style="font-size: 12px; font-weight: bold;">Nome do Mod *</label>
+        <input type="text" id="mod-create-name" placeholder="Ex: Papel de Parede Azul" dir="ltr">
+
+        <h4 style="margin: 12px 0 6px 0; font-size: 13px; color: #1a73e8;">Blocos de Código (Scratch-Style):</h4>
+        
+        <div class="scratch-block">
+          <span>🎨 Editar papel de parede do site (Cor de Fundo):</span>
+          <input type="color" id="block-bg-color" value="#101c33">
+        </div>
+
+        <button onclick="saveCreatedMod()" class="btn-success" style="width: 100%; margin-top: 12px;">Salvar & Publicar Mod</button>
+      </div>
+    </div>
   </div>
 
   <!-- MODAL: CRIAR GRUPO -->
@@ -815,6 +927,8 @@
     let messagesList = [];
     let groupsList = [];
     let groupPostsList = [];
+    let modsList = [];
+    let devRequestsList = [];
     let activeGroupId = null;
     let currentProfileUsername = null;
     let activeOpenedPostId = null;
@@ -851,9 +965,28 @@
       });
     }
 
+    function applyActiveMod() {
+      if (!currentUserData || !currentUserData.activeModCode) {
+        document.body.style.backgroundColor = '';
+        return;
+      }
+      const mod = modsList.find(m => m.code.toLowerCase() === currentUserData.activeModCode.toLowerCase());
+      if (mod && mod.bgColor) {
+        document.body.style.backgroundColor = mod.bgColor;
+      } else {
+        document.body.style.backgroundColor = '';
+      }
+    }
+
     function applyDynamicTheme() {
+      if (currentUserData && currentUserData.activeModCode) {
+        applyActiveMod();
+        return;
+      }
+
       if (!currentUserData || !currentUserData.useDynamicTheme) {
         document.body.classList.remove('theme-day', 'theme-night');
+        document.body.style.backgroundColor = '';
         return;
       }
       const hour = new Date().getHours();
@@ -1016,6 +1149,9 @@
     const publicGroupDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'groups', id);
     const publicGroupPostsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'group_posts');
     const publicGroupPostDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'group_posts', id);
+    const publicModsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'mods');
+    const publicModDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'mods', id);
+    const publicDevRequestsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'dev_requests');
 
     window.currentUserData = currentUserData;
 
@@ -1128,6 +1264,19 @@
         groupPostsList.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
         if (activeGroupId) renderGroupPosts(activeGroupId);
       });
+
+      onSnapshot(publicModsColl(), (snap) => {
+        modsList = [];
+        snap.forEach(d => modsList.push({ id: d.id, ...d.data() }));
+        if (!document.getElementById('view-mods').classList.contains('hidden')) renderModsView();
+        applyDynamicTheme();
+      });
+
+      onSnapshot(publicDevRequestsColl(), (snap) => {
+        devRequestsList = [];
+        snap.forEach(d => devRequestsList.push({ id: d.id, ...d.data() }));
+        if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminPanel();
+      });
     }
 
     function calculatePendingEarnings(item) {
@@ -1170,7 +1319,8 @@
 
         const admBtn = document.getElementById('nav-adm-btn');
         if (admBtn) {
-          admBtn.classList.toggle('hidden', currentUserData.username.toLowerCase() !== 'arnos');
+          const isAdm = myKey === 'arnos' || myKey === 'lorenzo';
+          admBtn.classList.toggle('hidden', !isAdm);
         }
       }
     }
@@ -1204,6 +1354,7 @@
       else if (!document.getElementById('view-groups').classList.contains('hidden')) renderGroupsList();
       else if (!document.getElementById('view-marketplace').classList.contains('hidden')) renderMarketplace();
       else if (!document.getElementById('view-messages').classList.contains('hidden')) renderMessages();
+      else if (!document.getElementById('view-mods').classList.contains('hidden')) renderModsView();
       else if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminPanel();
       else if (!document.getElementById('view-profile').classList.contains('hidden')) {
         if (currentProfileUsername) renderProfile(currentProfileUsername);
@@ -1211,10 +1362,16 @@
     }
 
     function renderBadges(username) {
-      if ((username || '').toLowerCase() === 'arnos') {
-        return `<span class="badge-square badge-dono">Dono</span><span class="badge-square badge-bot">Bot</span>`;
+      const uKey = (username || '').toLowerCase();
+      let badges = '';
+      if (uKey === 'arnos' || uKey === 'lorenzo') {
+        badges += `<span class="badge-square badge-dono">Dono</span><span class="badge-square badge-bot">Bot</span>`;
       }
-      return '';
+      const userObj = usersMap[uKey];
+      if (userObj && userObj.isDev) {
+        badges += `<span class="badge-square badge-dev">DEV</span>`;
+      }
+      return badges;
     }
 
     function renderAvatar(userObj, sizeClass = '') {
@@ -1252,7 +1409,10 @@
           following: [],
           blockedUsers: [],
           hideFollowing: false,
-          useDynamicTheme: false
+          useDynamicTheme: false,
+          isDev: false,
+          installedMods: [],
+          activeModCode: null
         };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
@@ -1276,6 +1436,7 @@
         if (!currentUserData.bio) currentUserData.bio = '';
         if (!currentUserData.following) currentUserData.following = [];
         if (!currentUserData.blockedUsers) currentUserData.blockedUsers = [];
+        if (!currentUserData.installedMods) currentUserData.installedMods = [];
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', currentUserData.username);
         showMainInterface();
@@ -1302,6 +1463,7 @@
       document.getElementById('view-group-detail').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
       document.getElementById('view-messages').classList.add('hidden');
+      document.getElementById('view-mods').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
       document.getElementById('view-admin').classList.add('hidden');
     }
@@ -1317,7 +1479,8 @@
     }
 
     function renderAdminPanel() {
-      if (!currentUserData || currentUserData.username.toLowerCase() !== 'arnos') {
+      const myUser = currentUserData ? currentUserData.username.toLowerCase() : '';
+      if (!currentUserData || (myUser !== 'arnos' && myUser !== 'lorenzo')) {
         navigateTo('feed');
         return;
       }
@@ -1325,6 +1488,25 @@
       document.getElementById('adm-total-users').innerText = Object.keys(usersMap).length;
       document.getElementById('adm-total-posts').innerText = postsList.length;
       document.getElementById('adm-total-products').innerText = productsList.length;
+
+      const devReqsDiv = document.getElementById('adm-dev-requests-list');
+      devReqsDiv.innerHTML = devRequestsList.length === 0 ? '<p style="font-size:12px; color:#70757a;">Nenhuma solicitação de dev pendente.</p>' : '';
+
+      devRequestsList.forEach(req => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; font-size: 13px;';
+        div.innerHTML = `
+          <div>
+            <strong>@${escapeHtml(req.username)}</strong> solicitou entrada na Lista de Devs.
+            <br><span style="font-size:10px; color:#70757a;">${new Date(req.timestamp).toLocaleString()}</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-success" style="padding:2px 8px; font-size:11px;" onclick="approveDevRequest('${escapeStr(req.username)}', '${req.id}')">Aceitar Dev</button>
+            <button class="btn-danger" style="padding:2px 8px; font-size:11px;" onclick="rejectDevRequest('${req.id}')">Recusar</button>
+          </div>
+        `;
+        devReqsDiv.appendChild(div);
+      });
 
       const listDiv = document.getElementById('adm-posts-moderation-list');
       listDiv.innerHTML = postsList.length === 0 ? '<p style="font-size:12px; color:#70757a;">Nenhum post.</p>' : '';
@@ -1342,6 +1524,20 @@
         listDiv.appendChild(div);
       });
     }
+
+    window.approveDevRequest = async function(targetUsername, reqId) {
+      try {
+        await updateDoc(publicUserDoc(targetUsername), { isDev: true });
+        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'dev_requests', reqId));
+        alert(`@${targetUsername} agora é um Desenvolvedor oficial do Arnos!`);
+      } catch(e) { alert("Erro ao aceitar pedido."); }
+    };
+
+    window.rejectDevRequest = async function(reqId) {
+      try {
+        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'dev_requests', reqId));
+      } catch(e) {}
+    };
 
     window.adminAddCredits = async function() {
       const username = document.getElementById('adm-target-user').value.trim();
@@ -1418,8 +1614,65 @@
         selectedAvatarBase64 = null;
         document.getElementById('profile-avatar-file').value = '';
         alert("Foto de perfil atualizada!");
+        closeSettingsModal();
         renderProfile(currentUserData.username);
       } catch (e) { alert("Erro ao atualizar foto."); }
+    };
+
+    window.openSettingsModal = function() {
+      if (!currentUserData) return;
+      document.getElementById('chk-dynamic-theme').checked = !!currentUserData.useDynamicTheme;
+      document.getElementById('chk-hide-following').checked = !!currentUserData.hideFollowing;
+      document.getElementById('profile-bio-input').value = currentUserData.bio || '';
+      document.getElementById('modal-settings').classList.remove('hidden');
+    };
+
+    window.closeSettingsModal = function() {
+      document.getElementById('modal-settings').classList.add('hidden');
+    };
+
+    window.openAdvancedSettingsModal = function() {
+      closeSettingsModal();
+      document.getElementById('adv-mod-id-input').value = '';
+      document.getElementById('dev-status-notice').innerText = '';
+      document.getElementById('modal-advanced-settings').classList.remove('hidden');
+    };
+
+    window.closeAdvancedSettingsModal = function() {
+      document.getElementById('modal-advanced-settings').classList.add('hidden');
+    };
+
+    window.requestDevAccess = async function() {
+      if (!currentUserData) return;
+      const myUser = currentUserData.username;
+      
+      const alreadyPending = devRequestsList.some(r => r.username.toLowerCase() === myUser.toLowerCase());
+      if (alreadyPending) {
+        document.getElementById('dev-status-notice').innerText = "⚠️ Você já entrou na lista de desenvolvedores. Aguarde a aprovação do Lorenzo!";
+        return;
+      }
+
+      if (currentUserData.isDev) {
+        document.getElementById('dev-status-notice').innerText = "✅ Você já é um Desenvolvedor! Aceda ao separador 🧩 Mods para criar seus mods.";
+        return;
+      }
+
+      try {
+        await addDoc(publicDevRequestsColl(), {
+          username: myUser,
+          timestamp: new Date().toISOString()
+        });
+        document.getElementById('dev-status-notice').innerText = "✨ Você entrou na lista de desenvolvedores com sucesso!";
+      } catch(e) { alert("Erro ao solicitar acesso de dev."); }
+    };
+
+    window.loadModFromAdvancedSettings = function() {
+      const code = document.getElementById('adv-mod-id-input').value.trim();
+      if (!code) return alert("Digite o código do mod!");
+      closeAdvancedSettingsModal();
+      navigateTo('mods');
+      document.getElementById('mod-code-search-input').value = code;
+      loadModByCode();
     };
 
     window.navigateTo = function(view, arg = null) {
@@ -1431,6 +1684,7 @@
       document.getElementById('view-group-detail').classList.add('hidden');
       document.getElementById('view-marketplace').classList.add('hidden');
       document.getElementById('view-messages').classList.add('hidden');
+      document.getElementById('view-mods').classList.add('hidden');
       document.getElementById('view-profile').classList.add('hidden');
       document.getElementById('view-admin').classList.add('hidden');
 
@@ -1438,6 +1692,7 @@
       else if (view === 'groups') { document.getElementById('view-groups').classList.remove('hidden'); renderGroupsList(); }
       else if (view === 'marketplace') { document.getElementById('view-marketplace').classList.remove('hidden'); renderMarketplace(); }
       else if (view === 'messages') { document.getElementById('view-messages').classList.remove('hidden'); renderMessages(); }
+      else if (view === 'mods') { document.getElementById('view-mods').classList.remove('hidden'); renderModsView(); }
       else if (view === 'admin') { document.getElementById('view-admin').classList.remove('hidden'); renderAdminPanel(); }
       else if (view === 'profile') {
         document.getElementById('view-profile').classList.remove('hidden');
@@ -1543,6 +1798,148 @@
       if (matchedShop.length === 0) shopContainer.innerHTML = '<p style="color:#70757a; font-size:13px; padding:8px;">Nenhum produto encontrado no Arnos Shop.</p>';
       else matchedShop.forEach(prod => shopContainer.appendChild(buildProductCard(prod)));
     }
+
+    function renderModsView() {
+      const myCreatedSec = document.getElementById('my-created-mods-card');
+      const isDev = currentUserData && currentUserData.isDev;
+      myCreatedSec.classList.toggle('hidden', !isDev);
+
+      const installedContainer = document.getElementById('installed-mods-container');
+      installedContainer.innerHTML = '';
+
+      const installedCodes = currentUserData ? (currentUserData.installedMods || []) : [];
+
+      if (installedCodes.length === 0) {
+        installedContainer.innerHTML = `<p style="color:#70757a; font-size:13px;">Não tem mods instalados. Digite o código do mod acima para adicionar.</p>`;
+      } else {
+        installedCodes.forEach(code => {
+          const mod = modsList.find(m => m.code.toLowerCase() === code.toLowerCase());
+          if (!mod) return;
+          const isUsing = currentUserData.activeModCode === mod.code;
+
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;';
+          div.innerHTML = `
+            <div>
+              <h3>${escapeHtml(mod.name)} <span style="font-size:11px; color:#1a73e8;">(Código: ${escapeHtml(mod.code)})</span></h3>
+              <p style="font-size:12px; color:#70757a;">Criado por @${escapeHtml(mod.author)}</p>
+              <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+                <span style="font-size:11px;">Cor de fundo:</span>
+                <div style="width:20px; height:20px; border-radius:4px; background-color:${mod.bgColor}; border:1px solid #ccc;"></div>
+              </div>
+            </div>
+            <div>
+              <button class="${isUsing ? 'btn-danger' : 'btn-success'}" onclick="toggleUseMod('${escapeStr(mod.code)}')">
+                ${isUsing ? 'Deixar de Usar' : 'Usar Mod'}
+              </button>
+            </div>
+          `;
+          installedContainer.appendChild(div);
+        });
+      }
+
+      if (isDev) {
+        const createdContainer = document.getElementById('created-mods-container');
+        createdContainer.innerHTML = '';
+        const myMods = modsList.filter(m => m.author.toLowerCase() === currentUserData.username.toLowerCase());
+
+        if (myMods.length === 0) {
+          createdContainer.innerHTML = `<p style="color:#70757a; font-size:13px;">Você ainda não criou nenhum mod.</p>`;
+        } else {
+          myMods.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;';
+            div.innerHTML = `
+              <div>
+                <strong>${escapeHtml(m.name)}</strong> (Código: <code>${escapeHtml(m.code)}</code>)
+                <br><span style="font-size:11px; color:#70757a;">Criado em ${new Date(m.timestamp).toLocaleDateString()}</span>
+              </div>
+              <button class="btn-danger" style="padding:4px 10px; font-size:11px;" onclick="deleteMyMod('${m.id}')">🗑️ Apagar Mod</button>
+            `;
+            createdContainer.appendChild(div);
+          });
+        }
+      }
+    }
+
+    window.loadModByCode = async function() {
+      const input = document.getElementById('mod-code-search-input');
+      const code = input.value.trim().toLowerCase();
+      if (!code || !currentUserData) return alert("Insira o código do mod.");
+
+      const mod = modsList.find(m => m.code.toLowerCase() === code);
+      if (!mod) return alert("Mod não encontrado! Verifique se o código está correto.");
+
+      let installed = currentUserData.installedMods ? [...currentUserData.installedMods] : [];
+      if (!installed.map(c => c.toLowerCase()).includes(code)) {
+        installed.push(mod.code);
+        try {
+          await updateDoc(publicUserDoc(currentUserData.username), { installedMods: installed });
+          currentUserData.installedMods = installed;
+          alert(`Mod "${mod.name}" instalado em Meus Mods!`);
+          renderModsView();
+        } catch(e) { alert("Erro ao carregar o mod."); }
+      } else {
+        alert("Você já tem este mod na sua lista!");
+      }
+    };
+
+    window.toggleUseMod = async function(modCode) {
+      if (!currentUserData) return;
+      let newActive = currentUserData.activeModCode === modCode ? null : modCode;
+
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { activeModCode: newActive });
+        currentUserData.activeModCode = newActive;
+        applyDynamicTheme();
+        renderModsView();
+      } catch(e) {}
+    };
+
+    window.openCreateModModal = function() {
+      document.getElementById('mod-create-code').value = '';
+      document.getElementById('mod-create-name').value = '';
+      document.getElementById('block-bg-color').value = '#101c33';
+      document.getElementById('modal-create-mod').classList.remove('hidden');
+    };
+
+    window.closeCreateModModal = function() {
+      document.getElementById('modal-create-mod').classList.add('hidden');
+    };
+
+    window.saveCreatedMod = async function() {
+      const code = document.getElementById('mod-create-code').value.trim();
+      const name = document.getElementById('mod-create-name').value.trim();
+      const bgColor = document.getElementById('block-bg-color').value;
+
+      if (!code || !name || !currentUserData) return alert("Preencha o código e o nome do mod.");
+
+      const exists = modsList.some(m => m.code.toLowerCase() === code.toLowerCase());
+      if (exists) {
+        return alert("❌ Erro: Este código de mod já existe! Escolha outro código.");
+      }
+
+      try {
+        await addDoc(publicModsColl(), {
+          code, name, bgColor,
+          author: currentUserData.username,
+          timestamp: new Date().toISOString()
+        });
+        closeCreateModModal();
+        alert("Mod publicado com sucesso!");
+        renderModsView();
+      } catch(e) { alert("Erro ao criar o mod."); }
+    };
+
+    window.deleteMyMod = async function(modId) {
+      if (!confirm("Tem certeza que deseja apagar este mod?")) return;
+      try {
+        await deleteDoc(publicModDoc(modId));
+        renderModsView();
+      } catch(e) {}
+    };
 
     window.openCreateGroupModal = function() {
       document.getElementById('group-create-name').value = '';
@@ -2534,9 +2931,12 @@
     };
 
     function renderProfile(name) {
-      const userKey = name.toLowerCase();
-      const user = usersMap[userKey];
-      if (!user) return;
+      const userKey = (name || '').toLowerCase();
+      let user = usersMap[userKey];
+      
+      if (!user) {
+        user = { username: name, bio: '', avatarUrl: '', following: [], blockedUsers: [] };
+      }
 
       const myUserKey = currentUserData ? currentUserData.username.toLowerCase() : '';
       const isSelf = myUserKey === userKey;
@@ -2558,19 +2958,18 @@
         <span style="cursor:pointer; text-decoration:underline;" onclick="switchProfileTab('following')">A seguir: <strong>${followingArr.length}</strong></span>
       `;
 
-      document.getElementById('profile-settings-section').classList.toggle('hidden', !isSelf);
-      if (isSelf) {
-        document.getElementById('chk-hide-following').checked = !!user.hideFollowing;
-        document.getElementById('chk-dynamic-theme').checked = !!user.useDynamicTheme;
-        document.getElementById('profile-bio-input').value = user.bio || '';
-      }
-
       document.getElementById('profile-deposit-card').classList.toggle('hidden', !isSelf);
 
       const actionArea = document.getElementById('profile-action-btn-area');
       actionArea.innerHTML = '';
 
-      if (!isSelf) {
+      if (isSelf) {
+        const settingsBtn = document.createElement('button');
+        settingsBtn.className = 'btn-primary';
+        settingsBtn.innerText = '⚙️ Configurações';
+        settingsBtn.onclick = () => openSettingsModal();
+        actionArea.appendChild(settingsBtn);
+      } else {
         const isFollowing = currentUserData && (currentUserData.following || []).map(u=>u.toLowerCase()).includes(userKey);
         const followBtn = document.createElement('button');
         followBtn.className = isFollowing ? '' : 'btn-primary';
