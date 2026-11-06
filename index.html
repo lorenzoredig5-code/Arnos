@@ -260,13 +260,19 @@
     .logo-dropdown-item:hover { background: rgba(26,115,232,0.1); color: #1a73e8; }
 
     /* BLOCOS DE PROGRAMAÇÃO DE MODS (ESTILO SCRATCH) */
-    .scratch-block {
-      background: #4a90e2; color: white; padding: 12px 16px; border-radius: 8px;
-      margin-bottom: 10px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 4px 0 #357abd; border: 1px solid #357abd;
+    .scratch-block-item {
+      background: #ffab19; color: white; padding: 10px 14px; border-radius: 8px;
+      margin-bottom: 8px; font-weight: bold; font-size: 13px; display: flex; align-items: center;
+      justify-content: space-between; gap: 8px; box-shadow: 0 4px 0 #c88000; border: 1px solid #c88000;
     }
-    .scratch-block input[type="color"] {
-      width: 40px !important; height: 30px !important; padding: 0 !important; cursor: pointer; margin-bottom: 0 !important;
+    .scratch-block-item.color-block {
+      background: #4a90e2; box-shadow: 0 4px 0 #357abd; border-color: #357abd;
+    }
+    .scratch-block-item input[type="color"] {
+      width: 36px !important; height: 28px !important; padding: 0 !important; cursor: pointer; margin-bottom: 0 !important;
+    }
+    .scratch-block-item input[type="number"] {
+      width: 70px !important; padding: 4px 6px !important; margin-bottom: 0 !important; font-weight: bold; text-align: center;
     }
 
     /* MODAL */
@@ -708,28 +714,31 @@
     </div>
   </div>
 
-  <!-- MODAL: CRIAR MOD EM BLOCOS -->
+  <!-- MODAL: CRIAR MOD EM BLOCOS DE TEMPO -->
   <div id="modal-create-mod" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>🧩 Criador de Mods (Programação em Blocos)</h3>
+        <h3>🧩 Criador de Mod Animado (Blocos Scratch)</h3>
         <button onclick="closeCreateModModal()">✕</button>
       </div>
       <div class="modal-body">
         <label style="font-size: 12px; font-weight: bold;">Código / ID do Mod (Único) *</label>
-        <input type="text" id="mod-create-code" placeholder="Ex: mod_fundo_azul" dir="ltr">
+        <input type="text" id="mod-create-code" placeholder="Ex: mod_arco_iris" dir="ltr">
 
         <label style="font-size: 12px; font-weight: bold;">Nome do Mod *</label>
-        <input type="text" id="mod-create-name" placeholder="Ex: Papel de Parede Azul" dir="ltr">
+        <input type="text" id="mod-create-name" placeholder="Ex: Papel de Parede Animado" dir="ltr">
 
-        <h4 style="margin: 12px 0 6px 0; font-size: 13px; color: #1a73e8;">Blocos de Código (Scratch-Style):</h4>
+        <h4 style="margin: 12px 0 6px 0; font-size: 13px; color: #1a73e8;">🧩 Sequência de Blocos de Código:</h4>
         
-        <div class="scratch-block">
-          <span>🎨 Editar papel de parede do site (Cor de Fundo):</span>
-          <input type="color" id="block-bg-color" value="#101c33">
+        <div style="display:flex; gap:6px; margin-bottom:12px;">
+          <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('time')">+ Bloco de Tempo (`Cada <> Segundos`)</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('color')">+ Bloco de Cor (`Mudar Cor`)</button>
         </div>
 
-        <button onclick="saveCreatedMod()" class="btn-success" style="width: 100%; margin-top: 12px;">Salvar & Publicar Mod</button>
+        <!-- CONTAINER DOS BLOCOS -->
+        <div id="scratch-blocks-container" style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:10px; min-height:100px; margin-bottom:12px;"></div>
+
+        <button onclick="saveCreatedMod()" class="btn-success" style="width: 100%;">Salvar & Publicar Mod Papel de Parede</button>
       </div>
     </div>
   </div>
@@ -940,6 +949,7 @@
     let activeChatKey = null;
     let activeMsgSubTab = 'profile';
     let currentSearchTab = 'posts';
+    let modAnimationTimer = null;
 
     async function uploadToCloudinaryGrupoApi(file) {
       const formData = new FormData();
@@ -962,12 +972,25 @@
     }
 
     function applyActiveMod() {
+      if (modAnimationTimer) { clearInterval(modAnimationTimer); modAnimationTimer = null; }
+
       if (!currentUserData || !currentUserData.activeModCode) {
         document.body.style.backgroundColor = '';
         return;
       }
       const mod = modsList.find(m => m.code.toLowerCase() === currentUserData.activeModCode.toLowerCase());
-      if (mod && mod.bgColor) {
+      if (!mod) return;
+
+      if (mod.colorsSequence && mod.colorsSequence.length > 0) {
+        let stepIndex = 0;
+        const intervalSec = (mod.intervalSeconds || 2) * 1000;
+        document.body.style.backgroundColor = mod.colorsSequence[0];
+
+        modAnimationTimer = setInterval(() => {
+          stepIndex = (stepIndex + 1) % mod.colorsSequence.length;
+          document.body.style.backgroundColor = mod.colorsSequence[stepIndex];
+        }, intervalSec);
+      } else if (mod.bgColor) {
         document.body.style.backgroundColor = mod.bgColor;
       } else {
         document.body.style.backgroundColor = '';
@@ -1820,15 +1843,11 @@
           div.innerHTML = `
             <div>
               <h3>${escapeHtml(mod.name)} <span style="font-size:11px; color:#1a73e8;">(Código: ${escapeHtml(mod.code)})</span></h3>
-              <p style="font-size:12px; color:#70757a;">Criado por @${escapeHtml(mod.author)}</p>
-              <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
-                <span style="font-size:11px;">Cor de fundo:</span>
-                <div style="width:20px; height:20px; border-radius:4px; background-color:${mod.bgColor}; border:1px solid #ccc;"></div>
-              </div>
+              <p style="font-size:12px; color:#70757a;">Criado por @${escapeHtml(mod.author)} • Animado a cada ${mod.intervalSeconds || 2}s</p>
             </div>
             <div>
               <button class="${isUsing ? 'btn-danger' : 'btn-success'}" onclick="toggleUseMod('${escapeStr(mod.code)}')">
-                ${isUsing ? 'Deixar de Usar' : 'Usar Mod'}
+                ${isUsing ? 'Desativar Papel de Parede' : 'Ativar Papel de Parede Animado'}
               </button>
             </div>
           `;
@@ -1895,10 +1914,48 @@
       } catch(e) {}
     };
 
+    /* SISTEMA DE ADICIONAR E REMOVER BLOCOS SCRATCH NO CRIADOR DE MODS */
+    window.addScratchBlock = function(type) {
+      const container = document.getElementById('scratch-blocks-container');
+      const id = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+
+      const div = document.createElement('div');
+      div.id = id;
+
+      if (type === 'time') {
+        div.className = 'scratch-block-item';
+        div.setAttribute('data-type', 'time');
+        div.innerHTML = `
+          <span>⏳ repita Cada <input type="number" class="block-time-val" value="2" min="1" max="60"> Segundos então...</span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else {
+        div.className = 'scratch-block-item color-block';
+        div.setAttribute('data-type', 'color');
+        div.innerHTML = `
+          <span>🎨 Mudar cor do fundo para: <input type="color" class="block-color-val" value="#101c33"></span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      }
+
+      container.appendChild(div);
+    };
+
+    window.removeScratchBlock = function(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    };
+
     window.openCreateModModal = function() {
       document.getElementById('mod-create-code').value = '';
       document.getElementById('mod-create-name').value = '';
-      document.getElementById('block-bg-color').value = '#101c33';
+      document.getElementById('scratch-blocks-container').innerHTML = '';
+      
+      // Adicionar blocos iniciais padrão
+      addScratchBlock('time');
+      addScratchBlock('color');
+      addScratchBlock('color');
+
       document.getElementById('modal-create-mod').classList.remove('hidden');
     };
 
@@ -1909,7 +1966,6 @@
     window.saveCreatedMod = async function() {
       const code = document.getElementById('mod-create-code').value.trim();
       const name = document.getElementById('mod-create-name').value.trim();
-      const bgColor = document.getElementById('block-bg-color').value;
 
       if (!code || !name || !currentUserData) return alert("Preencha o código e o nome do mod.");
 
@@ -1918,9 +1974,27 @@
         return alert("❌ Erro: Este código de mod já existe! Escolha outro código.");
       }
 
+      const blockEls = document.querySelectorAll('#scratch-blocks-container .scratch-block-item');
+      let intervalSeconds = 2;
+      let colorsSequence = [];
+
+      blockEls.forEach(el => {
+        const type = el.getAttribute('data-type');
+        if (type === 'time') {
+          const timeVal = parseFloat(el.querySelector('.block-time-val').value);
+          if (!isNaN(timeVal) && timeVal > 0) intervalSeconds = timeVal;
+        } else if (type === 'color') {
+          const colorVal = el.querySelector('.block-color-val').value;
+          if (colorVal) colorsSequence.push(colorVal);
+        }
+      });
+
+      if (colorsSequence.length === 0) colorsSequence.push('#101c33');
+
       try {
         await addDoc(publicModsColl(), {
-          code, name, bgColor,
+          code, name, intervalSeconds, colorsSequence,
+          bgColor: colorsSequence[0],
           author: currentUserData.username,
           timestamp: new Date().toISOString()
         });
@@ -2894,7 +2968,7 @@
       let visiblePosts = postsList.filter(p => !isBlockedBetween(myUser, p.author));
 
       if (visiblePosts.length === 0) {
-        list.innerHTML = '<p style="color:#70757a;">Nenhum post publicado ainda.</p>';
+        list.innerHTML = '<p style="color:#70757a;">Nenum post publicado ainda.</p>';
         return;
       }
       visiblePosts.forEach(p => list.appendChild(buildPostCard(p)));
