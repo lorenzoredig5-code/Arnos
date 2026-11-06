@@ -58,9 +58,7 @@
     }
     input:focus, select:focus, textarea:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
 
-    /* ========================================================== */
-    /* 🔥 BOTÕES COM EFEITO "LIQUID GLASS" AVANÇADO 🔥 */
-    /* ========================================================== */
+    /* BOTÕES COM EFEITO LIQUID GLASS */
     button {
       position: relative;
       background: rgba(255, 255, 255, 0.25);
@@ -326,7 +324,7 @@
   <!-- CONTAINER PRINCIPAL -->
   <div class="container">
 
-    <!-- LOADING VIEW COM STATUS DETALHADO -->
+    <!-- LOADING VIEW -->
     <div id="view-loading" class="card" style="text-align: center; padding: 30px; max-width: 480px; margin: 40px auto;">
       <h3 style="margin-bottom: 16px; color: #1a73e8;">🔄 A carregar o Arnos v2.0...</h3>
       <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">Estamos a preparar a tua experiência. Aguarde um momento enquanto sincronizamos a rede:</p>
@@ -373,27 +371,25 @@
 
     <!-- FEED VIEW -->
     <div id="view-feed" class="hidden">
-      <!-- BANNER DE AJUDA / APOIO EMOCIONAL -->
+      <!-- BANNER DE AJUDA EMOCIONAL -->
       <div id="post-support-banner" class="help-banner hidden">
         <strong>💛 Olá, você não está sozinho.</strong><br>
         Se está a passar por um momento difícil ou precisa de falar com alguém, ligue para o <strong>188</strong> (Centro de Valorização da Vida - CVV). O atendimento é gratuito, sigiloso e disponível 24 horas por dia.
       </div>
 
-      <!-- PAINEL DE RESULTADOS DA PESQUISA COM OS 3 BOTÕES -->
+      <!-- PAINEL DE RESULTADOS DA PESQUISA -->
       <div id="search-results-section" class="card hidden" style="border: 2px dashed #1a73e8; background: rgba(26,115,232,0.02);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <h3 style="font-size: 16px; color: #1a73e8;">🔍 Resultados da Pesquisa para: "<span id="search-query-display"></span>"</h3>
           <button onclick="clearGlobalSearch()" style="padding:4px 10px; font-size:11px;">✕ Limpar Pesquisa</button>
         </div>
 
-        <!-- ABAS/BOTÕES DE FILTRAGEM DA PESQUISA -->
         <div class="tabs" style="margin-bottom:12px;">
           <button id="search-tab-posts" class="tab-btn active" onclick="switchSearchTab('posts')">📝 Publicações (<span id="count-search-posts">0</span>)</button>
           <button id="search-tab-profiles" class="tab-btn" onclick="switchSearchTab('profiles')">👤 Perfis (<span id="count-search-profiles">0</span>)</button>
           <button id="search-tab-shop" class="tab-btn" onclick="switchSearchTab('shop')">🛍️ Arnos Shop (<span id="count-search-shop">0</span>)</button>
         </div>
 
-        <!-- CONTEÚDO DAS ABAS DE PESQUISA -->
         <div id="search-content-posts"></div>
         <div id="search-content-profiles" class="hidden"></div>
         <div id="search-content-shop" class="hidden"></div>
@@ -403,7 +399,6 @@
         <h3 style="font-size: 15px; margin-bottom: 8px;">Criar uma publicação</h3>
         <textarea id="post-input" rows="3" placeholder="No que estás a pensar?" dir="ltr"></textarea>
         
-        <!-- SELETOR DE MEMES / FIGURINHAS NO POST -->
         <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
           <button class="btn-primary" type="button" onclick="toggleMemePicker('post')" style="padding:4px 10px; font-size:11px;">🎭 Adicionar Meme</button>
           <span id="post-selected-meme-tag" style="font-size:11px; color:#1a73e8; font-weight:bold;"></span>
@@ -454,7 +449,6 @@
         </div>
       </div>
 
-      <!-- FORMULÁRIO DE POST DO GRUPO -->
       <div class="card" id="group-post-box">
         <h3 style="font-size: 15px; margin-bottom: 8px;">Publicar no Grupo</h3>
         <textarea id="group-post-input" rows="3" placeholder="Escreva algo para o grupo..." dir="ltr"></textarea>
@@ -471,7 +465,7 @@
       <div id="group-posts-list"></div>
     </div>
 
-    <!-- MODS VIEW (MEUS MODS & SISTEMA DE MODDING) -->
+    <!-- MODS VIEW -->
     <div id="view-mods" class="hidden">
       <div class="card">
         <h2>🧩 Central de Mods & Personalização</h2>
@@ -497,7 +491,7 @@
       </div>
     </div>
 
-    <!-- ADMIN PANEL VIEW (EXCLUSIVO PARA "arnos" / "lorenzo") -->
+    <!-- ADMIN PANEL VIEW -->
     <div id="view-admin" class="hidden">
       <div class="card" style="border: 2px solid #d93025; background: #fff5f5;">
         <h2 style="color: #d93025; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
@@ -568,7 +562,6 @@
         <h3 id="chat-title" style="margin-bottom: 8px;"></h3>
         <div id="chat-bubbles" class="chat-container"></div>
         
-        <!-- SELETOR DE MEMES NO CHAT PRIVADO -->
         <div id="chat-meme-picker" class="meme-picker-grid hidden"></div>
 
         <div style="display: flex; gap: 8px; align-items: center;">
@@ -696,7 +689,7 @@
       <div class="modal-body">
         <div style="margin-bottom: 16px;">
           <label style="font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px;">Carregar Mod por ID</label>
-          <input type="text" id="adv-mod-id-input" placeholder="Bote o ID do mod que você quer..." dir="ltr">
+          <input type="text" id="adv-mod-id-input" placeholder="Insira o ID do mod que deseja..." dir="ltr">
           <button class="btn-primary" onclick="loadModFromAdvancedSettings()" style="width: 100%;">Carregar Mod</button>
         </div>
 
@@ -704,8 +697,11 @@
 
         <div style="text-align: center;">
           <h4 style="margin-bottom: 8px; font-size: 14px;">🛠️ Programa de Desenvolvedores Arnos</h4>
-          <p style="font-size: 12px; color: #5f6368; margin-bottom: 12px;">Solicite acesso para poder criar seus próprios mods visualmente usando códigos em blocos.</p>
-          <button class="btn-purple" onclick="requestDevAccess()" style="width: 100%;">Criar Mod / Entrar na Lista de Devs</button>
+          <p style="font-size: 12px; color: #5f6368; margin-bottom: 12px;">Solicite acesso para criar os seus próprios mods visualmente usando códigos em blocos estilo Scratch.</p>
+          
+          <!-- BOTÃO PARA SOLICITAR ENTRADA NA LISTA DE DEVS -->
+          <button class="btn-purple" onclick="requestDevAccess()" style="width: 100%;">👨‍💻 Solicitar Entrada na Lista de Devs / Criar Mod</button>
+          
           <div id="dev-status-notice" style="margin-top: 10px; font-size: 12px; color: #137333; font-weight: bold;"></div>
         </div>
       </div>
@@ -1642,18 +1638,19 @@
       document.getElementById('modal-advanced-settings').classList.add('hidden');
     };
 
+    /* SOLICITAR ENTRADA NA LISTA DE DEVS */
     window.requestDevAccess = async function() {
       if (!currentUserData) return;
       const myUser = currentUserData.username;
       
       const alreadyPending = devRequestsList.some(r => r.username.toLowerCase() === myUser.toLowerCase());
       if (alreadyPending) {
-        document.getElementById('dev-status-notice').innerText = "⚠️ Você já entrou na lista de desenvolvedores. Aguarde a aprovação do Lorenzo!";
+        document.getElementById('dev-status-notice').innerText = "⚠️ Você já enviou o pedido e está na lista de desenvolvedores. Aguarde a aprovação do admin!";
         return;
       }
 
       if (currentUserData.isDev) {
-        document.getElementById('dev-status-notice').innerText = "✅ Você já é um Desenvolvedor! Aceda ao separador 🧩 Mods para criar seus mods.";
+        document.getElementById('dev-status-notice').innerText = "✅ Você já é um Desenvolvedor aprovado! Aceda ao separador 🧩 Mods para criar seus mods.";
         return;
       }
 
@@ -1662,7 +1659,7 @@
           username: myUser,
           timestamp: new Date().toISOString()
         });
-        document.getElementById('dev-status-notice').innerText = "✨ Você entrou na lista de desenvolvedores com sucesso!";
+        document.getElementById('dev-status-notice').innerText = "✨ Pedido enviado com sucesso! Você está na lista de desenvolvedores pendentes.";
       } catch(e) { alert("Erro ao solicitar acesso de dev."); }
     };
 
@@ -1845,7 +1842,7 @@
         const myMods = modsList.filter(m => m.author.toLowerCase() === currentUserData.username.toLowerCase());
 
         if (myMods.length === 0) {
-          createdContainer.innerHTML = `<p style="color:#70757a; font-size:13px;">Você ainda não criou nenhum mod.</p>`;
+          createdContainer.innerHTML = `<p style="color:#70757a; font-size:13px;">Você ainda não criou nenhum mod. Clique no botão acima para criar!</p>`;
         } else {
           myMods.forEach(m => {
             const div = document.createElement('div');
