@@ -271,12 +271,13 @@
     .calendar-day { border: 1px solid #dadce0; border-radius: 6px; padding: 6px 2px; font-size: 11px; background-color: #ffffff; }
     .calendar-day.active { background-color: #e6f4ea; border-color: #34a853; font-weight: bold; }
 
-    /* DROPDOWN MENU DE GRUPOS NA LOGO */
-    .logo-dropdown {
+    /* DROPDOWN MENU DE GRUPOS NA LOGO E DE BOTÕES EXTRAS DO MOD */
+    .logo-dropdown, .mod-buttons-dropdown {
       position: absolute; top: 50px; left: 16px; background: #ffffff; border: 1px solid #dadce0;
       border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); width: 240px; z-index: 1000; padding: 8px;
     }
-    body.theme-night .logo-dropdown { background-color: #121c30; border-color: #1e2d4a; }
+    .mod-buttons-dropdown { left: auto; right: 16px; width: 200px; }
+    body.theme-night .logo-dropdown, body.theme-night .mod-buttons-dropdown { background-color: #121c30; border-color: #1e2d4a; }
     .logo-dropdown-item { padding: 8px 12px; font-size: 13px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 8px; }
     .logo-dropdown-item:hover { background: rgba(26,115,232,0.1); color: #1a73e8; }
 
@@ -342,6 +343,9 @@
     </div>
 
     <nav>
+      <!-- CONTAINER ONDE OS BOTÕES CRIADOS PELO MOD APARECEM NO MÁXIMO DE 3 + BOTÃO "VER MAIS" -->
+      <div id="mod-custom-header-buttons-container" style="display:inline-flex; align-items:center; gap:8px; position:relative;"></div>
+
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('groups')">👥 Grupos</button>
       <button onclick="navigateTo('marketplace')">🛍️ Arnos Shop</button>
@@ -1120,9 +1124,12 @@
 
       const logo = document.getElementById('logo-text-display');
       if (logo) logo.style.color = '';
+
+      const customBtnsContainer = document.getElementById('mod-custom-header-buttons-container');
+      if (customBtnsContainer) customBtnsContainer.innerHTML = '';
     }
 
-    /* APLICAR MOD ATIVO COMPLETO */
+    /* APLICAR MOD ATIVO COMPLETO E RENDERIZAR BOTÕES NO HEADER */
     function applyActiveMod() {
       resetModEffects();
 
@@ -1175,6 +1182,9 @@
         document.querySelectorAll('input, textarea, select').forEach(i => i.style.backgroundColor = mod.inputBg);
       }
 
+      // RENDERIZAR BOTÕES CRIADOS NO MOD (MÁXIMO 3 + BOTÃO "VER MAIS")
+      renderModCustomButtonsInHeader(mod);
+
       if (mod.blinkColors && mod.blinkColors.length >= 2) {
         let step = 0;
         const sec = (mod.intervalSeconds || 2) * 1000;
@@ -1193,6 +1203,84 @@
         }, intervalSec);
       } else if (mod.bgColor) {
         document.body.style.backgroundColor = mod.bgColor;
+      }
+    }
+
+    function renderModCustomButtonsInHeader(mod) {
+      const container = document.getElementById('mod-custom-header-buttons-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const buttons = mod.customButtons || [];
+      if (buttons.length === 0) return;
+
+      const maxVisible = 3;
+      const visibleButtons = buttons.slice(0, maxVisible);
+      const remainingButtons = buttons.slice(maxVisible);
+
+      visibleButtons.forEach(btnInfo => {
+        const btn = document.createElement('button');
+        btn.id = btnInfo.id;
+        btn.innerText = btnInfo.text;
+        btn.className = 'btn-primary';
+        btn.style.cssText = 'padding: 6px 12px; font-size: 12px;';
+        
+        btn.onclick = () => handleModButtonClick(mod, btnInfo.id);
+        container.appendChild(btn);
+      });
+
+      if (remainingButtons.length > 0) {
+        const moreBtn = document.createElement('button');
+        moreBtn.id = 'btn-mod-more-dropdown';
+        moreBtn.innerText = 'Ver mais...';
+        moreBtn.className = 'btn-success';
+        moreBtn.style.cssText = 'padding: 6px 12px; font-size: 12px;';
+        moreBtn.onclick = (e) => toggleModMoreDropdown(e, remainingButtons, mod);
+        container.appendChild(moreBtn);
+      }
+    }
+
+    function toggleModMoreDropdown(e, remainingButtons, mod) {
+      e.stopPropagation();
+      let existing = document.getElementById('mod-extra-dropdown-menu');
+      if (existing) {
+        existing.remove();
+        return;
+      }
+
+      const dropdown = document.createElement('div');
+      dropdown.id = 'mod-extra-dropdown-menu';
+      dropdown.className = 'mod-buttons-dropdown';
+      
+      let html = `<div style="font-size: 11px; font-weight: bold; color: #70757a; padding: 4px 8px;">OUTROS BOTÕES</div>`;
+      remainingButtons.forEach(btnInfo => {
+        html += `<div class="logo-dropdown-item" onclick="triggerExtraModBtn('${mod.code}', '${btnInfo.id}')">🔘 ${escapeHtml(btnInfo.text)}</div>`;
+      });
+      dropdown.innerHTML = html;
+
+      const container = document.getElementById('mod-custom-header-buttons-container');
+      container.appendChild(dropdown);
+    }
+
+    window.triggerExtraModBtn = function(modCode, btnId) {
+      const mod = modsList.find(m => m.code.toLowerCase() === modCode.toLowerCase());
+      if (mod) handleModButtonClick(mod, btnId);
+      const dropdown = document.getElementById('mod-extra-dropdown-menu');
+      if (dropdown) dropdown.remove();
+    };
+
+    function handleModButtonClick(mod, buttonId) {
+      const actions = mod.buttonActions || [];
+      const matchedAction = actions.find(a => a.buttonId === buttonId);
+      if (!matchedAction) {
+        alert(`Botão "${buttonId}" acionado! (Nenhuma ação configurada para este botão).`);
+        return;
+      }
+
+      if (matchedAction.actionType === 'toast') {
+        alert(matchedAction.value || 'Aviso do Mod!');
+      } else if (matchedAction.actionType === 'url') {
+        if (matchedAction.value) window.open(matchedAction.value, '_blank');
       }
     }
 
@@ -1318,6 +1406,9 @@
     window.addEventListener('click', (e) => {
       const dropdown = document.getElementById('logo-groups-dropdown');
       if (dropdown) dropdown.classList.add('hidden');
+
+      const extraDropdown = document.getElementById('mod-extra-dropdown-menu');
+      if (extraDropdown) extraDropdown.remove();
 
       if (e.target.tagName === 'BUTTON') {
         if (modClickSoundEnabled) playTuruSound();
