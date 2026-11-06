@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Edição de Mods em Blocos</title>
+  <title>Arnos v2.0 - Edição de Mods em Blocos (20 Blocos + Criador de Animações)</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -284,17 +284,24 @@
     .scratch-block-item {
       background: #ffab19; color: white; padding: 10px 14px; border-radius: 8px;
       margin-bottom: 8px; font-weight: bold; font-size: 13px; display: flex; align-items: center;
-      justify-content: space-between; gap: 8px; box-shadow: 0 4px 0 #c88000; border: 1px solid #c88000;
+      justify-content: space-between; gap: 8px; box-shadow: 0 4px 0 #c88000; border: 1px solid #c88000; flex-wrap: wrap;
     }
     .scratch-block-item.color-block { background: #4a90e2; box-shadow: 0 4px 0 #357abd; border-color: #357abd; }
     .scratch-block-item.visual-block { background: #9966ff; box-shadow: 0 4px 0 #7744cc; border-color: #7744cc; }
     .scratch-block-item.audio-block { background: #0f9d58; box-shadow: 0 4px 0 #0b7842; border-color: #0b7842; }
+    .scratch-block-item.anim-block { background: #e91e63; box-shadow: 0 4px 0 #c2185b; border-color: #c2185b; }
 
     .scratch-block-item input[type="color"] {
       width: 36px !important; height: 28px !important; padding: 0 !important; cursor: pointer; margin-bottom: 0 !important;
     }
     .scratch-block-item input[type="number"], .scratch-block-item input[type="text"], .scratch-block-item select {
       width: auto !important; padding: 4px 6px !important; margin-bottom: 0 !important; font-weight: bold; text-align: center; font-size: 12px;
+    }
+
+    /* ESTÚDIO DE ANIMAÇÃO / QUADROS */
+    .frame-box {
+      background: #ffffff; color: #222; border: 1px dashed #1a73e8; border-radius: 8px;
+      padding: 10px; margin-bottom: 8px; font-size: 12px; position: relative;
     }
 
     /* MODAL */
@@ -738,11 +745,11 @@
     </div>
   </div>
 
-  <!-- MODAL: CRIAR / EDITAR MOD EM BLOCOS -->
+  <!-- MODAL: CRIAR / EDITAR MOD EM BLOCOS (20 BLOCOS) -->
   <div id="modal-create-mod" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="mod-modal-title">🧩 Criador de Mod Avançado (Blocos Scratch v2.0)</h3>
+        <h3 id="mod-modal-title">🧩 Criador de Mod Avançado (20 Blocos Scratch v2.0)</h3>
         <button onclick="closeCreateModModal()">✕</button>
       </div>
       <div class="modal-body">
@@ -752,29 +759,77 @@
         <input type="text" id="mod-create-code" placeholder="Ex: mod_supremo_arnos" dir="ltr">
 
         <label style="font-size: 12px; font-weight: bold;">Nome do Mod *</label>
-        <input type="text" id="mod-create-name" placeholder="Ex: Efeito Neve & Neon Avançado" dir="ltr">
+        <input type="text" id="mod-create-name" placeholder="Ex: Efeito Neve & Animação Personalizada" dir="ltr">
 
-        <h4 style="margin: 12px 0 6px 0; font-size: 13px; color: #1a73e8;">🧩 Adicionar Blocos Scratch ao Mod:</h4>
+        <h4 style="margin: 12px 0 6px 0; font-size: 13px; color: #1a73e8;">🧩 Adicionar Blocos Scratch ao Mod (20 Blocos):</h4>
         
         <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+          <!-- CONTROLE E ANIMAÇÃO -->
           <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('time')">+ Tempo (Cada <> seg)</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('color')">+ Mudar Cor Fundo</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('textColor')">+ Cor do Texto (1)</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('neonGlow')">+ Brilho Neon (2)</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('bgImage')">+ Imagem Fundo (3)</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('btnStyle')">+ Formato Botões (4)</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('cardOpacity')">+ Transparência (5)</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('blinkColors')">+ Piscar Alternado (6)</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('fontSize')">+ Tamanho Fonte (7)</button>
-          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('rotateAvatar')">+ Girar Avatares (8)</button>
-          <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('clickSound')">+ Som ao Clicar (9)</button>
-          <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('snowEffect')">+ Neve/Partículas (10)</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('btnAnimCustom')">🎬 (1) Animação Botão Toque</button>
+
+          <!-- DESIGN E CORES -->
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('color')">+ Cor Fundo Fixo</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('textColor')">🔤 (2) Cor do Texto</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('neonGlow')">✨ (3) Brilho Neon Cards</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('bgImage')">🖼️ (4) Imagem Fundo (URL)</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('btnStyle')">🔘 (5) Formato dos Botões</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('cardOpacity')">👻 (6) Transparência Cards</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('blinkColors')">🚨 (7) Piscar Cores</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('fontSize')">🔠 (8) Tamanho da Fonte</button>
+
+          <!-- AVATARES E BORDA -->
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('rotateAvatar')">🔄 (9) Girar Fotos Perfil</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('cardBorderColor')">🖼️ (10) Cor Borda Cards</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('cardRadius')">📐 (11) Arredondar Cards</button>
+
+          <!-- SOM E PARTÍCULAS -->
+          <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('clickSound')">🔊 (12) Som ao Clicar</button>
+          <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('snowEffect')">❄️ (13) Neve / Partículas</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('headerBg')">🔝 (14) Cor Fundo Header</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('logoColor')">🏷️ (15) Cor do Logo Arnos</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('inputBg')">✏️ (16) Cor dos Caixas Input</button>
+
+          <!-- EFEITOS ADICIONAIS -->
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('blurEffect')">🌫️ (17) Blur nos Modais</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('badgeGlow')">🌟 (18) Brilho nas Badges</button>
+          <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('scrollBarColor')">📜 (19) Cor da Barra Scroll</button>
         </div>
 
         <!-- CONTAINER DOS BLOCOS -->
         <div id="scratch-blocks-container" style="background:#f8f9fa; border:1px solid #dadce0; border-radius:8px; padding:10px; min-height:100px; margin-bottom:12px;"></div>
 
         <button onclick="saveCreatedMod()" class="btn-success" style="width: 100%;">Salvar & Publicar Mod Arnos</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ESTÚDIO CRIADOR DE ANIMAÇÃO POR QUADROS (FRAMES) -->
+  <div id="modal-animation-studio" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🎬 Estúdio de Animação de Botão (Quadros/Frames)</h3>
+        <button onclick="closeAnimationStudioModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; background:#f1f3f4; padding:16px; border-radius:8px; margin-bottom:16px;">
+          <span style="font-size:12px; color:#5f6368; display:block; margin-bottom:8px;">BOTÃO DE EXEMPLO (CLIQUE PARA TESTAR):</span>
+          <button id="anim-test-preview-btn" onclick="triggerPreviewAnimation()" style="font-size:14px; padding:10px 24px;">
+            ✨ Botão Exemplo
+          </button>
+        </div>
+
+        <h4 style="font-size:13px; color:#1a73e8; margin-bottom:8px;">Quadros da Animação:</h4>
+        <div id="animation-frames-container"></div>
+
+        <button type="button" class="btn-purple" onclick="addAnimationFrame()" style="width:100%; margin-bottom:12px;">+ Criar Próximo Quadro (Frame)</button>
+
+        <hr style="margin:12px 0; border:none; border-top:1px solid #eee;">
+
+        <label style="font-size:12px; font-weight:bold;">Nome da Animação *</label>
+        <input type="text" id="anim-studio-name" placeholder="Ex: Pop Aumentar com Giro" dir="ltr">
+
+        <button class="btn-success" onclick="saveCustomAnimationFromStudio()" style="width:100%;">Salvar Animação</button>
       </div>
     </div>
   </div>
@@ -986,10 +1041,14 @@
     let activeMsgSubTab = 'profile';
     let currentSearchTab = 'posts';
 
-    // VARIÁVEIS DE CONTROLO DE MODS AVANÇADOS
+    // CONTROLE DE ANIMAÇÃO E MODS
     let modAnimationTimer = null;
     let modSnowInterval = null;
     let modClickSoundEnabled = false;
+    let activeModAnimationData = null;
+
+    // HISTÓRICO DE ANIMAÇÕES LOCAIS DE BOTÃO
+    let animationStudioFrames = [];
 
     async function uploadToCloudinaryGrupoApi(file) {
       const formData = new FormData();
@@ -1011,7 +1070,7 @@
       });
     }
 
-    /* LIMPAR EFEITOS DE MODS */
+    /* RESET DE EFEITOS DE MODS */
     function resetModEffects() {
       if (modAnimationTimer) { clearInterval(modAnimationTimer); modAnimationTimer = null; }
       if (modSnowInterval) { clearInterval(modSnowInterval); modSnowInterval = null; }
@@ -1026,62 +1085,72 @@
       if (snowCanvas) snowCanvas.classList.add('hidden');
       
       modClickSoundEnabled = false;
+      activeModAnimationData = null;
 
-      // Resetar CSS de Cards, Botões e Avatares
-      document.querySelectorAll('.card').forEach(c => { c.style.opacity = ''; });
+      document.querySelectorAll('.card').forEach(c => { c.style.opacity = ''; c.style.borderColor = ''; c.style.borderRadius = ''; });
       document.querySelectorAll('button').forEach(b => { b.style.borderRadius = ''; });
       document.querySelectorAll('.user-avatar').forEach(a => { a.style.transform = ''; });
+      
+      const header = document.getElementById('app-header');
+      if (header) header.style.backgroundColor = '';
+
+      const logo = document.getElementById('logo-text-display');
+      if (logo) logo.style.color = '';
     }
 
-    /* APLICAR MOD ATIVO E EXECUTAR BLOCOS */
+    /* APLICAR MOD ATIVO COMPLETO */
     function applyActiveMod() {
       resetModEffects();
 
-      if (!currentUserData || !currentUserData.activeModCode) {
-        return;
-      }
+      if (!currentUserData || !currentUserData.activeModCode) return;
       const mod = modsList.find(m => m.code.toLowerCase() === currentUserData.activeModCode.toLowerCase());
       if (!mod) return;
 
-      // 1. Cor do Texto
       if (mod.textColor) document.body.style.color = mod.textColor;
-
-      // 2. Brilho Neon
       if (mod.neonGlow) document.body.classList.add('mod-neon-glow');
 
-      // 3. Imagem de Fundo
       if (mod.bgImage) {
         document.body.style.backgroundImage = `url('${mod.bgImage}')`;
         document.body.style.backgroundSize = 'cover';
         document.body.style.backgroundAttachment = 'fixed';
       }
 
-      // 4. Formato dos Botões
       if (mod.btnStyle === 'squared') {
         document.querySelectorAll('button').forEach(b => b.style.borderRadius = '4px');
       }
 
-      // 5. Transparência dos Cards
       if (mod.cardOpacity !== undefined && mod.cardOpacity !== null) {
         const op = parseFloat(mod.cardOpacity) / 100;
         document.querySelectorAll('.card').forEach(c => c.style.opacity = op);
       }
 
-      // 7. Tamanho da Fonte
       if (mod.fontSize) document.body.style.fontSize = mod.fontSize + 'px';
-
-      // 8. Rotação dos Avatares
       if (mod.rotateAvatarDeg) {
         document.querySelectorAll('.user-avatar').forEach(a => a.style.transform = `rotate(${mod.rotateAvatarDeg}deg)`);
       }
 
-      // 9. Som ao Clicar
       if (mod.clickSound) modClickSoundEnabled = true;
-
-      // 10. Neve / Partículas
       if (mod.snowEffect) startSnowEffect();
+      if (mod.customAnimation) activeModAnimationData = mod.customAnimation;
 
-      // 6. Piscar Cores Alternadas vs Sequência Simples
+      if (mod.cardBorderColor) {
+        document.querySelectorAll('.card').forEach(c => c.style.borderColor = mod.cardBorderColor);
+      }
+      if (mod.cardRadius) {
+        document.querySelectorAll('.card').forEach(c => c.style.borderRadius = mod.cardRadius + 'px');
+      }
+      if (mod.headerBg) {
+        const header = document.getElementById('app-header');
+        if (header) header.style.backgroundColor = mod.headerBg;
+      }
+      if (mod.logoColor) {
+        const logo = document.getElementById('logo-text-display');
+        if (logo) logo.style.color = mod.logoColor;
+      }
+      if (mod.inputBg) {
+        document.querySelectorAll('input, textarea, select').forEach(i => i.style.backgroundColor = mod.inputBg);
+      }
+
       if (mod.blinkColors && mod.blinkColors.length >= 2) {
         let step = 0;
         const sec = (mod.intervalSeconds || 2) * 1000;
@@ -1094,7 +1163,6 @@
         let stepIndex = 0;
         const intervalSec = (mod.intervalSeconds || 2) * 1000;
         document.body.style.backgroundColor = mod.colorsSequence[0];
-
         modAnimationTimer = setInterval(() => {
           stepIndex = (stepIndex + 1) % mod.colorsSequence.length;
           document.body.style.backgroundColor = mod.colorsSequence[stepIndex];
@@ -1104,7 +1172,6 @@
       }
     }
 
-    /* BLOCO 10: EFEITO NEVE CANVAS */
     function startSnowEffect() {
       const canvas = document.getElementById('mod-snow-canvas');
       if (!canvas) return;
@@ -1116,12 +1183,7 @@
       const numFlakes = 40;
       const flakes = [];
       for (let i = 0; i < numFlakes; i++) {
-        flakes.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          r: Math.random() * 3 + 1,
-          d: Math.random() * numFlakes
-        });
+        flakes.push({ x: Math.random() * width, y: Math.random() * height, r: Math.random() * 3 + 1, d: Math.random() * numFlakes });
       }
 
       function drawFlakes() {
@@ -1177,6 +1239,27 @@
       }
     }
 
+    /* EXECUTAR ANIMAÇÃO CUSTOMIZADA EM QUADROS AO CLICAR */
+    function runButtonFramesAnimation(btnElement, framesData) {
+      if (!btnElement || !framesData || framesData.length === 0) return;
+      let currentFrame = 0;
+      const frameDuration = 100; // 100ms por quadro
+
+      const interval = setInterval(() => {
+        if (currentFrame >= framesData.length) {
+          clearInterval(interval);
+          btnElement.style.transform = '';
+          btnElement.style.opacity = '';
+          return;
+        }
+
+        const frame = framesData[currentFrame];
+        btnElement.style.transform = `scale(${frame.scale || 1}) rotate(${frame.rotate || 0}deg)`;
+        btnElement.style.opacity = frame.opacity !== undefined ? frame.opacity : 1;
+        currentFrame++;
+      }, frameDuration);
+    }
+
     window.toggleDynamicThemeSetting = async function(isChecked) {
       if (!currentUserData) return;
       try {
@@ -1212,9 +1295,11 @@
       const dropdown = document.getElementById('logo-groups-dropdown');
       if (dropdown) dropdown.classList.add('hidden');
 
-      // BLOCO 9: SOM AO CLICAR EM BOTÕES
-      if (modClickSoundEnabled && e.target.tagName === 'BUTTON') {
-        playTuruSound();
+      if (e.target.tagName === 'BUTTON') {
+        if (modClickSoundEnabled) playTuruSound();
+        if (activeModAnimationData && activeModAnimationData.frames) {
+          runButtonFramesAnimation(e.target, activeModAnimationData.frames);
+        }
       }
     });
 
@@ -1594,7 +1679,8 @@
           useDynamicTheme: false,
           isDev: false,
           installedMods: [],
-          activeModCode: null
+          activeModCode: null,
+          savedAnimations: []
         };
         await setDoc(publicUserDoc(name), newUserData);
         currentUserData = newUserData;
@@ -1619,6 +1705,7 @@
         if (!currentUserData.following) currentUserData.following = [];
         if (!currentUserData.blockedUsers) currentUserData.blockedUsers = [];
         if (!currentUserData.installedMods) currentUserData.installedMods = [];
+        if (!currentUserData.savedAnimations) currentUserData.savedAnimations = [];
         window.currentUserData = currentUserData;
         localStorage.setItem('arnos_logged_username', currentUserData.username);
         showMainInterface();
@@ -2079,7 +2166,7 @@
       } catch(e) {}
     };
 
-    /* SISTEMA COMPLETO DOS 10 BLOCOS SCRATCH NO CRIADOR DE MODS */
+    /* SISTEMA DOS 20 BLOCOS SCRATCH NO CRIADOR DE MODS */
     window.addScratchBlock = function(type, initialData = {}) {
       const container = document.getElementById('scratch-blocks-container');
       const id = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
@@ -2092,9 +2179,28 @@
         div.setAttribute('data-type', 'time');
         const val = initialData.intervalSeconds !== undefined ? initialData.intervalSeconds : 2;
         div.innerHTML = `
-          <span>⏳ repita Cada <input type="number" class="block-time-val" value="${val}" min="1" max="60"> Segundos então...</span>
+          <span>⏳ Repita Cada <input type="number" class="block-time-val" value="${val}" min="1" max="60"> Segundos então...</span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
+      } else if (type === 'btnAnimCustom') {
+        div.className = 'scratch-block-item anim-block';
+        div.setAttribute('data-type', 'btnAnimCustom');
+        div.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:6px; width:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span>🎬 (1) Animação ao Apertar Botões (Em Quadros):</span>
+              <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+            </div>
+            
+            <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px; width:100%;" onclick="openAnimationStudioModal('${id}')">🎨 Criar Animação em Quadros</button>
+            
+            <span style="font-size:11px; margin-top:4px;">📜 Histórico de Animações Guardadas:</span>
+            <select class="block-animcustom-select" style="width:100% !important; text-align:left;">
+              <option value="">-- Selecione uma animação --</option>
+            </select>
+          </div>
+        `;
+        setTimeout(() => updateBlockAnimationHistoryDropdown(div, initialData.selectedAnimId), 0);
       } else if (type === 'color') {
         div.className = 'scratch-block-item color-block';
         div.setAttribute('data-type', 'color');
@@ -2108,7 +2214,7 @@
         div.setAttribute('data-type', 'textColor');
         const colorVal = initialData.textColor || '#1a73e8';
         div.innerHTML = `
-          <span>🔤 (1) Mudar Cor do Texto para: <input type="color" class="block-textcolor-val" value="${colorVal}"></span>
+          <span>🔤 (2) Cor do Texto: <input type="color" class="block-textcolor-val" value="${colorVal}"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'neonGlow') {
@@ -2116,7 +2222,7 @@
         div.setAttribute('data-type', 'neonGlow');
         const isNeon = initialData.neonGlow !== undefined ? String(initialData.neonGlow) : 'true';
         div.innerHTML = `
-          <span>✨ (2) Aplicar Brilho Neon nos Cards: 
+          <span>✨ (3) Brilho Neon nos Cards: 
             <select class="block-neon-val"><option value="true" ${isNeon === 'true' ? 'selected' : ''}>Ligado</option><option value="false" ${isNeon === 'false' ? 'selected' : ''}>Desligado</option></select>
           </span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
@@ -2126,7 +2232,7 @@
         div.setAttribute('data-type', 'bgImage');
         const imgUrl = initialData.bgImage || '';
         div.innerHTML = `
-          <span>🖼️ (3) Imagem de Fundo (URL): <input type="text" class="block-bgimage-val" value="${escapeHtml(imgUrl)}" placeholder="https://..." style="width:160px !important;"></span>
+          <span>🖼️ (4) Imagem Fundo (URL): <input type="text" class="block-bgimage-val" value="${escapeHtml(imgUrl)}" placeholder="https://..." style="width:160px !important;"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'btnStyle') {
@@ -2134,7 +2240,7 @@
         div.setAttribute('data-type', 'btnStyle');
         const btnSt = initialData.btnStyle || 'rounded';
         div.innerHTML = `
-          <span>🔘 (4) Formato dos Botões: 
+          <span>🔘 (5) Formato dos Botões: 
             <select class="block-btnstyle-val"><option value="rounded" ${btnSt === 'rounded' ? 'selected' : ''}>Redondo (Liquid)</option><option value="squared" ${btnSt === 'squared' ? 'selected' : ''}>Quadrado Flutuante</option></select>
           </span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
@@ -2144,7 +2250,7 @@
         div.setAttribute('data-type', 'cardOpacity');
         const opVal = initialData.cardOpacity !== undefined ? initialData.cardOpacity : 90;
         div.innerHTML = `
-          <span>👻 (5) Transparência dos Cards: <input type="number" class="block-cardopacity-val" value="${opVal}" min="10" max="100">%</span>
+          <span>👻 (6) Transparência dos Cards: <input type="number" class="block-cardopacity-val" value="${opVal}" min="10" max="100">%</span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'blinkColors') {
@@ -2153,7 +2259,7 @@
         const c1 = (initialData.blinkColors && initialData.blinkColors[0]) || '#ff0000';
         const c2 = (initialData.blinkColors && initialData.blinkColors[1]) || '#0000ff';
         div.innerHTML = `
-          <span>🚨 (6) Piscar Cores Alternadas: <input type="color" class="block-blink1-val" value="${c1}"> e <input type="color" class="block-blink2-val" value="${c2}"></span>
+          <span>🚨 (7) Piscar Cores Alternadas: <input type="color" class="block-blink1-val" value="${c1}"> e <input type="color" class="block-blink2-val" value="${c2}"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'fontSize') {
@@ -2161,7 +2267,7 @@
         div.setAttribute('data-type', 'fontSize');
         const fsVal = initialData.fontSize || 15;
         div.innerHTML = `
-          <span>🔠 (7) Tamanho da Fonte: <input type="number" class="block-fontsize-val" value="${fsVal}" min="10" max="24"> px</span>
+          <span>🔠 (8) Tamanho da Fonte: <input type="number" class="block-fontsize-val" value="${fsVal}" min="10" max="24"> px</span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'rotateAvatar') {
@@ -2169,7 +2275,23 @@
         div.setAttribute('data-type', 'rotateAvatar');
         const rotVal = initialData.rotateAvatarDeg || 15;
         div.innerHTML = `
-          <span>🔄 (8) Girar Fotos dos Perfis: <input type="number" class="block-rotateavatar-val" value="${rotVal}" min="-360" max="360"> Graus</span>
+          <span>🔄 (9) Girar Fotos dos Perfis: <input type="number" class="block-rotateavatar-val" value="${rotVal}" min="-360" max="360"> Graus</span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'cardBorderColor') {
+        div.className = 'scratch-block-item visual-block';
+        div.setAttribute('data-type', 'cardBorderColor');
+        const colorVal = initialData.cardBorderColor || '#1a73e8';
+        div.innerHTML = `
+          <span>🖼️ (10) Cor da Borda dos Cards: <input type="color" class="block-cardborder-val" value="${colorVal}"></span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'cardRadius') {
+        div.className = 'scratch-block-item visual-block';
+        div.setAttribute('data-type', 'cardRadius');
+        const radVal = initialData.cardRadius || 12;
+        div.innerHTML = `
+          <span>📐 (11) Arredondar Cards: <input type="number" class="block-cardradius-val" value="${radVal}" min="0" max="50"> px</span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'clickSound') {
@@ -2177,7 +2299,7 @@
         div.setAttribute('data-type', 'clickSound');
         const isSnd = initialData.clickSound !== undefined ? String(initialData.clickSound) : 'true';
         div.innerHTML = `
-          <span>🔊 (9) Som ao Clicar em Qualquer Botão: 
+          <span>🔊 (12) Som ao Clicar em Botões: 
             <select class="block-clicksound-val"><option value="true" ${isSnd === 'true' ? 'selected' : ''}>Ativado</option><option value="false" ${isSnd === 'false' ? 'selected' : ''}>Desativado</option></select>
           </span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
@@ -2187,14 +2309,184 @@
         div.setAttribute('data-type', 'snowEffect');
         const isSnow = initialData.snowEffect !== undefined ? String(initialData.snowEffect) : 'true';
         div.innerHTML = `
-          <span>❄️ (10) Efeito Neve / Partículas no Fundo: 
+          <span>❄️ (13) Neve / Partículas no Fundo: 
             <select class="block-snow-val"><option value="true" ${isSnow === 'true' ? 'selected' : ''}>Ligado</option><option value="false" ${isSnow === 'false' ? 'selected' : ''}>Desligado</option></select>
           </span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'headerBg') {
+        div.className = 'scratch-block-item visual-block';
+        div.setAttribute('data-type', 'headerBg');
+        const cVal = initialData.headerBg || '#ffffff';
+        div.innerHTML = `
+          <span>🔝 (14) Cor Fundo do Header: <input type="color" class="block-headerbg-val" value="${cVal}"></span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'logoColor') {
+        div.className = 'scratch-block-item visual-block';
+        div.setAttribute('data-type', 'logoColor');
+        const cVal = initialData.logoColor || '#1a73e8';
+        div.innerHTML = `
+          <span>🏷️ (15) Cor do Logo Arnos: <input type="color" class="block-logocolor-val" value="${cVal}"></span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'inputBg') {
+        div.className = 'scratch-block-item visual-block';
+        div.setAttribute('data-type', 'inputBg');
+        const cVal = initialData.inputBg || '#ffffff';
+        div.innerHTML = `
+          <span>✏️ (16) Cor dos Caixas Input: <input type="color" class="block-inputbg-val" value="${cVal}"></span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'blurEffect') {
+        div.className = 'scratch-block-item visual-block';
+        div.setAttribute('data-type', 'blurEffect');
+        div.innerHTML = `
+          <span>🌫️ (17) Aplicar Fundo Desfocado nos Modais</span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'badgeGlow') {
+        div.className = 'scratch-block-item visual-block';
+        div.setAttribute('data-type', 'badgeGlow');
+        div.innerHTML = `
+          <span>🌟 (18) Brilho nas Badges (Dono / DEV / Bot)</span>
+          <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
+        `;
+      } else if (type === 'scrollBarColor') {
+        div.className = 'scratch-block-item visual-block';
+        div.setAttribute('data-type', 'scrollBarColor');
+        const cVal = initialData.scrollBarColor || '#1a73e8';
+        div.innerHTML = `
+          <span>📜 (19) Cor da Barra de Rolagem: <input type="color" class="block-scrollbar-val" value="${cVal}"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       }
 
       container.appendChild(div);
+    };
+
+    function updateBlockAnimationHistoryDropdown(blockElement, selectedId = null) {
+      const select = blockElement.querySelector('.block-animcustom-select');
+      if (!select) return;
+      select.innerHTML = '<option value="">-- Selecione uma animação --</option>';
+
+      const savedList = currentUserData ? (currentUserData.savedAnimations || []) : [];
+      savedList.forEach(anim => {
+        const opt = document.createElement('option');
+        opt.value = anim.id;
+        opt.innerText = `${anim.name} (${anim.frames.length} quadros)`;
+        if (selectedId && anim.id === selectedId) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    /* CRIADOR DE ANIMAÇÃO POR QUADROS (FRAMES STUDIO) */
+    let currentEditingBlockIdForAnim = null;
+
+    window.openAnimationStudioModal = function(blockId) {
+      currentEditingBlockIdForAnim = blockId;
+      animationStudioFrames = [];
+      document.getElementById('anim-studio-name').value = '';
+      
+      // Quadro 1 Inicial Padrão
+      animationStudioFrames.push({ frameNum: 1, scale: 1.0, rotate: 0, opacity: 1.0 });
+      renderAnimationStudioFrames();
+      document.getElementById('modal-animation-studio').classList.remove('hidden');
+    };
+
+    window.closeAnimationStudioModal = function() {
+      document.getElementById('modal-animation-studio').classList.add('hidden');
+    };
+
+    window.addAnimationFrame = function() {
+      const nextNum = animationStudioFrames.length + 1;
+      const prevFrame = animationStudioFrames[animationStudioFrames.length - 1] || { scale: 1.0, rotate: 0, opacity: 1.0 };
+      // Incrementa size por padrão para facilitar a criação
+      animationStudioFrames.push({
+        frameNum: nextNum,
+        scale: parseFloat((prevFrame.scale + 0.15).toFixed(2)),
+        rotate: prevFrame.rotate,
+        opacity: prevFrame.opacity
+      });
+      renderAnimationStudioFrames();
+      triggerPreviewAnimation();
+    };
+
+    window.removeAnimationFrame = function(index) {
+      if (animationStudioFrames.length <= 1) return alert("A animação precisa de pelo menos 1 quadro!");
+      animationStudioFrames.splice(index, 1);
+      // Re-indexar números de quadros
+      animationStudioFrames.forEach((f, i) => f.frameNum = i + 1);
+      renderAnimationStudioFrames();
+    };
+
+    function renderAnimationStudioFrames() {
+      const container = document.getElementById('animation-frames-container');
+      container.innerHTML = '';
+
+      animationStudioFrames.forEach((f, idx) => {
+        const div = document.createElement('div');
+        div.className = 'frame-box';
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <strong>🖼️ Quadro (Frame) #${f.frameNum} ${idx === 0 ? '<span style="color:#188038;">[Inicial]</span>' : ''}</strong>
+            ${idx > 0 ? `<button type="button" class="btn-danger" style="padding:1px 6px; font-size:10px;" onclick="removeAnimationFrame(${idx})">Remover Quadro</button>` : ''}
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px;">
+            <div>
+              <label style="font-size:10px; font-weight:bold;">Tamanho / Size (Scale):</label>
+              <input type="number" step="0.05" value="${f.scale}" min="0.1" max="3.0" onchange="updateFrameValue(${idx}, 'scale', this.value)" dir="ltr">
+            </div>
+            <div>
+              <label style="font-size:10px; font-weight:bold;">Rotação (Graus):</label>
+              <input type="number" value="${f.rotate}" min="-360" max="360" onchange="updateFrameValue(${idx}, 'rotate', this.value)" dir="ltr">
+            </div>
+            <div>
+              <label style="font-size:10px; font-weight:bold;">Opacidade (0.1 - 1.0):</label>
+              <input type="number" step="0.1" value="${f.opacity}" min="0.1" max="1.0" onchange="updateFrameValue(${idx}, 'opacity', this.value)" dir="ltr">
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    window.updateFrameValue = function(index, prop, val) {
+      if (!animationStudioFrames[index]) return;
+      animationStudioFrames[index][prop] = parseFloat(val);
+      triggerPreviewAnimation();
+    };
+
+    window.triggerPreviewAnimation = function() {
+      const btn = document.getElementById('anim-test-preview-btn');
+      runButtonFramesAnimation(btn, animationStudioFrames);
+    };
+
+    window.saveCustomAnimationFromStudio = async function() {
+      const name = document.getElementById('anim-studio-name').value.trim();
+      if (!name) return alert("Escreva um nome para guardar esta animação!");
+      if (!currentUserData) return;
+
+      const newAnimObj = {
+        id: 'anim_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        name: name,
+        frames: [...animationStudioFrames]
+      };
+
+      let saved = currentUserData.savedAnimations ? [...currentUserData.savedAnimations] : [];
+      saved.push(newAnimObj);
+
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { savedAnimations: saved });
+        currentUserData.savedAnimations = saved;
+        alert(`Animação "${name}" salva no seu histórico!`);
+        closeAnimationStudioModal();
+
+        // Atualizar todos os dropdowns de blocos de animação abertos
+        document.querySelectorAll('#scratch-blocks-container .scratch-block-item.anim-block').forEach(b => {
+          updateBlockAnimationHistoryDropdown(b, newAnimObj.id);
+        });
+      } catch(e) { alert("Erro ao guardar animação."); }
     };
 
     window.removeScratchBlock = function(id) {
@@ -2203,7 +2495,7 @@
     };
 
     window.openCreateModModal = function() {
-      document.getElementById('mod-modal-title').innerText = "🧩 Criador de Mod Avançado (Blocos Scratch v2.0)";
+      document.getElementById('mod-modal-title').innerText = "🧩 Criador de Mod Avançado (20 Blocos Scratch v2.0)";
       document.getElementById('mod-editing-id').value = '';
       document.getElementById('mod-create-code').value = '';
       document.getElementById('mod-create-code').disabled = false;
@@ -2212,13 +2504,14 @@
       
       // Blocos demonstrativos iniciais
       addScratchBlock('time');
+      addScratchBlock('btnAnimCustom');
       addScratchBlock('color');
       addScratchBlock('neonGlow');
 
       document.getElementById('modal-create-mod').classList.remove('hidden');
     };
 
-    /* EDITAR MOD EXISTENTE (APENAS O CRIADOR/DONO DO MOD) */
+    /* EDITAR MOD EXISTENTE */
     window.openEditModModal = function(modId) {
       const mod = modsList.find(m => m.id === modId);
       if (!mod || !currentUserData) return;
@@ -2227,15 +2520,14 @@
       document.getElementById('mod-modal-title').innerText = `✏️ Editar Mod: ${mod.name}`;
       document.getElementById('mod-editing-id').value = mod.id;
       document.getElementById('mod-create-code').value = mod.code;
-      document.getElementById('mod-create-code').disabled = true; // Código/ID não muda
+      document.getElementById('mod-create-code').disabled = true;
       document.getElementById('mod-create-name').value = mod.name;
 
       const container = document.getElementById('scratch-blocks-container');
       container.innerHTML = '';
 
-      // Reconstruir os blocos salvos do mod
       if (mod.intervalSeconds) addScratchBlock('time', { intervalSeconds: mod.intervalSeconds });
-      
+      if (mod.customAnimation) addScratchBlock('btnAnimCustom', { selectedAnimId: mod.customAnimation.id });
       if (mod.colorsSequence && mod.colorsSequence.length > 0) {
         mod.colorsSequence.forEach(c => addScratchBlock('color', { color: c }));
       } else if (mod.bgColor) {
@@ -2250,8 +2542,13 @@
       if (mod.blinkColors) addScratchBlock('blinkColors', { blinkColors: mod.blinkColors });
       if (mod.fontSize) addScratchBlock('fontSize', { fontSize: mod.fontSize });
       if (mod.rotateAvatarDeg) addScratchBlock('rotateAvatar', { rotateAvatarDeg: mod.rotateAvatarDeg });
+      if (mod.cardBorderColor) addScratchBlock('cardBorderColor', { cardBorderColor: mod.cardBorderColor });
+      if (mod.cardRadius) addScratchBlock('cardRadius', { cardRadius: mod.cardRadius });
       if (mod.clickSound) addScratchBlock('clickSound', { clickSound: mod.clickSound });
       if (mod.snowEffect) addScratchBlock('snowEffect', { snowEffect: mod.snowEffect });
+      if (mod.headerBg) addScratchBlock('headerBg', { headerBg: mod.headerBg });
+      if (mod.logoColor) addScratchBlock('logoColor', { logoColor: mod.logoColor });
+      if (mod.inputBg) addScratchBlock('inputBg', { inputBg: mod.inputBg });
 
       document.getElementById('modal-create-mod').classList.remove('hidden');
     };
@@ -2283,14 +2580,25 @@
       let blinkColors = null;
       let fontSize = null;
       let rotateAvatarDeg = null;
+      let cardBorderColor = null;
+      let cardRadius = null;
       let clickSound = false;
       let snowEffect = false;
+      let headerBg = null;
+      let logoColor = null;
+      let inputBg = null;
+      let customAnimation = null;
 
       blockEls.forEach(el => {
         const type = el.getAttribute('data-type');
         if (type === 'time') {
           const val = parseFloat(el.querySelector('.block-time-val').value);
           if (!isNaN(val) && val > 0) intervalSeconds = val;
+        } else if (type === 'btnAnimCustom') {
+          const selectedId = el.querySelector('.block-animcustom-select').value;
+          if (selectedId && currentUserData && currentUserData.savedAnimations) {
+            customAnimation = currentUserData.savedAnimations.find(a => a.id === selectedId) || null;
+          }
         } else if (type === 'color') {
           colorsSequence.push(el.querySelector('.block-color-val').value);
         } else if (type === 'textColor') {
@@ -2309,16 +2617,27 @@
           fontSize = parseInt(el.querySelector('.block-fontsize-val').value);
         } else if (type === 'rotateAvatar') {
           rotateAvatarDeg = parseInt(el.querySelector('.block-rotateavatar-val').value);
+        } else if (type === 'cardBorderColor') {
+          cardBorderColor = el.querySelector('.block-cardborder-val').value;
+        } else if (type === 'cardRadius') {
+          cardRadius = parseInt(el.querySelector('.block-cardradius-val').value);
         } else if (type === 'clickSound') {
           clickSound = el.querySelector('.block-clicksound-val').value === 'true';
         } else if (type === 'snowEffect') {
           snowEffect = el.querySelector('.block-snow-val').value === 'true';
+        } else if (type === 'headerBg') {
+          headerBg = el.querySelector('.block-headerbg-val').value;
+        } else if (type === 'logoColor') {
+          logoColor = el.querySelector('.block-logocolor-val').value;
+        } else if (type === 'inputBg') {
+          inputBg = el.querySelector('.block-inputbg-val').value;
         }
       });
 
       const modPayload = {
         code, name, intervalSeconds, colorsSequence,
-        textColor, neonGlow, bgImage, btnStyle, cardOpacity, blinkColors, fontSize, rotateAvatarDeg, clickSound, snowEffect,
+        textColor, neonGlow, bgImage, btnStyle, cardOpacity, blinkColors, fontSize, rotateAvatarDeg,
+        cardBorderColor, cardRadius, clickSound, snowEffect, headerBg, logoColor, inputBg, customAnimation,
         bgColor: colorsSequence[0] || null,
         author: currentUserData.username,
         timestamp: new Date().toISOString()
