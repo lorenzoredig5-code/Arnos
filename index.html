@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arnos v2.0 - Perfil Corrigido & Layout Responsivo</title>
+  <title>Arnos v2.0 - Edição de Mods em Blocos</title>
   <style>
     /* RESET & BASE STYLES */
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -161,7 +161,7 @@
     nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
 
-    /* BADGES DA CONTA ARNOS (DONO, BOT & DEV) */
+    /* BADGES DA CONTA ARNOS */
     .badge-square {
       display: inline-block; padding: 2px 6px; font-size: 10px; font-weight: bold;
       border-radius: 4px; margin-left: 4px; vertical-align: middle; color: #ffffff; text-transform: uppercase;
@@ -738,14 +738,16 @@
     </div>
   </div>
 
-  <!-- MODAL: CRIAR MOD EM BLOCOS (COM TODOS OS 10 NOVOS BLOCOS ARNOS) -->
+  <!-- MODAL: CRIAR / EDITAR MOD EM BLOCOS -->
   <div id="modal-create-mod" class="modal-overlay hidden">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>🧩 Criador de Mod Avançado (Blocos Scratch v2.0)</h3>
+        <h3 id="mod-modal-title">🧩 Criador de Mod Avançado (Blocos Scratch v2.0)</h3>
         <button onclick="closeCreateModModal()">✕</button>
       </div>
       <div class="modal-body">
+        <input type="hidden" id="mod-editing-id" value="">
+
         <label style="font-size: 12px; font-weight: bold;">Código / ID do Mod (Único) *</label>
         <input type="text" id="mod-create-code" placeholder="Ex: mod_supremo_arnos" dir="ltr">
 
@@ -2032,7 +2034,10 @@
                 <strong>${escapeHtml(m.name)}</strong> (Código: <code>${escapeHtml(m.code)}</code>)
                 <br><span style="font-size:11px; color:#70757a;">Criado em ${new Date(m.timestamp).toLocaleDateString()}</span>
               </div>
-              <button class="btn-danger" style="padding:4px 10px; font-size:11px;" onclick="deleteMyMod('${m.id}')">🗑️ Apagar Mod</button>
+              <div style="display:flex; gap:6px;">
+                <button class="btn-primary" style="padding:4px 10px; font-size:11px;" onclick="openEditModModal('${m.id}')">✏️ Editar Blocos</button>
+                <button class="btn-danger" style="padding:4px 10px; font-size:11px;" onclick="deleteMyMod('${m.id}')">🗑️ Apagar Mod</button>
+              </div>
             `;
             createdContainer.appendChild(div);
           });
@@ -2075,7 +2080,7 @@
     };
 
     /* SISTEMA COMPLETO DOS 10 BLOCOS SCRATCH NO CRIADOR DE MODS */
-    window.addScratchBlock = function(type) {
+    window.addScratchBlock = function(type, initialData = {}) {
       const container = document.getElementById('scratch-blocks-container');
       const id = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
 
@@ -2085,92 +2090,105 @@
       if (type === 'time') {
         div.className = 'scratch-block-item';
         div.setAttribute('data-type', 'time');
+        const val = initialData.intervalSeconds !== undefined ? initialData.intervalSeconds : 2;
         div.innerHTML = `
-          <span>⏳ repita Cada <input type="number" class="block-time-val" value="2" min="1" max="60"> Segundos então...</span>
+          <span>⏳ repita Cada <input type="number" class="block-time-val" value="${val}" min="1" max="60"> Segundos então...</span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'color') {
         div.className = 'scratch-block-item color-block';
         div.setAttribute('data-type', 'color');
+        const colorVal = initialData.color || '#101c33';
         div.innerHTML = `
-          <span>🎨 Mudar cor do fundo para: <input type="color" class="block-color-val" value="#101c33"></span>
+          <span>🎨 Mudar cor do fundo para: <input type="color" class="block-color-val" value="${colorVal}"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'textColor') {
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'textColor');
+        const colorVal = initialData.textColor || '#1a73e8';
         div.innerHTML = `
-          <span>🔤 (1) Mudar Cor do Texto para: <input type="color" class="block-textcolor-val" value="#1a73e8"></span>
+          <span>🔤 (1) Mudar Cor do Texto para: <input type="color" class="block-textcolor-val" value="${colorVal}"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'neonGlow') {
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'neonGlow');
+        const isNeon = initialData.neonGlow !== undefined ? String(initialData.neonGlow) : 'true';
         div.innerHTML = `
           <span>✨ (2) Aplicar Brilho Neon nos Cards: 
-            <select class="block-neon-val"><option value="true">Ligado</option><option value="false">Desligado</option></select>
+            <select class="block-neon-val"><option value="true" ${isNeon === 'true' ? 'selected' : ''}>Ligado</option><option value="false" ${isNeon === 'false' ? 'selected' : ''}>Desligado</option></select>
           </span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'bgImage') {
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'bgImage');
+        const imgUrl = initialData.bgImage || '';
         div.innerHTML = `
-          <span>🖼️ (3) Imagem de Fundo (URL): <input type="text" class="block-bgimage-val" placeholder="https://..." style="width:160px !important;"></span>
+          <span>🖼️ (3) Imagem de Fundo (URL): <input type="text" class="block-bgimage-val" value="${escapeHtml(imgUrl)}" placeholder="https://..." style="width:160px !important;"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'btnStyle') {
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'btnStyle');
+        const btnSt = initialData.btnStyle || 'rounded';
         div.innerHTML = `
           <span>🔘 (4) Formato dos Botões: 
-            <select class="block-btnstyle-val"><option value="rounded">Redondo (Liquid)</option><option value="squared">Quadrado Flutuante</option></select>
+            <select class="block-btnstyle-val"><option value="rounded" ${btnSt === 'rounded' ? 'selected' : ''}>Redondo (Liquid)</option><option value="squared" ${btnSt === 'squared' ? 'selected' : ''}>Quadrado Flutuante</option></select>
           </span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'cardOpacity') {
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'cardOpacity');
+        const opVal = initialData.cardOpacity !== undefined ? initialData.cardOpacity : 90;
         div.innerHTML = `
-          <span>👻 (5) Transparência dos Cards: <input type="number" class="block-cardopacity-val" value="90" min="10" max="100">%</span>
+          <span>👻 (5) Transparência dos Cards: <input type="number" class="block-cardopacity-val" value="${opVal}" min="10" max="100">%</span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'blinkColors') {
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'blinkColors');
+        const c1 = (initialData.blinkColors && initialData.blinkColors[0]) || '#ff0000';
+        const c2 = (initialData.blinkColors && initialData.blinkColors[1]) || '#0000ff';
         div.innerHTML = `
-          <span>🚨 (6) Piscar Cores Alternadas: <input type="color" class="block-blink1-val" value="#ff0000"> e <input type="color" class="block-blink2-val" value="#0000ff"></span>
+          <span>🚨 (6) Piscar Cores Alternadas: <input type="color" class="block-blink1-val" value="${c1}"> e <input type="color" class="block-blink2-val" value="${c2}"></span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'fontSize') {
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'fontSize');
+        const fsVal = initialData.fontSize || 15;
         div.innerHTML = `
-          <span>🔠 (7) Tamanho da Fonte: <input type="number" class="block-fontsize-val" value="15" min="10" max="24"> px</span>
+          <span>🔠 (7) Tamanho da Fonte: <input type="number" class="block-fontsize-val" value="${fsVal}" min="10" max="24"> px</span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'rotateAvatar') {
         div.className = 'scratch-block-item visual-block';
         div.setAttribute('data-type', 'rotateAvatar');
+        const rotVal = initialData.rotateAvatarDeg || 15;
         div.innerHTML = `
-          <span>🔄 (8) Girar Fotos dos Perfis: <input type="number" class="block-rotateavatar-val" value="15" min="-360" max="360"> Graus</span>
+          <span>🔄 (8) Girar Fotos dos Perfis: <input type="number" class="block-rotateavatar-val" value="${rotVal}" min="-360" max="360"> Graus</span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'clickSound') {
         div.className = 'scratch-block-item audio-block';
         div.setAttribute('data-type', 'clickSound');
+        const isSnd = initialData.clickSound !== undefined ? String(initialData.clickSound) : 'true';
         div.innerHTML = `
           <span>🔊 (9) Som ao Clicar em Qualquer Botão: 
-            <select class="block-clicksound-val"><option value="true">Ativado</option><option value="false">Desativado</option></select>
+            <select class="block-clicksound-val"><option value="true" ${isSnd === 'true' ? 'selected' : ''}>Ativado</option><option value="false" ${isSnd === 'false' ? 'selected' : ''}>Desativado</option></select>
           </span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
       } else if (type === 'snowEffect') {
         div.className = 'scratch-block-item audio-block';
         div.setAttribute('data-type', 'snowEffect');
+        const isSnow = initialData.snowEffect !== undefined ? String(initialData.snowEffect) : 'true';
         div.innerHTML = `
           <span>❄️ (10) Efeito Neve / Partículas no Fundo: 
-            <select class="block-snow-val"><option value="true">Ligado</option><option value="false">Desligado</option></select>
+            <select class="block-snow-val"><option value="true" ${isSnow === 'true' ? 'selected' : ''}>Ligado</option><option value="false" ${isSnow === 'false' ? 'selected' : ''}>Desligado</option></select>
           </span>
           <button type="button" class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="removeScratchBlock('${id}')">✕</button>
         `;
@@ -2185,7 +2203,10 @@
     };
 
     window.openCreateModModal = function() {
+      document.getElementById('mod-modal-title').innerText = "🧩 Criador de Mod Avançado (Blocos Scratch v2.0)";
+      document.getElementById('mod-editing-id').value = '';
       document.getElementById('mod-create-code').value = '';
+      document.getElementById('mod-create-code').disabled = false;
       document.getElementById('mod-create-name').value = '';
       document.getElementById('scratch-blocks-container').innerHTML = '';
       
@@ -2197,19 +2218,58 @@
       document.getElementById('modal-create-mod').classList.remove('hidden');
     };
 
+    /* EDITAR MOD EXISTENTE (APENAS O CRIADOR/DONO DO MOD) */
+    window.openEditModModal = function(modId) {
+      const mod = modsList.find(m => m.id === modId);
+      if (!mod || !currentUserData) return;
+      if (mod.author.toLowerCase() !== currentUserData.username.toLowerCase()) return alert("Você apenas pode editar os seus próprios mods.");
+
+      document.getElementById('mod-modal-title').innerText = `✏️ Editar Mod: ${mod.name}`;
+      document.getElementById('mod-editing-id').value = mod.id;
+      document.getElementById('mod-create-code').value = mod.code;
+      document.getElementById('mod-create-code').disabled = true; // Código/ID não muda
+      document.getElementById('mod-create-name').value = mod.name;
+
+      const container = document.getElementById('scratch-blocks-container');
+      container.innerHTML = '';
+
+      // Reconstruir os blocos salvos do mod
+      if (mod.intervalSeconds) addScratchBlock('time', { intervalSeconds: mod.intervalSeconds });
+      
+      if (mod.colorsSequence && mod.colorsSequence.length > 0) {
+        mod.colorsSequence.forEach(c => addScratchBlock('color', { color: c }));
+      } else if (mod.bgColor) {
+        addScratchBlock('color', { color: mod.bgColor });
+      }
+
+      if (mod.textColor) addScratchBlock('textColor', { textColor: mod.textColor });
+      if (mod.neonGlow) addScratchBlock('neonGlow', { neonGlow: mod.neonGlow });
+      if (mod.bgImage) addScratchBlock('bgImage', { bgImage: mod.bgImage });
+      if (mod.btnStyle) addScratchBlock('btnStyle', { btnStyle: mod.btnStyle });
+      if (mod.cardOpacity !== undefined && mod.cardOpacity !== null) addScratchBlock('cardOpacity', { cardOpacity: mod.cardOpacity });
+      if (mod.blinkColors) addScratchBlock('blinkColors', { blinkColors: mod.blinkColors });
+      if (mod.fontSize) addScratchBlock('fontSize', { fontSize: mod.fontSize });
+      if (mod.rotateAvatarDeg) addScratchBlock('rotateAvatar', { rotateAvatarDeg: mod.rotateAvatarDeg });
+      if (mod.clickSound) addScratchBlock('clickSound', { clickSound: mod.clickSound });
+      if (mod.snowEffect) addScratchBlock('snowEffect', { snowEffect: mod.snowEffect });
+
+      document.getElementById('modal-create-mod').classList.remove('hidden');
+    };
+
     window.closeCreateModModal = function() {
       document.getElementById('modal-create-mod').classList.add('hidden');
     };
 
     window.saveCreatedMod = async function() {
+      const editingId = document.getElementById('mod-editing-id').value;
       const code = document.getElementById('mod-create-code').value.trim();
       const name = document.getElementById('mod-create-name').value.trim();
 
       if (!code || !name || !currentUserData) return alert("Preencha o código e o nome do mod.");
 
-      const exists = modsList.some(m => m.code.toLowerCase() === code.toLowerCase());
-      if (exists) {
-        return alert("❌ Erro: Este código de mod já existe! Escolha outro código.");
+      if (!editingId) {
+        const exists = modsList.some(m => m.code.toLowerCase() === code.toLowerCase());
+        if (exists) return alert("❌ Erro: Este código de mod já existe! Escolha outro código.");
       }
 
       const blockEls = document.querySelectorAll('#scratch-blocks-container .scratch-block-item');
@@ -2256,18 +2316,25 @@
         }
       });
 
+      const modPayload = {
+        code, name, intervalSeconds, colorsSequence,
+        textColor, neonGlow, bgImage, btnStyle, cardOpacity, blinkColors, fontSize, rotateAvatarDeg, clickSound, snowEffect,
+        bgColor: colorsSequence[0] || null,
+        author: currentUserData.username,
+        timestamp: new Date().toISOString()
+      };
+
       try {
-        await addDoc(publicModsColl(), {
-          code, name, intervalSeconds, colorsSequence,
-          textColor, neonGlow, bgImage, btnStyle, cardOpacity, blinkColors, fontSize, rotateAvatarDeg, clickSound, snowEffect,
-          bgColor: colorsSequence[0] || null,
-          author: currentUserData.username,
-          timestamp: new Date().toISOString()
-        });
+        if (editingId) {
+          await updateDoc(publicModDoc(editingId), modPayload);
+          alert("Mod atualizado com sucesso!");
+        } else {
+          await addDoc(publicModsColl(), modPayload);
+          alert("Mod completo publicado com sucesso!");
+        }
         closeCreateModModal();
-        alert("Mod completo publicado com sucesso!");
         renderModsView();
-      } catch(e) { alert("Erro ao criar o mod."); }
+      } catch(e) { alert("Erro ao salvar o mod."); }
     };
 
     window.deleteMyMod = async function(modId) {
