@@ -161,6 +161,33 @@
     nav { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .nav-user { font-weight: bold; font-size: 13px; cursor: pointer; color: #1a73e8; text-decoration: underline; }
 
+    /* BOTÃO DE NOTIFICAÇÃO EM CÍRCULO */
+    .notification-circle-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      padding: 0;
+      position: relative;
+      font-size: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .notification-badge-counter {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background-color: #d93025;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      padding: 1px 5px;
+      font-size: 10px;
+      font-weight: bold;
+      min-width: 18px;
+      text-align: center;
+    }
+
     /* BADGES DA CONTA ARNOS */
     .badge-square {
       display: inline-block; padding: 2px 6px; font-size: 10px; font-weight: bold;
@@ -350,7 +377,18 @@
       <button onclick="navigateTo('feed')">Home</button>
       <button onclick="navigateTo('groups')">👥 Grupos</button>
       <button onclick="navigateTo('marketplace')">🛍️ Arnos Shop</button>
-      <button onclick="navigateTo('mods')">🧩 Mods</button>
+      <div style="display:inline-flex; flex-direction:column; align-items:center; vertical-align:middle;">
+        <button onclick="navigateTo('mods')">🧩 Mods</button>
+        <span style="font-size: 10px; font-weight: bold; color: #1a73e8; margin-top: 2px;">beta</span>
+      </div>
+      
+      <!-- BOTÃO DE NOTIFICAÇÃO EM CÍRCULO COM EMOJI E CONTADOR -->
+      <button class="notification-circle-btn btn-primary" onclick="openNotificationsModal()" title="Notificações">
+        🔔
+        <span id="global-notification-counter" class="notification-badge-counter hidden">0</span>
+      </button>
+
+      <button onclick="navigateTo('marketplace')">🛍️ Arnos Shop</button> <!-- (Mantido original) -->
       
       <div class="badge-container">
         <button onclick="navigateTo('messages')">Mensagens</button>
@@ -364,6 +402,34 @@
       <button onclick="logout()">Log out</button>
     </nav>
   </header>
+
+  <!-- MODAL DE AVISO DE MOD DESCONHECIDO -->
+  <div id="modal-unknown-mod-warning" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 420px; text-align: center; padding: 10px;">
+      <div class="modal-body">
+        <h3 style="color: #d93025; margin-bottom: 12px;">⚠️ Aviso, você está rodando um mod desconhecido</h3>
+        <p style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">Deseja continuar?</p>
+        <p style="font-size: 13px; color: #5f6368; margin-bottom: 20px;">Esse mod editará seu site inteiro</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="btn-danger" onclick="cancelActiveModForUser()" style="flex: 1;">Cancelar mod</button>
+          <button class="btn-primary" onclick="closeUnknownModWarning()" style="flex: 1;">Continuar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE TODAS AS NOTIFICAÇÕES -->
+  <div id="modal-notifications" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>🔔 Notificações</h3>
+        <button onclick="closeNotificationsModal()">✕</button>
+      </div>
+      <div class="modal-body" id="notifications-modal-content-list">
+        <!-- Lista de notificações -->
+      </div>
+    </div>
+  </div>
 
   <!-- CONTAINER PRINCIPAL -->
   <div class="container">
@@ -544,6 +610,17 @@
           <span class="badge-square badge-bot">Bot</span>
         </h2>
         <p style="font-size: 13px; color: #5f6368; margin-bottom: 16px;">Gestão exclusiva para as contas de administração <strong>arnos / lorenzo</strong>.</p>
+
+        <!-- SECÇÃO DE ENVIO DE NOTIFICAÇÃO GLOBAL -->
+        <div style="background: #fff; padding: 16px; border-radius: 6px; border: 1px solid #dadce0; margin-bottom: 16px;">
+          <h3 style="font-size: 14px; margin-bottom: 8px;">📢 Enviar Notificação Global para Todos</h3>
+          <input type="text" id="adm-notif-text" placeholder="Texto da notificação (ex: Nova atualização disponível!)" dir="ltr">
+          <input type="text" id="adm-notif-img" placeholder="Link de imagem opcional (https://...)" dir="ltr">
+          <button class="btn-primary" onclick="adminSendGlobalNotification()" style="width: 100%;">Enviar Notificação para Todo Mundo</button>
+          
+          <h4 style="font-size: 13px; margin: 12px 0 6px 0;">Histórico de Notificações Enviadas (Apagar remove para todos):</h4>
+          <div id="adm-sent-notifications-history" style="max-height: 180px; overflow-y: auto;"></div>
+        </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
           <div style="background: #fff; padding: 12px; border-radius: 6px; border: 1px solid #dadce0;">
@@ -770,20 +847,13 @@
         <h4 style="margin: 12px 0 6px 0; font-size: 13px; color: #1a73e8;">🧩 Adicionar Blocos Scratch ao Mod:</h4>
         
         <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
-          <!-- BLOCO NOVO SOLICITADO: QUANDO COMEÇAR A CENA / EDITAR LOGO -->
           <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px; background:#00897b;" onclick="addScratchBlock('whenSceneStarts')">🟢 Quando começar a cena [Editar Logo]</button>
-
-          <!-- BLOCOS DE BOTÕES E EVENTOS -->
           <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('createButton')">🔘 Criar Botão [ID] [Texto]</button>
           <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('clickButtonEvent')">⚡ Ao apertar botão [ID], então:</button>
           <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('actionGoogleToast')">💬 Mostrar Aviso Google [Msg]</button>
           <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('actionOpenUrl')">🌐 Abrir Página Web [URL]</button>
-
-          <!-- CONTROLE E ANIMAÇÃO -->
           <button type="button" class="btn-primary" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('time')">+ Tempo (Cada <> seg)</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('btnAnimCustom')">🎬 Animação Botão Toque</button>
-
-          <!-- DESIGN E CORES -->
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('color')">+ Cor Fundo Fixo</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('textColor')">🔤 Cor do Texto</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('neonGlow')">✨ Brilho Neon Cards</button>
@@ -792,13 +862,9 @@
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('cardOpacity')">👻 Transparência Cards</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('blinkColors')">🚨 Piscar Cores</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('fontSize')">🔠 Tamanho da Fonte</button>
-
-          <!-- AVATARES E BORDA -->
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('rotateAvatar')">🔄 Girar Fotos Perfil</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('cardBorderColor')">🖼️ Cor Borda Cards</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('cardRadius')">📐 Arredondar Cards</button>
-
-          <!-- SOM E PARTÍCULAS -->
           <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('clickSound')">🔊 Som ao Clicar</button>
           <button type="button" class="btn-success" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('snowEffect')">❄️ Neve / Partículas</button>
           <button type="button" class="btn-purple" style="font-size:11px; padding:4px 8px;" onclick="addScratchBlock('headerBg')">🔝 Cor Fundo Header</button>
@@ -1035,6 +1101,7 @@
     let groupPostsList = [];
     let modsList = [];
     let devRequestsList = [];
+    let notificationsList = [];
     let activeGroupId = null;
     let currentProfileUsername = null;
     let activeOpenedPostId = null;
@@ -1057,7 +1124,6 @@
     let modClickSoundEnabled = false;
     let activeModAnimationData = null;
 
-    // HISTÓRICO DE ANIMAÇÕES LOCAIS DE BOTÃO
     let animationStudioFrames = [];
 
     async function uploadToCloudinaryGrupoApi(file) {
@@ -1080,7 +1146,6 @@
       });
     }
 
-    /* RESET DE EFEITOS DE MODS */
     function resetModEffects() {
       if (modAnimationTimer) { clearInterval(modAnimationTimer); modAnimationTimer = null; }
       if (modSnowInterval) { clearInterval(modSnowInterval); modSnowInterval = null; }
@@ -1107,22 +1172,24 @@
       const logo = document.getElementById('logo-text-display');
       if (logo) {
         logo.style.color = '';
-        logo.innerText = 'Arnos'; // Restaura o texto original da logo
+        logo.innerText = 'Arnos';
       }
 
       const customBtnsContainer = document.getElementById('mod-custom-header-buttons-container');
       if (customBtnsContainer) customBtnsContainer.innerHTML = '';
     }
 
-    /* APLICAR MOD ATIVO COMPLETO E RENDERIZAR LOGO/BOTÕES */
     function applyActiveMod() {
       resetModEffects();
 
       if (!currentUserData || !currentUserData.activeModCode) return;
       const mod = modsList.find(m => m.code.toLowerCase() === currentUserData.activeModCode.toLowerCase());
-      if (!mod) return;
+      if (!mod) {
+        // Se o mod ativo não for encontrado na lista oficial, é um mod desconhecido!
+        document.getElementById('modal-unknown-mod-warning').classList.remove('hidden');
+        return;
+      }
 
-      // EXECUTAR O BLOCO "QUANDO COMEÇAR A CENA" / EDITAR LOGO
       if (mod.sceneLogoText) {
         const logo = document.getElementById('logo-text-display');
         if (logo) logo.innerText = mod.sceneLogoText;
@@ -1173,7 +1240,6 @@
         document.querySelectorAll('input, textarea, select').forEach(i => i.style.backgroundColor = mod.inputBg);
       }
 
-      // RENDERIZAR BOTÕES CRIADOS NO MOD (MÁXIMO 3 + BOTÃO "VER MAIS")
       renderModCustomButtonsInHeader(mod);
 
       if (mod.blinkColors && mod.blinkColors.length >= 2) {
@@ -1195,6 +1261,148 @@
       } else if (mod.bgColor) {
         document.body.style.backgroundColor = mod.bgColor;
       }
+    }
+
+    // FUNÇÕES DO AVISO E CANCELAR MOD
+    window.closeUnknownModWarning = function() {
+      document.getElementById('modal-unknown-mod-warning').classList.add('hidden');
+    };
+
+    window.cancelActiveModForUser = async function() {
+      if (!currentUserData) return;
+      try {
+        await updateDoc(publicUserDoc(currentUserData.username), { activeModCode: null });
+        currentUserData.activeModCode = null;
+        resetModEffects();
+        closeUnknownModWarning();
+        alert("Mod cancelado apenas para você!");
+      } catch(e) {}
+    };
+
+    // SISTEMA DE NOTIFICAÇÕES (COLEÇÕES E LÓGICA)
+    const publicNotificationsColl = () => collection(db, 'artifacts', appId, 'public', 'data', 'notifications');
+    const publicNotificationDoc = (id) => doc(db, 'artifacts', appId, 'public', 'data', 'notifications', id);
+
+    async function triggerNotification(targetUsername, titleText, type, referenceId = null, imageUrl = null) {
+      if (!targetUsername) return;
+      try {
+        await addDoc(publicNotificationsColl(), {
+          recipient: targetUsername.toLowerCase(),
+          text: titleText,
+          type: type, // 'like', 'comment', 'message', 'global'
+          referenceId: referenceId,
+          imageUrl: imageUrl || '',
+          read: false,
+          timestamp: new Date().toISOString()
+        });
+
+        // Verificar se é para a conta "lorenzo" e duplicar no painel de admin / notificação específica se necessário
+        if (targetUsername.toLowerCase() !== 'lorenzo') {
+          // Opcional: notificar admin se for relevante
+        }
+      } catch(e) {}
+    }
+
+    window.adminSendGlobalNotification = async function() {
+      const text = document.getElementById('adm-notif-text').value.trim();
+      const imageUrl = document.getElementById('adm-notif-img').value.trim();
+      if (!text) return alert("Digite o texto da notificação!");
+
+      try {
+        await addDoc(publicNotificationsColl(), {
+          recipient: 'all',
+          text: text,
+          type: 'global',
+          referenceId: null,
+          imageUrl: imageUrl,
+          read: false,
+          timestamp: new Date().toISOString()
+        });
+        document.getElementById('adm-notif-text').value = '';
+        document.getElementById('adm-notif-img').value = '';
+        alert("Notificação enviada para todo mundo!");
+      } catch(e) { alert("Erro ao enviar notificação."); }
+    };
+
+    window.deleteGlobalNotification = async function(notifId) {
+      if (!confirm("Apagar esta notificação para todos?")) return;
+      try {
+        await deleteDoc(publicNotificationDoc(notifId));
+      } catch(e) {}
+    };
+
+    window.openNotificationsModal = async function() {
+      if (!currentUserData) return;
+      renderNotificationsModalContent();
+      document.getElementById('modal-notifications').classList.remove('hidden');
+
+      // Marcar notificações como lidas
+      notificationsList.forEach(n => {
+        if ((n.recipient === 'all' || n.recipient === currentUserData.username.toLowerCase()) && !n.read) {
+          updateDoc(publicNotificationDoc(n.id), { read: true }).catch(() => {});
+        }
+      });
+    };
+
+    window.closeNotificationsModal = function() {
+      document.getElementById('modal-notifications').classList.add('hidden');
+      updateNotificationsBadge();
+    };
+
+    function updateNotificationsBadge() {
+      if (!currentUserData) return;
+      const myUser = currentUserData.username.toLowerCase();
+      const unreadCount = notificationsList.filter(n => 
+        (n.recipient === 'all' || n.recipient === myUser) && !n.read
+      ).length;
+
+      const badge = document.getElementById('global-notification-counter');
+      if (unreadCount > 0) {
+        badge.innerText = unreadCount;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function renderNotificationsModalContent() {
+      const container = document.getElementById('notifications-modal-content-list');
+      container.innerHTML = '';
+      if (!currentUserData) return;
+
+      const myUser = currentUserData.username.toLowerCase();
+      const myNotifs = notificationsList.filter(n => n.recipient === 'all' || n.recipient === myUser);
+      myNotifs.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      if (myNotifs.length === 0) {
+        container.innerHTML = '<p style="color:#70757a; font-size:13px; text-align:center;">Sem notificações no momento.</p>';
+        return;
+      }
+
+      myNotifs.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.cssText = 'padding: 10px; margin-bottom: 8px; cursor: pointer;';
+        
+        let clickAction = '';
+        if (n.type === 'like' || n.type === 'comment') {
+          clickAction = `onclick="closeNotificationsModal(); openPostModal('${n.referenceId}')"`;
+        } else if (n.type === 'message') {
+          clickAction = `onclick="closeNotificationsModal(); navigateTo('messages')"`;
+        }
+
+        div.setAttribute('onclick', clickAction.replace('onclick="', '').slice(0, -1));
+
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:13px; color:#1a73e8;">🔔 ${escapeHtml(n.text)}</strong>
+            <span style="font-size:10px; color:#70757a;">${new Date(n.timestamp).toLocaleTimeString()}</span>
+          </div>
+          ${n.imageUrl ? `<img src="${escapeHtml(n.imageUrl)}" style="max-width:100%; max-height:120px; border-radius:6px; margin-top:6px;">` : ''}
+          ${(myUser === 'arnos' || myUser === 'lorenzo') && n.recipient === 'all' ? `<button class="btn-danger" style="padding:2px 6px; font-size:10px; margin-top:6px;" onclick="deleteGlobalNotification('${n.id}')">Apagar para Todos</button>` : ''}
+        `;
+        container.appendChild(div);
+      });
     }
 
     function renderModCustomButtonsInHeader(mod) {
@@ -1342,7 +1550,6 @@
       }
     }
 
-    /* EXECUTAR ANIMAÇÃO CUSTOMIZADA EM QUADROS AO CLICAR */
     function runButtonFramesAnimation(btnElement, framesData) {
       if (!btnElement || !framesData || framesData.length === 0) return;
       let currentFrame = 0;
@@ -1650,6 +1857,13 @@
         snap.forEach(d => devRequestsList.push({ id: d.id, ...d.data() }));
         if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminPanel();
       });
+
+      onSnapshot(publicNotificationsColl(), (snap) => {
+        notificationsList = [];
+        snap.forEach(d => notificationsList.push({ id: d.id, ...d.data() }));
+        updateNotificationsBadge();
+        if (!document.getElementById('view-admin').classList.contains('hidden')) renderAdminPanel();
+      });
     }
 
     function calculatePendingEarnings(item) {
@@ -1864,6 +2078,24 @@
       document.getElementById('adm-total-posts').innerText = postsList.length;
       document.getElementById('adm-total-products').innerText = productsList.length;
 
+      // Renderizar histórico de notificações globais enviadas para poder apagar
+      const sentHistoryDiv = document.getElementById('adm-sent-notifications-history');
+      sentHistoryDiv.innerHTML = '';
+      const globalNotifs = notificationsList.filter(n => n.recipient === 'all' && n.type === 'global');
+      if (globalNotifs.length === 0) {
+        sentHistoryDiv.innerHTML = '<p style="font-size:12px; color:#70757a;">Nenhuma notificação global ativa.</p>';
+      } else {
+        globalNotifs.forEach(n => {
+          const div = document.createElement('div');
+          div.style.cssText = 'padding: 6px; border-bottom: 1px solid #eee; display:flex; justify-content:space-between; align-items:center; font-size:12px;';
+          div.innerHTML = `
+            <span>${escapeHtml(n.text)}</span>
+            <button class="btn-danger" style="padding:2px 6px; font-size:10px;" onclick="deleteGlobalNotification('${n.id}')">Apagar</button>
+          `;
+          sentHistoryDiv.appendChild(div);
+        });
+      }
+
       const devReqsDiv = document.getElementById('adm-dev-requests-list');
       devReqsDiv.innerHTML = devRequestsList.length === 0 ? '<p style="font-size:12px; color:#70757a;">Nenhuma solicitação de dev pendente.</p>' : '';
 
@@ -2074,7 +2306,6 @@
         currentProfileUsername = arg || currentUserData.username;
         renderProfile(currentProfileUsername);
       }
-      // Reaplicar mod se estiver ativo para garantir que o bloco "Quando começar a cena" atualize a logo
       if (currentUserData && currentUserData.activeModCode) {
         applyActiveMod();
       }
@@ -2276,7 +2507,6 @@
       } catch(e) {}
     };
 
-    /* SISTEMA DE BLOCOS SCRATCH NO CRIADOR DE MODS */
     window.addScratchBlock = function(type, initialData = {}) {
       const container = document.getElementById('scratch-blocks-container');
       const id = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
@@ -2435,7 +2665,6 @@
       });
     }
 
-    /* CRIADOR DE ANIMAÇÃO POR QUADROS (FRAMES STUDIO) */
     let currentEditingBlockIdForAnim = null;
 
     window.openAnimationStudioModal = function(blockId) {
@@ -3191,6 +3420,10 @@
           sender: currentUserData.username, buyer: currentUserData.username, seller: otherUser,
           productName: prodName, message: msg, timestamp: new Date().toISOString(), read: false
         });
+
+        // Trigger notification for message
+        await triggerNotification(otherUser, `${currentUserData.username} mandou mensagem para você`, 'message', null);
+
         input.value = '';
       } catch (e) {}
     };
@@ -3206,6 +3439,7 @@
           sender: currentUserData.username, buyer: currentUserData.username, seller: otherUser,
           productName: prodName, message: '', memeUrl, timestamp: new Date().toISOString(), read: false
         });
+        await triggerNotification(otherUser, `${currentUserData.username} mandou mensagem para você`, 'message', null);
       } catch(e) {}
     }
 
@@ -3227,6 +3461,7 @@
           sender: currentUserData.username, buyer: currentUserData.username, seller: targetUser,
           productName: '[Perfil]', message: text, timestamp: new Date().toISOString(), read: false
         });
+        await triggerNotification(targetUser, `${currentUserData.username} mandou mensagem para você`, 'message', null);
         closeDirectMsgModal();
         alert(`Mensagem enviada para ${targetUser}!`);
         navigateTo('messages');
@@ -3241,6 +3476,7 @@
           productName: productName, message: `Olá! Tenho interesse no seu produto ${productName}.`,
           timestamp: new Date().toISOString(), read: false
         });
+        await triggerNotification(sellerName, `${currentUserData.username} mandou mensagem para você`, 'message', null);
         navigateTo('messages');
       } catch (e) { alert("Erro ao iniciar chat."); }
     };
@@ -3365,7 +3601,14 @@
 
       let comments = post.comments ? [...post.comments] : [];
       comments.push({ id: 'c_' + Date.now(), author: currentUserData.username, text, timestamp: new Date().toISOString() });
-      try { await updateDoc(publicPostDoc(postId), { comments }); input.value = ''; } catch (e) {}
+      try {
+        await updateDoc(publicPostDoc(postId), { comments });
+        // Trigger notification for comment
+        if (post.author.toLowerCase() !== currentUserData.username.toLowerCase()) {
+          await triggerNotification(post.author, `${currentUserData.username} comentou no seu post`, 'comment', postId);
+        }
+        input.value = '';
+      } catch (e) {}
     }
 
     async function addCommentFromModalWithMeme(postId, memeUrl) {
@@ -3374,7 +3617,12 @@
       if (!post) return;
       let comments = post.comments ? [...post.comments] : [];
       comments.push({ id: 'c_' + Date.now(), author: currentUserData.username, text: '', memeUrl, timestamp: new Date().toISOString() });
-      try { await updateDoc(publicPostDoc(postId), { comments }); } catch (e) {}
+      try {
+        await updateDoc(publicPostDoc(postId), { comments });
+        if (post.author.toLowerCase() !== currentUserData.username.toLowerCase()) {
+          await triggerNotification(post.author, `${currentUserData.username} comentou no seu post`, 'comment', postId);
+        }
+      } catch (e) {}
     }
 
     window.deleteComment = async function(postId, commentId) {
@@ -3447,8 +3695,17 @@
       if (!post) return;
       let likes = post.likes ? [...post.likes] : [];
       const myUser = currentUserData.username;
-      if (likes.includes(myUser)) likes = likes.filter(u => u !== myUser);
-      else likes.push(myUser);
+      
+      const isLiking = !likes.includes(myUser);
+      if (isLiking) {
+        likes.push(myUser);
+        if (post.author.toLowerCase() !== myUser.toLowerCase()) {
+          await triggerNotification(post.author, `${myUser} curtiu seu post`, 'like', postId);
+        }
+      } else {
+        likes = likes.filter(u => u !== myUser);
+      }
+
       try { await updateDoc(publicPostDoc(postId), { likes }); } catch (e) {}
     };
 
